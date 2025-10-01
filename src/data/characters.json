@@ -1,0 +1,66 @@
+[
+    {
+        "id": 1,
+        "name": "Leandros",
+        "rarity": "",
+        "class": "Warrior",
+        "fragment": "Aethelgard",
+        "images": [
+            "/img/characters/Aethelgard-Leandros01.png",
+            "/img/characters/Aethelgard-Leandros02.png",
+            "/img/characters/Aethelgard-Leandros03.png"
+        ],
+        "epitaph": "",
+        "weaponsAndEquipment": [
+            "",
+            "",
+            ""
+        ],
+        "birthday": "June 15th",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skills": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    }
+]
