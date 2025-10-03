@@ -25,6 +25,8 @@ function App() {
       <h1>Soul Echoes</h1>
 
       <p>¡Empieza el gacha!</p>
+
+      <button>¡Prueba tu suerte!</button>
     </>)
   )
 }
