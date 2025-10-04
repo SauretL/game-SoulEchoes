@@ -6,9 +6,9 @@
         "class": "Warrior",
         "fragment": "Aethelgard",
         "images": [
-            "/img/characters/Aethelgard-Leandros01.png",
-            "/img/characters/Aethelgard-Leandros02.png",
-            "/img/characters/Aethelgard-Leandros03.png"
+            "img/characters/Aethelgard-Leandros01.png",
+            "img/characters/Aethelgard-Leandros02.png",
+            "img/characters/Aethelgard-Leandros03.png"
         ],
         "epitaph": "",
         "weaponsAndEquipment": [
