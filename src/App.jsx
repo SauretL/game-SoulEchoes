@@ -1,5 +1,6 @@
 import './App.css'
-import { useState } from 'react';
+import { useEffect, useState } from 'react'
+import loadArray from './utils/loadArray.js'
 
 function App() {
 
@@ -10,6 +11,16 @@ function App() {
   const changeView = () => {
     setCurrentView(currentView === "start" ? "gacha" : "start")
   }
+
+  useEffect(() => {
+    loadArray("./public/data/characters.json")
+      .then(data => {
+        console.log("The characters are:", data)
+      })
+  },
+    []
+  )
+
 
   return (
 
