@@ -1,5 +1,6 @@
 import './App.css'
 import { useEffect, useState } from 'react'
+import GachaCards from './components/GachaCards.jsx'
 import loadArray from './utils/loadArray.js'
 
 function App() {
@@ -12,10 +13,14 @@ function App() {
     setCurrentView(currentView === "start" ? "gacha" : "start")
   }
 
+  const [characterArray, setCharacterArray] = useState([])
+
+
   useEffect(() => {
     loadArray("./public/data/characters.json")
       .then(data => {
         console.log("The characters are:", data)
+        setCharacterArray(data)
       })
   },
     []
@@ -38,6 +43,7 @@ function App() {
       <p>¡Empieza el gacha!</p>
 
       <button>¡Prueba tu suerte!</button>
+      <GachaCards arrayInicial={characterArray} />
     </>)
   )
 }

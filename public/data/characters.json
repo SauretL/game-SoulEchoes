@@ -2,7 +2,7 @@
     {
         "id": 1,
         "name": "Leandros",
-        "rarity": "",
+        "rarity": "Raro",
         "class": "Warrior",
         "fragment": "Aethelgard",
         "images": [
@@ -10,10 +10,15 @@
             "img/characters/Aethelgard-Leandros02.png",
             "img/characters/Aethelgard-Leandros03.png"
         ],
-        "epitaph": "",
-        "weaponsAndEquipment": [
-            "Dictam, la espada del juicio. Es una espada con grandes poderes divinos otorgada a Leandros por los dioses debido a su rectitud ante la ley.",
-            "Armadura del protector de La Orden. Su uniforme como mano derecha de Isolde, la Capitana de los paladines.",
+        "epitaph": "Caballero implacable, siervo fiel de los dioses y la ley.",
+        "equipmentNames": [
+            "Dictam, la espada del juicio",
+            "Armadura del protector de La Orden",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "Es una espada con grandes poderes divinos otorgada a Leandros por los dioses debido a su rectitud ante la ley.",
+            "Su uniforme como mano derecha de Isolde, la Capitana de los paladines.",
             ""
         ],
         "birthday": "June 15th",
@@ -28,13 +33,18 @@
             "Aún eran cadetes, y Valeria había dejado pasar el hurto que cometió un niño en un puesto de verduras en la ciudad. Leandros se enteró de esto y enfrentó a su compañera. Él creía que era importante que todos los crímenes fueran juzgados; no correspondía ni a Valeria ni a él decidir si un crimen tenía castigo o no. Ella le aseguró que lo que decía no tenía sentido: en algún momento él iba a tener que tomar la decisión de juzgar a alguien en el momento; no siempre podría hacer arrestos. El título que le dio la Orden le daba ese poder y responsabilidad. Ese día, los cadetes podían visitar sus hogares, y él lo hizo para despejarse luego de una intensa discusión con la joven noble. Pero al regresar a su hogar, su hermana no se encontraba; al preguntar, le informaron que Teodora había salido al campo a dar un paseo, pero ya hacía varias horas que no volvía. Luego de seguir varias pistas sobre su paradero, Leandros encontró a su hermana muerta: había sido alimento de los perros de unos bárbaros. En ese momento, todo se hizo claro para el cadete: su espada sería juez y verdugo de esos seres detestables y esas bestias del mal. Fue después de que había terminado con su trabajo y tiñó de sangre su armadura y el filo de su espada, que se dio cuenta que los dioses le obsequiaron una reliquia poderosa, y que en sus manos ya no estaba su espada común de cadete, sino que poseía a Dictam.",
             ""
         ],
-        "skills": [
-            "Discernere Nocentes, al pronunciar este comando, la espada Dictam adquiere la capacidad de ignorar barreras físicas y protecciones mágicas de poder medio que no sean de origen divino. Sin embargo, su efecto principal es discernir la culpa: corta con facilidad a personas y seres que han infringido las leyes de los dioses, mientras que encuentra impenetrable la piel de aquellos que jamás han pecado. En este estado, la hoja traspasa cualquier obstáculo físico u objeto que se interponga en su camino, a menos que esté protegido por magia avanzada o por una bendición divina. Así, puede ignorar por completo la espada de su contrincante y la armadura que lleva puesta para atacar al oponente directamente.",
-            "Avercio Execratio, es el hechizo en la armadura que se le otorgó a Leandros por su trabajo como protector de Isolde, miembro de la Orden. Con este hechizo el caballero nulifica cualquier maldición que pueda sufrir.",
+        "skillsNames": [
+            "Discernere Nocentes",
+            "Avercio Execratio",
+            ""
+        ],
+        "skillsDescriptions": [
+            "Al pronunciar este comando, la espada Dictam adquiere la capacidad de ignorar barreras físicas y protecciones mágicas de poder medio que no sean de origen divino. Sin embargo, su efecto principal es discernir la culpa: corta con facilidad a personas y seres que han infringido las leyes de los dioses, mientras que encuentra impenetrable la piel de aquellos que jamás han pecado. En este estado, la hoja traspasa cualquier obstáculo físico u objeto que se interponga en su camino, a menos que esté protegido por magia avanzada o por una bendición divina. Así, puede ignorar por completo la espada de su contrincante y la armadura que lleva puesta para atacar al oponente directamente.",
+            "Es el hechizo en la armadura que se le otorgó a Leandros por su trabajo como protector de Isolde, miembro de la Orden. Con este hechizo el caballero nulifica cualquier maldición que pueda sufrir.",
             ""
         ],
         "quotes": [
-            "",
+            "“La Ley es lo que mantiene ordenado este mundo. Todos los aspectos de la vida de una persona están gobernados por una estructura que nos han dado los dioses. Del otro lado está el caos: las redadas, los robos, la mentira y el mal. Yo me aseguro de que esta Ley se cumpla, para que los ciudadanos de Aethelgard puedan vivir en paz.”",
             "",
             "",
             "",
@@ -56,6 +66,80 @@
         ],
         "fragments": {
             "aethelgard": "“Este es mi hogar. Me crié en el seno de una familia humilde. Fue mi dedicación absoluta a la Justicia lo que me permitió ascender a los altos rangos de la caballería. Le debo todo a la Orden, y por ello, mi deber es mantener esta ciudad en un camino recto, en estricto cumplimiento de las leyes divinas.”",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 2,
+        "name": "Isolde",
+        "rarity": "Épico",
+        "class": "Face",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Isolde01.png",
+            "img/characters/Aethelgard-Isolde02.png",
+            "img/characters/Aethelgard-Isolde03.png"
+        ],
+        "epitaph": "El filo de su arma fue el símbolo de la Ley, su voz, la voluntad de los dioses.",
+        "equipmentNames": [
+            "Spina Sacra",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "Lanza que pasa al capitán de los paladines cuando asume su puesto. No es un arma particularmente poderosa, pero es símbolo de estatus, liderazgo y de poder divino.",
+            "",
+            ""
+        ],
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "Miembro de La Orden, Isolde ocupaba un lugar importante al comandar a los paladines. Si La Orden era la voluntad de los dioses, entonces ella comandaba el hierro con el que los dioses castigaban a los herejes e impuros. Fuerte era su convicción por mantener la estructura que había hecho funcionar Aethelgard durante siglos. Ella rezaba todos los días, como era costumbre entre los habitantes de la ciudad. Pero, a diferencia de otros, sus oraciones tenían respuesta: una voz le contestaba todas las noches.",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "Perception Hérétique",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "Isolde puede revelar el caos y las herejías con la mirada. Puede detectar quiénes están actuando en contra de la voluntad divina y la Orden.",
+            "",
+            ""
+        ],
+        "quotes": [
+            "“Escucho la dirección de los dioses. Ellos me aseguran que mis órdenes son correctas, que lo que imponemos es la Ley y que, sin ella, esto no sería más que caos. Nos ocuparemos de todo criminal, bárbaro y salvaje que se resista a aceptar la palabra divina.”",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "“”",
             "skarnfell": "",
             "mycelondra": "",
             "alsahra": "",
