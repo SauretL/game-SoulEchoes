@@ -1,27 +1,60 @@
 import './App.css'
 import { useEffect, useState } from 'react'
-import GachaCards from './components/GachaCards.jsx'
+import GachaCards from './components/GachaCards/GachaCards.jsx'
+import PlayerLibrary from './components/PlayerLibrary/PlayerLibrary.jsx'
 import gachaPull from './utils/gachaPull.js'
 import loadArray from './utils/loadArray.js'
 
 function App() {
 
-  //create states for the different page looks
+  //states
   const [currentView, setCurrentView] = useState("start")
-  const changeView = () => {
-    if (currentView === "start") setCurrentView("gacha")
-    else setCurrentView("start")
-  }
-
   const [characterArray, setCharacterArray] = useState([])
   const [allCharacters, setAllCharacters] = useState([])
   const [pullCount, setPullCount] = useState(0)
+  const [playerCharacters, setPlayerCharacters] = useState([])
+  const [sortBy, setSortBy] = useState("id")
 
   useEffect(() => {
     loadArray("./public/data/characters.json")
       .then(charsArray => setAllCharacters(charsArray))
       .catch(error => console.error("Error loading characters:", error))
   }, [])
+
+  //functions
+
+  const addToPlayerCollection = (newCharacters) => {
+    setPlayerCharacters(prevCollection => {
+      const updatedCollection = [...prevCollection]
+
+      newCharacters.forEach(newChar => {
+        const existingCharIndex = updatedCollection.findIndex(
+          char => char.id === newChar.id
+        )
+
+        if (existingCharIndex !== -1) {
+          updatedCollection[existingCharIndex] = {
+            ...updatedCollection[existingCharIndex],
+            duplicates: updatedCollection[existingCharIndex].duplicates + 1
+          }
+        } else {
+          updatedCollection.push({
+            id: newChar.id,
+            name: newChar.name,
+            epitaph: newChar.epitaph,
+            rarity: newChar.rarity,
+            rarityTier: newChar.rarityTier,
+            class: newChar.class,
+            fragment: newChar.fragment,
+            images: newChar.images,
+            duplicates: 1
+          })
+        }
+      })
+
+      return updatedCollection
+    })
+  }
 
   function gachaButton() {
     if (allCharacters.length > 0) {
@@ -44,31 +77,64 @@ function App() {
         }
       })
       setCharacterArray(annotated)
+      addToPlayerCollection(rawResults)
     }
   }
 
+  const changeView = (view) => {
+    setCurrentView(view)
+  }
+
+  const getSortedCollection = () => {
+    const sorted = [...playerCharacters]
+
+    switch (sortBy) {
+      case "name":
+        return sorted.sort((a, b) => a.name.localeCompare(b.name))
+      case "rarity":
+        return sorted.sort((a, b) => b.rarityTier - a.rarityTier || a.name.localeCompare(b.name))
+      case "fragment":
+        return sorted.sort((a, b) => a.fragment.localeCompare(b.fragment) || a.name.localeCompare(b.name))
+      case "class":
+        return sorted.sort((a, b) => a.class.localeCompare(b.class) || a.name.localeCompare(b.name))
+      case "id":
+      default:
+        return sorted.sort((a, b) => a.id - b.id)
+    }
+  }
 
   return (
-    currentView === "start" ? (
-      <div className="app-container">
+    <div className="app-container">
+      {currentView === "start" && (
         <div className="start-view">
           <h1>Soul Echoes</h1>
           <p>A lo largo de distintos mundos y tiempos han surgido héroes y villanos que llevaron a cabo grandes hazañas que dejaron su huella en la historia. Las almas de estos personajes hacen eco en los distintos fragmentos de la realidad. Hoy, esos fragmentos se han unido y estos ecos han tomado vida nuevamente. Escucha sus voces: descubre las historias que guardan estas almas mientras te ayudan a continuar con tu objetivo de reunir todos sus relatos.</p>
-          <button onClick={changeView}>Comienza el juego</button>
+          <button onClick={() => changeView("gacha")}>Comienza el juego</button>
         </div>
-      </div>
-    ) : (
-      <div className="app-container">
+      )}
+
+      {currentView === "gacha" && (
         <div className="gacha-view">
           <h1>Soul Echoes</h1>
           <p>¡Empieza el gacha!</p>
           <button onClick={gachaButton}>¡Prueba tu suerte!</button>
+          <button onClick={() => changeView("library")} style={{ marginLeft: '10px' }}>
+            Ver Mi Colección ({playerCharacters.length})
+          </button>
           <GachaCards arrayInicial={characterArray} />
         </div>
-      </div>
-    )
+      )}
+
+      {currentView === "library" && (
+        <PlayerLibrary
+          playerCharacters={getSortedCollection()}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          onBack={() => changeView("gacha")}
+        />
+      )}
+    </div>
   )
 }
-
 export default App
 

@@ -1,0 +1,165 @@
+.library-container {
+    min-height: 100vh;
+    padding: 20px;
+    background: transparent;
+}
+
+.library-header {
+    text-align: center;
+    background: rgba(10, 10, 26, 0.7);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(41, 106, 180, 0.3);
+}
+
+.library-header h1 {
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, #9370db 0%, #296ab4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 15px;
+}
+
+.sort-controls {
+    margin: 20px 0;
+}
+
+.sort-select {
+    background: rgba(41, 106, 180, 0.3);
+    color: white;
+    border: 1px solid #296ab4;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 1rem;
+    margin-left: 10px;
+}
+
+.sort-select option {
+    background: #1a1a2e;
+    color: white;
+}
+
+.back-button {
+    background: linear-gradient(135deg, #6a5acd 0%, #9370db 100%);
+    margin-top: 10px;
+}
+
+.library-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.library-card {
+    background: rgba(26, 26, 46, 0.8);
+    border-radius: 12px;
+    padding: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.library-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+.character-name {
+    color: white;
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.duplicate-count {
+    background: rgba(41, 106, 180, 0.3);
+    color: #e0e0ff;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.card-info p {
+    margin: 8px 0;
+    color: #c0c0ff;
+    font-size: 0.9rem;
+}
+
+.card-footer {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.rarity-indicator {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* rarities */
+.rarity-1 {
+    border-color: #6b7280;
+}
+
+.rarity-2 {
+    border-color: #3b82f6;
+}
+
+.rarity-3 {
+    border-color: #f59e0b;
+}
+
+.rarity-1-text {
+    color: #9ca3af;
+}
+
+.rarity-2-text {
+    color: #60a5fa;
+}
+
+.rarity-3-text {
+    color: #fbbf24;
+}
+
+.empty-library {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: #c0c0ff;
+    font-size: 1.2rem;
+}
+
+.empty-library p {
+    margin: 10px 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .library-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+    }
+
+    .library-header h1 {
+        font-size: 2rem;
+    }
+
+    .card-header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+}
