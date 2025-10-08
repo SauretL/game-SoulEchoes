@@ -163,3 +163,31 @@
         text-align: center;
     }
 }
+
+.library-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.stats-button {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.stats-button:hover {
+    background: #45a049;
+}

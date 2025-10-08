@@ -22,7 +22,9 @@
             "Su uniforme como mano derecha de Isolde, la Capitana de los paladines.",
             ""
         ],
-        "birthday": "June 15th",
+        "gender": "Hombre",
+        "age": 27,
+        "birthday": "Junio 15",
         "likes": "La Justicia, La Orden, su hermana Teodora.",
         "dislikes": "Valeria, los pecados, los perros, los bárbaros.",
         "favoriteFood": "guiso de cordero de su hermana.",
@@ -97,6 +99,8 @@
             "",
             ""
         ],
+        "gender": "Mujer",
+        "age": 24,
         "birthday": "",
         "likes": "",
         "dislikes": "",
@@ -171,7 +175,8 @@
         ],
         "quotes": [
             "Mi hermano siempre quiso hacer lo correcto... aunque eso lo hiciera sufrir."
-        ]
+        ],
+        "gender": "Mujer"
     },
     {
         "id": 4,
@@ -195,7 +200,8 @@
         ],
         "quotes": [
             "El conocimiento es la forma más pura de obediencia."
-        ]
+        ],
+        "gender": "Hombre"
     },
     {
         "id": 5,
@@ -219,7 +225,8 @@
         ],
         "quotes": [
             "Cada palabra escrita es un mandato de los cielos."
-        ]
+        ],
+        "gender": "Mujer"
     },
     {
         "id": 6,
@@ -243,7 +250,8 @@
         ],
         "quotes": [
             "El acero sirve al mandato, no al hombre."
-        ]
+        ],
+        "gender": "Hombre"
     },
     {
         "id": 7,
@@ -267,7 +275,8 @@
         ],
         "quotes": [
             "Que mi espada sea la voz de los dioses."
-        ]
+        ],
+        "gender": "Mujer"
     },
     {
         "id": 8,
@@ -291,7 +300,8 @@
         ],
         "quotes": [
             "La voz de La Orden nunca se equivoca."
-        ]
+        ],
+        "gender": "Hombre"
     },
     {
         "id": 9,
@@ -315,7 +325,8 @@
         ],
         "quotes": [
             "La fé no se pregunta, se cumple."
-        ]
+        ],
+        "gender": "Mujer"
     },
     {
         "id": 10,
@@ -339,7 +350,8 @@
         ],
         "quotes": [
             "El valor de una moneda está en la bendición que la respalda."
-        ]
+        ],
+        "gender": "Hombre"
     },
     {
         "id": 11,
@@ -363,7 +375,8 @@
         ],
         "quotes": [
             "Que los dioses bendigan cada trato justo."
-        ]
+        ],
+        "gender": "Mujer"
     },
     {
         "id": 12,
@@ -387,7 +400,8 @@
         ],
         "quotes": [
             "El silencio también es una forma de obediencia."
-        ]
+        ],
+        "gender": "Hombre"
     },
     {
         "id": 13,
@@ -411,7 +425,8 @@
         ],
         "quotes": [
             "La paz se mantiene con disciplina, no con palabras."
-        ]
+        ],
+        "gender": "Mujer"
     },
     {
         "id": 14,
@@ -435,7 +450,8 @@
         ],
         "quotes": [
             "Nada se enseña sin la bendición de La Orden."
-        ]
+        ],
+        "gender": "Hombre"
     },
     {
         "id": 15,
@@ -459,7 +475,8 @@
         ],
         "quotes": [
             "La verdad no se descubre, se recibe."
-        ]
+        ],
+        "gender": "Mujer"
     },
     {
         "id": 16,
@@ -484,6 +501,8 @@
             "",
             ""
         ],
+        "gender": "Mujer",
+        "age": null,
         "birthday": "",
         "likes": "",
         "dislikes": "",
@@ -535,5 +554,386 @@
             "grimfrost": "",
             "yancan": ""
         }
+    },
+    {
+        "id": 17,
+        "name": "Raaku",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Shield",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/characters/Skarnfell-Raaku01.png",
+            "img/characters/Skarnfell-Raaku02.png",
+            "img/characters/Skarnfell-Raaku03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "Equipo 01",
+            "Equipo 02",
+            "Equipo 03"
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "Historia 1",
+            "Historia 2",
+            "Historia 3",
+            "Historia 4",
+            "Historia 5"
+        ],
+        "skillsNames": [
+            "Habilidad 1",
+            "Habilidad 2",
+            "Habilidad 3"
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "Frase 1",
+            "Frase 2",
+            "Frase 3",
+            "Frase 4",
+            "Frase 5"
+        ],
+        "birthdayQuoteSelf": "Frase cumpleaños propio",
+        "birthdayQuotePlayer": "Frase cumpleaños jugador",
+        "opinions": [
+            "Sobre [Personaje X]",
+            "Sobre [Personaje Y]",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "Orden de Aethelgard",
+            "skarnfell": "Horda de Skarnfell",
+            "mycelondra": "Verdancios de Mycel'ondra",
+            "alsahra": "Nómadas de Al'Sahra",
+            "grimfrost": "Hijos de Grimfrost",
+            "yancan": "Estirpe de Yancan"
+        }
+    },
+    {
+        "id": 18,
+        "name": "Kira",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Sniper",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/characters/Skarnfell-Kira01.png",
+            "img/characters/Skarnfell-Kira02.png",
+            "img/characters/Skarnfell-Kira03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Mujer",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 19,
+        "name": "Korbak",
+        "rarity": "Épico",
+        "rarityTier": 3,
+        "class": "Warrior",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/characters/Skarnfell-Korbak01.png",
+            "img/characters/Skarnfell-Korbak02.png",
+            "img/characters/Skarnfell-Korbak03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 20,
+        "name": "Cazador M",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/common-chars/Skarnfell-HunterM.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            ""
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            ""
+        ],
+        "gender": "Hombre"
+    },
+    {
+        "id": 21,
+        "name": "Cazador F",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/common-chars/Skarnfell-HunterF.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            ""
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            ""
+        ],
+        "gender": "Mujer"
+    },
+    {
+        "id": 22,
+        "name": "Artesano M",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/common-chars/Skarnfell-ArtisanM.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            ""
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            ""
+        ],
+        "gender": "Hombre"
+    },
+    {
+        "id": 23,
+        "name": "Artesano F",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/common-chars/Skarnfell-ArtisanF.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            ""
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            ""
+        ],
+        "gender": "Mujer"
+    },
+    {
+        "id": 24,
+        "name": "Shaman F",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/common-chars/Skarnfell-ShamanF.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            ""
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            ""
+        ],
+        "gender": "Mujer"
+    },
+    {
+        "id": 25,
+        "name": "Shaman M",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/common-chars/Skarnfell-ShamanM.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            ""
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            ""
+        ],
+        "gender": "Hombre"
     }
 ]

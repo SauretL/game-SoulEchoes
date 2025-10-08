@@ -1,6 +1,6 @@
 import './PlayerLibrary.css'
 
-function PlayerLibrary({ playerCharacters, sortBy, setSortBy, onBack }) {
+function PlayerLibrary({ playerCharacters, sortBy, setSortBy, onBack, onCharacterClick, onShowStats }) {
     return (
         <div className="library-container">
             <div className="library-header">
@@ -19,12 +19,14 @@ function PlayerLibrary({ playerCharacters, sortBy, setSortBy, onBack }) {
                         <option value="rarity">Rareza</option>
                         <option value="fragment">Fragmento</option>
                         <option value="class">Clase</option>
+                        <option value="duplicates">Duplicados</option>
                     </select>
                 </div>
+                <div className="action-buttons">
+                    <button onClick={onShowStats} className="stats-button">Ver Estadísticas</button>
+                    <button onClick={onBack} className="back-button">Volver al Gacha</button>
+                </div>
 
-                <button onClick={onBack} className="back-button">
-                    Volver al Gacha
-                </button>
             </div>
 
             <div className="library-grid">
@@ -35,7 +37,11 @@ function PlayerLibrary({ playerCharacters, sortBy, setSortBy, onBack }) {
                     </div>
                 ) : (
                     playerCharacters.map(character => (
-                        <div key={character.id} className={`library-card rarity-${character.rarityTier}`}>
+                        <div
+                            key={character.id}
+                            className={`library-card rarity-${character.rarityTier}`}
+                            onClick={() => onCharacterClick(character)}
+                            style={{ cursor: 'pointer' }}>
                             <div className="card-header">
                                 <h3 className="character-name">{character.name}</h3>
                                 <span className="duplicate-count">x{character.duplicates}</span>
@@ -60,7 +66,7 @@ function PlayerLibrary({ playerCharacters, sortBy, setSortBy, onBack }) {
 
                             <div className="card-footer">
                                 <div className={`rarity-indicator rarity-${character.rarityTier}`}>
-                                    {character.rarityTier === 3 ? '★' : character.rarityTier === 2 ? '✦' : '•'}
+                                    {character.rarityTier === 3 ? '★3★' : character.rarityTier === 2 ? '✦2✦' : '•1•'}
                                 </div>
                             </div>
                         </div>

@@ -4,6 +4,8 @@ import GachaCards from './components/GachaCards/GachaCards.jsx'
 import PlayerLibrary from './components/PlayerLibrary/PlayerLibrary.jsx'
 import gachaPull from './utils/gachaPull.js'
 import loadArray from './utils/loadArray.js'
+import CharacterDetail from './components/CharacterDetail/CharacterDetail.jsx'
+import PlayerStats from './components/PlayerStats/PlayerStats.jsx'
 
 function App() {
 
@@ -14,6 +16,9 @@ function App() {
   const [pullCount, setPullCount] = useState(0)
   const [playerCharacters, setPlayerCharacters] = useState([])
   const [sortBy, setSortBy] = useState("id")
+  const [selectedCharacter, setSelectedCharacter] = useState(null)
+
+
 
   useEffect(() => {
     loadArray("./public/data/characters.json")
@@ -47,7 +52,24 @@ function App() {
             class: newChar.class,
             fragment: newChar.fragment,
             images: newChar.images,
-            duplicates: 1
+            duplicates: 1,
+            genre: newChar.genre,
+            age: newChar.age,
+            birthday: newChar.birthday,
+            likes: newChar.likes,
+            dislikes: newChar.dislikes,
+            favoriteFood: newChar.favoriteFood,
+            hobbies: newChar.hobbies,
+            stories: newChar.stories,
+            skillsNames: newChar.skillsNames,
+            skillsDescriptions: newChar.skillsDescriptions,
+            quotes: newChar.quotes,
+            equipmentNames: newChar.equipmentNames,
+            equipmentDescriptions: newChar.equipmentDescriptions,
+            opinions: newChar.opinions,
+            fragments: newChar.fragments,
+            birthdayQuoteSelf: newChar.birthdayQuoteSelf,
+            birthdayQuotePlayer: newChar.birthdayQuotePlayer
           })
         }
       })
@@ -73,6 +95,20 @@ function App() {
           equipmentNames: char.equipmentNames,
           skillsNames: char.skillsNames,
           quotes: char.quotes,
+          genre: char.genre,
+          age: char.age,
+          birthday: char.birthday,
+          likes: char.likes,
+          dislikes: char.dislikes,
+          favoriteFood: char.favoriteFood,
+          hobbies: char.hobbies,
+          stories: char.stories,
+          skillsDescriptions: char.skillsDescriptions,
+          equipmentDescriptions: char.equipmentDescriptions,
+          opinions: char.opinions,
+          fragments: char.fragments,
+          birthdayQuoteSelf: char.birthdayQuoteSelf,
+          birthdayQuotePlayer: char.birthdayQuotePlayer,
           _drawUid: "pull-" + newPull + "-" + i + "-" + Math.random().toString(36).slice(2, 6)
         }
       })
@@ -97,10 +133,20 @@ function App() {
         return sorted.sort((a, b) => a.fragment.localeCompare(b.fragment) || a.name.localeCompare(b.name))
       case "class":
         return sorted.sort((a, b) => a.class.localeCompare(b.class) || a.name.localeCompare(b.name))
+      case "duplicates":
+        return sorted.sort((a, b) => b.duplicates - a.duplicates || a.name.localeCompare(b.name))
       case "id":
       default:
         return sorted.sort((a, b) => a.id - b.id)
     }
+  }
+
+  const handleCharacterClick = (character) => {
+    setSelectedCharacter(character)
+  }
+
+  const closeCharacterDetail = () => {
+    setSelectedCharacter(null)
   }
 
   return (
@@ -121,7 +167,9 @@ function App() {
           <button onClick={() => changeView("library")} style={{ marginLeft: '10px' }}>
             Ver Mi Colección ({playerCharacters.length})
           </button>
-          <GachaCards arrayInicial={characterArray} />
+          <GachaCards
+            arrayInicial={characterArray}
+            onCharacterClick={handleCharacterClick} />
         </div>
       )}
 
@@ -131,6 +179,22 @@ function App() {
           sortBy={sortBy}
           setSortBy={setSortBy}
           onBack={() => changeView("gacha")}
+          onCharacterClick={handleCharacterClick}
+          onShowStats={() => changeView("stats")}
+        />
+      )}
+      {currentView === "stats" && (
+        <PlayerStats
+          playerCharacters={playerCharacters}
+          allCharacters={allCharacters}
+          onBack={() => changeView("library")}
+        />
+      )}
+      {/* Character Detail Modal */}
+      {selectedCharacter && (
+        <CharacterDetail
+          character={selectedCharacter}
+          onClose={closeCharacterDetail}
         />
       )}
     </div>

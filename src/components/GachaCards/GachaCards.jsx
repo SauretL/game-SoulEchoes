@@ -1,13 +1,17 @@
 import './GachaCards.css'
 
-function GachaCards({ arrayInicial = [] }) {
+function GachaCards({ arrayInicial = [], onCharacterClick }) {
     return (
         <div className="cards-container">
             {arrayInicial.map((character, index) => {
                 const rarity = character.rarityTier || character.rarity || 1
                 const key = character._drawUid || character.id || `${character.name}-${index}`
                 return (
-                    <div key={key} className={`character-card rarity-${rarity}`}>
+                    <div
+                        key={key}
+                        className={`character-card rarity-${rarity}`}
+                        onClick={() => onCharacterClick(character)}
+                        style={{ cursor: 'pointer' }}>
                         <h3 className="character-name">{character.name}</h3>
                         <p className="character-epitaph">{character.epitaph}</p>
                         <p><b>Rareza</b>: {character.rarity || rarity}</p>
