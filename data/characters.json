@@ -1,0 +1,2248 @@
+[
+    {
+        "id": 1,
+        "name": "Leandros",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Warrior",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Leandros01.png",
+            "img/characters/Aethelgard-Leandros02.png",
+            "img/characters/Aethelgard-Leandros03.png"
+        ],
+        "epitaph": "Caballero implacable, siervo fiel de los dioses y la ley.",
+        "equipmentNames": [
+            "Dictam, la espada del juicio",
+            "Armadura del protector de La Orden",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "Es una espada con grandes poderes divinos otorgada a Leandros por los dioses debido a su rectitud ante la ley.",
+            "Su uniforme como mano derecha de Isolde, la Capitana de los paladines.",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": 27,
+        "birthday": "Junio 15",
+        "likes": "La Justicia, La Orden, su hermana Teodora.",
+        "dislikes": "Valeria, los pecados, los perros, los bárbaros.",
+        "favoriteFood": "guiso de cordero de su hermana.",
+        "hobbies": "Leer libros.",
+        "stories": [
+            "Leandros nació en una familia humilde de Aethelgard, era un hombre seguro de que la Ley es absoluta y estaba dispuesto a lo que fuera para llevarla a cabo. Tenía una visión blanca y negra de la moralidad. Era un miembro importante de la Orden que acataba órdenes sin cuestionarse, esto en ocasiones lo ponía en conflicto con alguno de sus compañeros en especial con Valeria quien tenía una visión más flexible de la ley y con quién tuvo una gran rivalidad toda su vida. Cuando era solo un cadete, un día apareció con la espada mágica 'Dictam'. Nadie sabe cómo consiguió esta arma sagrada; muchos decían que los dioses le habían recompensado por su labor e ideales inquebrantables, pero parecía que para él la hoja conservaba un valor sentimental incluso mayor. Cuando se hacía referencia a 'Dictam', esto parecía despertarle un recuerdo indeseable, quizás algo relacionado con cómo la obtuvo.",
+            "En el instituto de preparación, el joven Leandros siempre fue uno de los alumnos más aplicados y estudiosos. En cambio, siempre tuvo problemas para relacionarse con chicos de su edad; en general, prefería pasar tiempo con adultos o con algunos estudiantes de cursos superiores. La única otra joven con la que podía pasar un tiempo agradable era su hermana menor, Teodora, que era un año más joven que él.",
+            "Los años de prestar servicio a la Orden le dieron fama de juez y ejecutor, de impartir la ley cueste lo que cueste y de ser completamente inquebrantable en ese aspecto. De esta forma ganó el visto bueno de algunos altos mandos. Isolde, quien era la general a cargo de los paladines y miembro de la corte real, tomó interés en el paladín y lo hizo su segundo al mando. Así estuvo otros años más obedeciendo órdenes directas de Isolde y cometió varias proezas en nombre de ella para aniquilar a enemigos de la Orden. Leandros veía esto como el nuevo rol que los dioses le habían concedido y consideraba un gran honor formar parte importante en la protección de Aethelgard. Pero un día Isolde le pidió que atacara un pueblo en las afueras de la ciudad; aparentemente, todos sus habitantes habían cometido herejía…",
+            "Aún eran cadetes, y Valeria había dejado pasar el hurto que cometió un niño en un puesto de verduras en la ciudad. Leandros se enteró de esto y enfrentó a su compañera. Él creía que era importante que todos los crímenes fueran juzgados; no correspondía ni a Valeria ni a él decidir si un crimen tenía castigo o no. Ella le aseguró que lo que decía no tenía sentido: en algún momento él iba a tener que tomar la decisión de juzgar a alguien en el momento; no siempre podría hacer arrestos. El título que le dio la Orden le daba ese poder y responsabilidad. Ese día, los cadetes podían visitar sus hogares, y él lo hizo para despejarse luego de una intensa discusión con la joven noble. Pero al regresar a su hogar, su hermana no se encontraba; al preguntar, le informaron que Teodora había salido al campo a dar un paseo, pero ya hacía varias horas que no volvía. Luego de seguir varias pistas sobre su paradero, Leandros encontró a su hermana muerta: había sido alimento de los perros de unos bárbaros. En ese momento, todo se hizo claro para el cadete: su espada sería juez y verdugo de esos seres detestables y esas bestias del mal. Fue después de que había terminado con su trabajo y tiñó de sangre su armadura y el filo de su espada, que se dio cuenta que los dioses le obsequiaron una reliquia poderosa, y que en sus manos ya no estaba su espada común de cadete, sino que poseía a Dictam.",
+            ""
+        ],
+        "skillsNames": [
+            "Discernere Nocentes",
+            "Avercio Execratio",
+            ""
+        ],
+        "skillsDescriptions": [
+            "Al pronunciar este comando, la espada Dictam adquiere la capacidad de ignorar barreras físicas y protecciones mágicas de poder medio que no sean de origen divino. Sin embargo, su efecto principal es discernir la culpa: corta con facilidad a personas y seres que han infringido las leyes de los dioses, mientras que encuentra impenetrable la piel de aquellos que jamás han pecado. En este estado, la hoja traspasa cualquier obstáculo físico u objeto que se interponga en su camino, a menos que esté protegido por magia avanzada o por una bendición divina. Así, puede ignorar por completo la espada de su contrincante y la armadura que lleva puesta para atacar al oponente directamente.",
+            "Es el hechizo en la armadura que se le otorgó a Leandros por su trabajo como protector de Isolde, miembro de la Orden. Con este hechizo el caballero nulifica cualquier maldición que pueda sufrir.",
+            ""
+        ],
+        "quotes": [
+            "“La Ley es lo que mantiene ordenado este mundo. Todos los aspectos de la vida de una persona están gobernados por una estructura que nos han dado los dioses. Del otro lado está el caos: las redadas, los robos, la mentira y el mal. Yo me aseguro de que esta Ley se cumpla, para que los ciudadanos de Aethelgard puedan vivir en paz.”",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "Sobre Valeria:",
+            "Sobre Isolde 1:",
+            "Sobre Isolde 2:",
+            "Sobre Alaric:",
+            "Sobre Finniam:",
+            "Sobre Kaelan:",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "“Este es mi hogar. Me crié en el seno de una familia humilde. Fue mi dedicación absoluta a la Justicia lo que me permitió ascender a los altos rangos de la caballería. Le debo todo a la Orden, y por ello, mi deber es mantener esta ciudad en un camino recto, en estricto cumplimiento de las leyes divinas.”",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 2,
+        "name": "Isolde",
+        "rarity": "Épico",
+        "rarityTier": 3,
+        "class": "Face",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Isolde01.png",
+            "img/characters/Aethelgard-Isolde02.png",
+            "img/characters/Aethelgard-Isolde03.png"
+        ],
+        "epitaph": "El filo de su arma fue el símbolo de la Ley, su voz, la voluntad de los dioses.",
+        "equipmentNames": [
+            "Spina Sacra",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "Lanza que pasa al capitán de los paladines cuando asume su puesto. No es un arma particularmente poderosa, pero es símbolo de estatus, liderazgo y de poder divino.",
+            "",
+            ""
+        ],
+        "gender": "Mujer",
+        "age": 24,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "Miembro de La Orden, Isolde ocupaba un lugar importante al comandar a los paladines. Si La Orden era la voluntad de los dioses, entonces ella comandaba el hierro con el que los dioses castigaban a los herejes e impuros. Fuerte era su convicción por mantener la estructura que había hecho funcionar Aethelgard durante siglos. Ella rezaba todos los días, como era costumbre entre los habitantes de la ciudad. Pero, a diferencia de otros, sus oraciones tenían respuesta: una voz le contestaba todas las noches.",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "Perception Hérétique",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "Isolde puede revelar el caos y las herejías con la mirada. Puede detectar quiénes están actuando en contra de la voluntad divina y la Orden.",
+            "",
+            ""
+        ],
+        "quotes": [
+            "“Escucho la dirección de los dioses. Ellos me aseguran que mis órdenes son correctas, que lo que imponemos es la Ley y que, sin ella, esto no sería más que caos. Nos ocuparemos de todo criminal, bárbaro y salvaje que se resista a aceptar la palabra divina.”",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "“”",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 3,
+        "name": "Teodora",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/common-chars/Aethelgard-Teodora.png"
+        ],
+        "epitaph": "Vivió con pureza, murió con inocencia.",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            "Hermana menor de Leandros, Teodora creció en un hogar humilde dentro de Aethelgard. Alegre, compasiva y devota, creía que la bondad también era una forma de obedecer a los dioses. Mientras su hermano se formaba como soldado de La Orden, ella dedicaba sus días a estudiar los himnos sagrados y ayudar a los necesitados del barrio. Para muchos, representaba el corazón puro que toda ciudad bendita debía proteger. Su muerte marcó profundamente a Leandros, quien vería en su pérdida un llamado divino para impartir justicia sin misericordia."
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            "Mi hermano siempre quiso hacer lo correcto... aunque eso lo hiciera sufrir."
+        ],
+        "gender": "Mujer"
+    },
+    {
+        "id": 4,
+        "name": "Estudiante M",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/common-chars/Aethelgard-StudentM.png"
+        ],
+        "epitaph": "Buscó el saber como ofrenda a los dioses.",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            "Joven aprendiz de las artes y escrituras sagradas, dedicado a comprender los designios de La Orden y el lugar del hombre bajo la mirada divina."
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            "El conocimiento es la forma más pura de obediencia."
+        ],
+        "gender": "Hombre"
+    },
+    {
+        "id": 5,
+        "name": "Estudiante F",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/common-chars/Aethelgard-StudentF.png"
+        ],
+        "epitaph": "Aprendió con fé, habló con verdad.",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            "Discípula entusiasta de los sabios de Aethelgard, criada entre pergaminos y oraciones, aspiraba a servir a La Orden con su intelecto."
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            "Cada palabra escrita es un mandato de los cielos."
+        ],
+        "gender": "Mujer"
+    },
+    {
+        "id": 6,
+        "name": "Caballero M",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/common-chars/Aethelgard-KnightM.png"
+        ],
+        "epitaph": "Luchó sin dudar por la voluntad divina.",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            "Soldado juramentado de La Orden, entrenado para proteger las tierras sagradas y mantener la paz dictada por los dioses."
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            "El acero sirve al mandato, no al hombre."
+        ],
+        "gender": "Hombre"
+    },
+    {
+        "id": 7,
+        "name": "Caballero F",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/common-chars/Aethelgard-KnightF.png"
+        ],
+        "epitaph": "Defendió la fe con honor y fuego.",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            "Guerrera disciplinada de La Orden, símbolo de rectitud y fuerza, dedicada a mantener la pureza de las ciudades santas."
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            "Que mi espada sea la voz de los dioses."
+        ],
+        "gender": "Mujer"
+    },
+    {
+        "id": 8,
+        "name": "Sacerdote M",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/common-chars/Aethelgard-PriestM.png"
+        ],
+        "epitaph": "Predicó la palabra hasta su último aliento.",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            "Siervo de los templos mayores, guía espiritual del pueblo, encargado de llevar las plegarias humanas a los oídos divinos."
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            "La voz de La Orden nunca se equivoca."
+        ],
+        "gender": "Hombre"
+    },
+    {
+        "id": 9,
+        "name": "Sacerdote F",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/common-chars/Aethelgard-PriestF.png"
+        ],
+        "epitaph": "Sirvió con devoción y pureza eterna.",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            "Mujer consagrada al servicio divino, encargada de rituales y bendiciones, un faro de fe en tiempos de duda."
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            "La fé no se pregunta, se cumple."
+        ],
+        "gender": "Mujer"
+    },
+    {
+        "id": 10,
+        "name": "Comerciante M",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/common-chars/Aethelgard-ShopkeeperM.png"
+        ],
+        "epitaph": "Vendió con justicia y honró las leyes divinas.",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            "Mercader honesto de los mercados de Aethelgard, equilibrando el lucro con la piedad y cumpliendo los decretos del comercio sagrado."
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            "El valor de una moneda está en la bendición que la respalda."
+        ],
+        "gender": "Hombre"
+    },
+    {
+        "id": 11,
+        "name": "Comerciante F",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/common-chars/Aethelgard-ShopkeeperF.png"
+        ],
+        "epitaph": "Comerció con virtud, prosperó con fe.",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            "Vendedora conocida en las plazas santas, ejemplo de equilibrio entre trabajo, fe y obediencia a las normas de La Orden."
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            "Que los dioses bendigan cada trato justo."
+        ],
+        "gender": "Mujer"
+    },
+    {
+        "id": 12,
+        "name": "Guardia M",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/common-chars/Aethelgard-GuardM.png"
+        ],
+        "epitaph": "Protegió las murallas con alma de hierro.",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            "Vigilante de las puertas sagradas, dedicado a mantener el orden en nombre de los dioses y proteger a los fieles de Aethelgard."
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            "El silencio también es una forma de obediencia."
+        ],
+        "gender": "Hombre"
+    },
+    {
+        "id": 13,
+        "name": "Guardia F",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/common-chars/Aethelgard-GuardF.png"
+        ],
+        "epitaph": "Custodió la fe sin titubeos ni descanso.",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            "Defensora de las calles y templos, guardiana severa que mantenía la paz y la ley divina en tiempos de agitación."
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            "La paz se mantiene con disciplina, no con palabras."
+        ],
+        "gender": "Mujer"
+    },
+    {
+        "id": 14,
+        "name": "Profesor M",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/common-chars/Aethelgard-ProfessorM.png"
+        ],
+        "epitaph": "Enseñó la verdad dictada por los dioses.",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            "Maestro erudito, transmisor de las doctrinas y saberes antiguos, encargado de formar a las nuevas generaciones bajo la guía divina."
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            "Nada se enseña sin la bendición de La Orden."
+        ],
+        "gender": "Hombre"
+    },
+    {
+        "id": 15,
+        "name": "Profesor F",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/common-chars/Aethelgard-ProfessorF.png"
+        ],
+        "epitaph": "Difundió la sabiduría sagrada con humildad.",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            "Instructora dedicada, guardiana del conocimiento bendito, instruía a los jóvenes en los caminos de la fe y la razón bajo la mirada de los dioses."
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            "La verdad no se descubre, se recibe."
+        ],
+        "gender": "Mujer"
+    },
+    {
+        "id": 16,
+        "name": "Valeria",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Warrior",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Valeria01.png",
+            "img/characters/Aethelgard-Valeria02.png",
+            "img/characters/Aethelgard-Valeria03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Mujer",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 17,
+        "name": "Raaku",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Shield",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/characters/Skarnfell-Raaku01.png",
+            "img/characters/Skarnfell-Raaku02.png",
+            "img/characters/Skarnfell-Raaku03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "Equipo 01",
+            "Equipo 02",
+            "Equipo 03"
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "Historia 1",
+            "Historia 2",
+            "Historia 3",
+            "Historia 4",
+            "Historia 5"
+        ],
+        "skillsNames": [
+            "Habilidad 1",
+            "Habilidad 2",
+            "Habilidad 3"
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "Frase 1",
+            "Frase 2",
+            "Frase 3",
+            "Frase 4",
+            "Frase 5"
+        ],
+        "birthdayQuoteSelf": "Frase cumpleaños propio",
+        "birthdayQuotePlayer": "Frase cumpleaños jugador",
+        "opinions": [
+            "Sobre [Personaje X]",
+            "Sobre [Personaje Y]",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "Orden de Aethelgard",
+            "skarnfell": "Horda de Skarnfell",
+            "mycelondra": "Verdancios de Mycel'ondra",
+            "alsahra": "Nómadas de Al'Sahra",
+            "grimfrost": "Hijos de Grimfrost",
+            "yancan": "Estirpe de Yancan"
+        }
+    },
+    {
+        "id": 18,
+        "name": "Kira",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Sniper",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/characters/Skarnfell-Kira01.png",
+            "img/characters/Skarnfell-Kira02.png",
+            "img/characters/Skarnfell-Kira03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Mujer",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 19,
+        "name": "Korbak",
+        "rarity": "Épico",
+        "rarityTier": 3,
+        "class": "Warrior",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/characters/Skarnfell-Korbak01.png",
+            "img/characters/Skarnfell-Korbak02.png",
+            "img/characters/Skarnfell-Korbak03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 20,
+        "name": "Cazador M",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/common-chars/Skarnfell-HunterM.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            ""
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            ""
+        ],
+        "gender": "Hombre"
+    },
+    {
+        "id": 21,
+        "name": "Cazador F",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/common-chars/Skarnfell-HunterF.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            ""
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            ""
+        ],
+        "gender": "Mujer"
+    },
+    {
+        "id": 22,
+        "name": "Artesano M",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/common-chars/Skarnfell-ArtisanM.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            ""
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            ""
+        ],
+        "gender": "Hombre"
+    },
+    {
+        "id": 23,
+        "name": "Artesano F",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/common-chars/Skarnfell-ArtisanF.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            ""
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            ""
+        ],
+        "gender": "Mujer"
+    },
+    {
+        "id": 24,
+        "name": "Shaman F",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/common-chars/Skarnfell-ShamanF.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            ""
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            ""
+        ],
+        "gender": "Mujer"
+    },
+    {
+        "id": 25,
+        "name": "Shaman M",
+        "rarity": "Común",
+        "rarityTier": 1,
+        "class": "Ninguna",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/common-chars/Skarnfell-ShamanM.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "Ninguno"
+        ],
+        "stories": [
+            ""
+        ],
+        "skillsNames": [
+            "Ninguno"
+        ],
+        "quotes": [
+            ""
+        ],
+        "gender": "Hombre"
+    },
+    {
+        "id": 26,
+        "name": "Seraphina",
+        "rarity": "Épico",
+        "rarityTier": 3,
+        "class": "Jumper",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Seraphina01.png",
+            "img/characters/Aethelgard-Seraphina02.png",
+            "img/characters/Aethelgard-Seraphina03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Mujer",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 27,
+        "name": "Elara",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Mage",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Elara01.png",
+            "img/characters/Aethelgard-Elara02.png",
+            "img/characters/Aethelgard-Elara03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Mujer",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 28,
+        "name": "Alaric",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Engineer",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Alaric01.png",
+            "img/characters/Aethelgard-Alaric02.png",
+            "img/characters/Aethelgard-Alaric03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 29,
+        "name": "Finnian",
+        "rarity": "Épico",
+        "rarityTier": 3,
+        "class": "Face",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Finnian01.png",
+            "img/characters/Aethelgard-Finnian02.png",
+            "img/characters/Aethelgard-Finnian03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 30,
+        "name": "Kaelan",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Shadow",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Kaelan01.png",
+            "img/characters/Aethelgard-Kaelan02.png",
+            "img/characters/Aethelgard-Kaelan03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 31,
+        "name": "Lyra",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Sniper",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Lyra01.png",
+            "img/characters/Aethelgard-Lyra02.png",
+            "img/characters/Aethelgard-Lyra03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Mujer",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 32,
+        "name": "Bjorn",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Shield",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Bjorn01.png",
+            "img/characters/Aethelgard-Bjorn02.png",
+            "img/characters/Aethelgard-Bjorn03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 33,
+        "name": "Rurik",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Fist",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Rurik01.png",
+            "img/characters/Aethelgard-Rurik02.png",
+            "img/characters/Aethelgard-Rurik03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 34,
+        "name": "Astrid",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Vehicle",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Astrid01.png",
+            "img/characters/Aethelgard-Astrid02.png",
+            "img/characters/Aethelgard-Astrid03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Mujer",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 35,
+        "name": "Maltheor",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Berserk",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Maltheor01.png",
+            "img/characters/Aethelgard-Maltheor02.png",
+            "img/characters/Aethelgard-Maltheor03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 36,
+        "name": "Morwenna",
+        "rarity": "Épico",
+        "rarityTier": 3,
+        "class": "Summoner",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Morwenna01.png",
+            "img/characters/Aethelgard-Morwenna02.png",
+            "img/characters/Aethelgard-Morwenna03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Mujer",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 38,
+        "name": "Aranea",
+        "rarity": "Épico",
+        "rarityTier": 3,
+        "class": "Mage",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/characters/Skarnfell-Aranea01.png",
+            "img/characters/Skarnfell-Aranea02.png",
+            "img/characters/Skarnfell-Aranea03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Mujer",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 39,
+        "name": "Grom",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Vehicle",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/characters/Skarnfell-Grom01.png",
+            "img/characters/Skarnfell-Grom02.png",
+            "img/characters/Skarnfell-Grom03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 40,
+        "name": "Skarrl",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Berserk",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/characters/Skarnfell-Skarrl01.png",
+            "img/characters/Skarnfell-Skarrl02.png",
+            "img/characters/Skarnfell-Skarrl03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 41,
+        "name": "Krana",
+        "rarity": "Épico",
+        "rarityTier": 3,
+        "class": "Shadow",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/characters/Skarnfell-Krana01.png",
+            "img/characters/Skarnfell-Krana02.png",
+            "img/characters/Skarnfell-Krana03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Masculino",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 42,
+        "name": "Xuku",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Jumper",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/characters/Skarnfell-Xuku01.png",
+            "img/characters/Skarnfell-Xuku02.png",
+            "img/characters/Skarnfell-Xuku03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Masculino",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 43,
+        "name": "Xinara",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Summoner",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/characters/Skarnfell-Xinara01.png",
+            "img/characters/Skarnfell-Xinara02.png",
+            "img/characters/Skarnfell-Xinara03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Femenino",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    }
+]
