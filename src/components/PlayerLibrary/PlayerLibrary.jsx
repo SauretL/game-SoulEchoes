@@ -1,11 +1,14 @@
 import './PlayerLibrary.css'
 
-function PlayerLibrary({ playerCharacters, sortBy, setSortBy, onBack, onCharacterClick, onShowStats }) {
+function PlayerLibrary({ playerCharacters, sortBy, setSortBy, onBack, onCharacterClick, onShowStats, playerCoins }) {
     return (
         <div className="library-container">
             <div className="library-header">
                 <h1>Mi Biblioteca de Almas</h1>
-                <p>Personajes coleccionados: {playerCharacters.length}</p>
+                <div className="library-info">
+                    <p>Personajes coleccionados: {playerCharacters.length}</p>
+                    <p>Monedas: {playerCoins}</p>
+                </div>
 
                 <div className="sort-controls">
                     <label>Ordenar por: </label>

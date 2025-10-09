@@ -4,6 +4,8 @@ import './CharacterDetail.css'
 function CharacterDetail({ character, onClose }) {
     const [activeTab, setActiveTab] = useState('general')
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false)
+    const [modalImageIndex, setModalImageIndex] = useState(0)
 
     if (!character) return null
 
@@ -19,6 +21,98 @@ function CharacterDetail({ character, onClose }) {
         )
     }
 
+    const nextModalImage = () => {
+        setModalImageIndex((prev) =>
+            prev < (character.images?.length - 1) ? prev + 1 : 0
+        )
+    }
+
+    const prevModalImage = () => {
+        setModalImageIndex((prev) =>
+            prev > 0 ? prev - 1 : (character.images?.length - 1)
+        )
+    }
+
+    const openImageModal = (index) => {
+        setModalImageIndex(index)
+        setIsImageModalOpen(true)
+    }
+
+    const closeImageModal = () => {
+        setIsImageModalOpen(false)
+    }
+    // Tier 1 Rarity simple look
+    if (character.rarityTier === 1) {
+        return (
+            <div className="character-detail-overlay">
+                <div className="character-detail-container simplified-view">
+                    {/* Header */}
+                    <div className="detail-header">
+                        <h1>{character.name}</h1>
+                        <button className="close-button" onClick={onClose}>×</button>
+                    </div>
+
+                    <div className="simplified-content">
+                        {/* Image Gallery */}
+                        <div className="image-section">
+                            <div className="main-image-container">
+                                <img
+                                    src={character.images?.[currentImageIndex]}
+                                    alt={character.name}
+                                    className="main-image"
+                                />
+                                {character.images?.length > 1 && (
+                                    <>
+                                        <button className="image-nav prev" onClick={prevImage}>‹</button>
+                                        <button className="image-nav next" onClick={nextImage}>›</button>
+                                        <div className="image-counter">
+                                            {currentImageIndex + 1} / {character.images.length}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="simplified-info">
+                            <div className="basic-info">
+                                <p><strong>Epitafio:</strong> {character.epitaph}</p>
+                                <p><strong>Género:</strong> {character.gender}</p>
+                                <p><strong>Rareza:</strong> {character.rarity}</p>
+                                <p><strong>Clase:</strong> {character.class}</p>
+                                <p><strong>Fragmento:</strong> {character.fragment}</p>
+                            </div>
+
+                            {character.stories?.[0] && (
+                                <div className="story-section">
+                                    <h3>Historia</h3>
+                                    <p>{character.stories[0]}</p>
+                                </div>
+                            )}
+
+                            <div className="equipment-section">
+                                <h3>Equipamiento</h3>
+                                <p>{character.equipmentNames?.[0] || 'Ninguno'}</p>
+                            </div>
+
+                            <div className="skills-section">
+                                <h3>Habilidades</h3>
+                                <p>{character.skillsNames?.[0] || 'Ninguno'}</p>
+                            </div>
+
+                            {character.quotes?.[0] && (
+                                <div className="quotes-section">
+                                    <h3>Frase</h3>
+                                    <p>"{character.quotes[0]}"</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    // Tier 2 and 3 Rarity complete look
     return (
         <div className="character-detail-overlay">
             <div className="character-detail-container">
@@ -137,10 +231,35 @@ function CharacterDetail({ character, onClose }) {
                                                     src={image}
                                                     alt={`${character.name} ${index + 1}`}
                                                     className={`gallery-thumbnail ${currentImageIndex === index ? 'active' : ''}`}
-                                                    onClick={() => setCurrentImageIndex(index)}
+                                                    onClick={() => openImageModal(index)}
                                                 />
                                             )
                                         ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Modal for large image */}
+                            {isImageModalOpen && (
+                                <div className="image-modal-overlay" onClick={closeImageModal}>
+                                    <div className="image-modal-container" onClick={(e) => e.stopPropagation()}>
+                                        <button className="image-modal-close" onClick={closeImageModal}>×</button>
+                                        <div className="image-modal-content">
+                                            <img
+                                                src={character.images?.[modalImageIndex]}
+                                                alt={`${character.name} ${modalImageIndex + 1}`}
+                                                className="image-modal-img"
+                                            />
+                                        </div>
+                                        {character.images?.length > 1 && (
+                                            <>
+                                                <button className="image-modal-nav image-modal-prev" onClick={prevModalImage}>‹</button>
+                                                <button className="image-modal-nav image-modal-next" onClick={nextModalImage}>›</button>
+                                                <div className="image-modal-counter">
+                                                    {modalImageIndex + 1} / {character.images.length}
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             )}

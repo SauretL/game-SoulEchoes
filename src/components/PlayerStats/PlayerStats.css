@@ -144,3 +144,18 @@
         grid-template-columns: 1fr;
     }
 }
+
+.stats-top-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.coins-info {
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    color: #8b4513;
+    border: 2px solid #ffb700;
+}

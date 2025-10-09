@@ -935,5 +935,1314 @@
             ""
         ],
         "gender": "Hombre"
+    },
+    {
+        "id": 26,
+        "name": "Seraphina",
+        "rarity": "Épico",
+        "rarityTier": 3,
+        "class": "Jumper",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Seraphina01.png",
+            "img/characters/Aethelgard-Seraphina02.png",
+            "img/characters/Aethelgard-Seraphina03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Mujer",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 27,
+        "name": "Elara",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Mage",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Elara01.png",
+            "img/characters/Aethelgard-Elara02.png",
+            "img/characters/Aethelgard-Elara03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Mujer",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 28,
+        "name": "Alaric",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Engineer",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Alaric01.png",
+            "img/characters/Aethelgard-Alaric02.png",
+            "img/characters/Aethelgard-Alaric03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 29,
+        "name": "Finnian",
+        "rarity": "Épico",
+        "rarityTier": 3,
+        "class": "Face",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Finnian01.png",
+            "img/characters/Aethelgard-Finnian02.png",
+            "img/characters/Aethelgard-Finnian03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 30,
+        "name": "Kaelan",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Shadow",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Kaelan01.png",
+            "img/characters/Aethelgard-Kaelan02.png",
+            "img/characters/Aethelgard-Kaelan03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 31,
+        "name": "Lyra",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Sniper",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Lyra01.png",
+            "img/characters/Aethelgard-Lyra02.png",
+            "img/characters/Aethelgard-Lyra03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Mujer",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 32,
+        "name": "Bjorn",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Shield",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Bjorn01.png",
+            "img/characters/Aethelgard-Bjorn02.png",
+            "img/characters/Aethelgard-Bjorn03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 33,
+        "name": "Rurik",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Fist",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Rurik01.png",
+            "img/characters/Aethelgard-Rurik02.png",
+            "img/characters/Aethelgard-Rurik03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 34,
+        "name": "Astrid",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Vehicle",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Astrid01.png",
+            "img/characters/Aethelgard-Astrid02.png",
+            "img/characters/Aethelgard-Astrid03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Mujer",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 35,
+        "name": "Maltheor",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Berserk",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Maltheor01.png",
+            "img/characters/Aethelgard-Maltheor02.png",
+            "img/characters/Aethelgard-Maltheor03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 36,
+        "name": "Morwenna",
+        "rarity": "Épico",
+        "rarityTier": 3,
+        "class": "Summoner",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Morwenna01.png",
+            "img/characters/Aethelgard-Morwenna02.png",
+            "img/characters/Aethelgard-Morwenna03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Mujer",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 38,
+        "name": "Aranea",
+        "rarity": "Épico",
+        "rarityTier": 3,
+        "class": "Mage",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/characters/Skarnfell-Aranea01.png",
+            "img/characters/Skarnfell-Aranea02.png",
+            "img/characters/Skarnfell-Aranea03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Mujer",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 39,
+        "name": "Grom",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Vehicle",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/characters/Skarnfell-Grom01.png",
+            "img/characters/Skarnfell-Grom02.png",
+            "img/characters/Skarnfell-Grom03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 40,
+        "name": "Skarrl",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Berserk",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/characters/Skarnfell-Skarrl01.png",
+            "img/characters/Skarnfell-Skarrl02.png",
+            "img/characters/Skarnfell-Skarrl03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Hombre",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 41,
+        "name": "Krana",
+        "rarity": "Épico",
+        "rarityTier": 3,
+        "class": "Shadow",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/characters/Skarnfell-Krana01.png",
+            "img/characters/Skarnfell-Krana02.png",
+            "img/characters/Skarnfell-Krana03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Masculino",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 42,
+        "name": "Xuku",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Jumper",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/characters/Skarnfell-Xuku01.png",
+            "img/characters/Skarnfell-Xuku02.png",
+            "img/characters/Skarnfell-Xuku03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Masculino",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 43,
+        "name": "Xinara",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Summoner",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/characters/Skarnfell-Xinara01.png",
+            "img/characters/Skarnfell-Xinara02.png",
+            "img/characters/Skarnfell-Xinara03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "Femenino",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
     }
 ]

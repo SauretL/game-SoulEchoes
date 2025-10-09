@@ -1,6 +1,6 @@
 import './PlayerStats.css'
 
-function PlayerStats({ playerCharacters, allCharacters, onBack }) {
+function PlayerStats({ playerCharacters, allCharacters, playerCoins, onBack }) {
 
     // General stats
     const totalCharacters = allCharacters.length
@@ -31,9 +31,12 @@ function PlayerStats({ playerCharacters, allCharacters, onBack }) {
         <div className="stats-container">
             <div className="stats-header">
                 <h1>Estadísticas de la Colección</h1>
-                <button onClick={onBack} className="back-button">
-                    Volver a la Biblioteca
-                </button>
+                <div className="stats-top-info">
+                    <span className="coins-info">Monedas: {playerCoins}</span>
+                    <button onClick={onBack} className="back-button">
+                        Volver a la Biblioteca
+                    </button>
+                </div>
             </div>
 
             <div className="stats-section">

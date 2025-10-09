@@ -17,6 +17,8 @@ function App() {
   const [playerCharacters, setPlayerCharacters] = useState([])
   const [sortBy, setSortBy] = useState("id")
   const [selectedCharacter, setSelectedCharacter] = useState(null)
+  const [playerCoins, setPlayerCoins] = useState(1000)
+
 
 
 
@@ -53,7 +55,7 @@ function App() {
             fragment: newChar.fragment,
             images: newChar.images,
             duplicates: 1,
-            genre: newChar.genre,
+            gender: newChar.gender,
             age: newChar.age,
             birthday: newChar.birthday,
             likes: newChar.likes,
@@ -79,7 +81,14 @@ function App() {
   }
 
   function gachaButton() {
+    const pullCost = 100
+
+    if (playerCoins < pullCost) {
+      alert("No tienes suficientes monedas para hacer un pull!")
+      return
+    }
     if (allCharacters.length > 0) {
+      setPlayerCoins(prevCoins => prevCoins - pullCost)
       const rawResults = gachaPull(allCharacters, 5)
       const newPull = pullCount + 1
       setPullCount(newPull)
@@ -95,20 +104,6 @@ function App() {
           equipmentNames: char.equipmentNames,
           skillsNames: char.skillsNames,
           quotes: char.quotes,
-          genre: char.genre,
-          age: char.age,
-          birthday: char.birthday,
-          likes: char.likes,
-          dislikes: char.dislikes,
-          favoriteFood: char.favoriteFood,
-          hobbies: char.hobbies,
-          stories: char.stories,
-          skillsDescriptions: char.skillsDescriptions,
-          equipmentDescriptions: char.equipmentDescriptions,
-          opinions: char.opinions,
-          fragments: char.fragments,
-          birthdayQuoteSelf: char.birthdayQuoteSelf,
-          birthdayQuotePlayer: char.birthdayQuotePlayer,
           _drawUid: "pull-" + newPull + "-" + i + "-" + Math.random().toString(36).slice(2, 6)
         }
       })
@@ -178,6 +173,7 @@ function App() {
           playerCharacters={getSortedCollection()}
           sortBy={sortBy}
           setSortBy={setSortBy}
+          playerCoins={playerCoins}
           onBack={() => changeView("gacha")}
           onCharacterClick={handleCharacterClick}
           onShowStats={() => changeView("stats")}
@@ -187,6 +183,7 @@ function App() {
         <PlayerStats
           playerCharacters={playerCharacters}
           allCharacters={allCharacters}
+          playerCoins={playerCoins}
           onBack={() => changeView("library")}
         />
       )}
