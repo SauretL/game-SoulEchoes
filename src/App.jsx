@@ -1,32 +1,23 @@
 import './App.css'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import GachaCards from './components/GachaCards/GachaCards.jsx'
 import PlayerLibrary from './components/PlayerLibrary/PlayerLibrary.jsx'
 import gachaPull from './utils/gachaPull.js'
-import loadArray from './utils/loadArray.js'
 import CharacterDetail from './components/CharacterDetail/CharacterDetail.jsx'
 import PlayerStats from './components/PlayerStats/PlayerStats.jsx'
+import allCharacters from './data/characters.json'
 
 function App() {
 
   //states
   const [currentView, setCurrentView] = useState("start")
   const [characterArray, setCharacterArray] = useState([])
-  const [allCharacters, setAllCharacters] = useState([])
   const [pullCount, setPullCount] = useState(0)
   const [playerCharacters, setPlayerCharacters] = useState([])
   const [sortBy, setSortBy] = useState("id")
   const [selectedCharacter, setSelectedCharacter] = useState(null)
   const [playerCoins, setPlayerCoins] = useState(1000)
 
-
-
-
-  useEffect(() => {
-    loadArray("./public/data/characters.json")
-      .then(charsArray => setAllCharacters(charsArray))
-      .catch(error => console.error("Error loading characters:", error))
-  }, [])
 
   //functions
 
