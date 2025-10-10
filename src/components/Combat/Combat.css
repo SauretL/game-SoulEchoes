@@ -1,0 +1,287 @@
+/* COMBAT OVERLAY */
+.combat-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    font-family: 'Courier New', monospace;
+}
+
+.combat-container {
+    background: #1a1a2a;
+    border: 2px solid #444;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 800px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    color: #e0e0e0;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+}
+
+/* COMBAT HEADER */
+.combat-header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #444;
+}
+
+.combat-header h2 {
+    color: #ffd700;
+    margin: 0 0 10px 0;
+    font-size: 1.8em;
+}
+
+.turn-indicator {
+    background: #2a4a6a;
+    color: #ffd700;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: bold;
+    border: 1px solid #3b82f6;
+}
+
+/* BATTLE FIELD */
+.battle-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 20px;
+}
+
+.combatant {
+    flex: 1;
+    text-align: center;
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+}
+
+.player-combatant {
+    border-color: #296ab4;
+    background: rgba(41, 106, 180, 0.1);
+}
+
+.enemy-combatant {
+    border-color: #dc2626;
+    background: rgba(220, 38, 38, 0.1);
+}
+
+.combatant-info h3 {
+    color: #ffd700;
+    margin: 0 0 10px 0;
+    font-size: 1.2em;
+}
+
+/* HP BAR */
+.hp-bar {
+    background: #333;
+    border: 1px solid #555;
+    border-radius: 10px;
+    height: 20px;
+    margin: 10px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.hp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ef4444, #22c55e);
+    transition: width 0.3s ease;
+    border-radius: 8px;
+}
+
+.hp-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* STATS */
+.stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    font-size: 0.8em;
+    margin-top: 10px;
+}
+
+.stats span {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #444;
+}
+
+/* COMBATANT IMAGE */
+.combatant-image {
+    margin-top: 15px;
+}
+
+.combatant-image img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 2px solid #444;
+    background: #0a0a14;
+}
+
+/* VS SEPARATOR */
+.vs-separator {
+    background: #ffd700;
+    color: #000;
+    padding: 10px 15px;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 1.2em;
+    border: 2px solid #b45309;
+}
+
+/* ACTION BUTTONS */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.attack-btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 160px;
+}
+
+.physical-attack {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: white;
+}
+
+.psychic-attack {
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+    color: white;
+}
+
+.attack-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.attack-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* BATTLE LOG */
+.battle-log {
+    background: #0a0a14;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.battle-log h4 {
+    color: #ffd700;
+    margin: 0 0 10px 0;
+    font-size: 1.1em;
+}
+
+.log-messages {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.log-message {
+    padding: 8px;
+    margin: 5px 0;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    border-left: 3px solid #296ab4;
+    font-size: 0.9em;
+}
+
+/* BATTLE RESULT */
+.battle-result {
+    text-align: center;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 15px;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+.battle-result.victory {
+    background: rgba(34, 197, 94, 0.2);
+    border: 2px solid #22c55e;
+    color: #22c55e;
+}
+
+.battle-result.defeat {
+    background: rgba(239, 68, 68, 0.2);
+    border: 2px solid #ef4444;
+    color: #ef4444;
+}
+
+.battle-result h2 {
+    margin: 0 0 10px 0;
+    font-size: 2em;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .battle-field {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .vs-separator {
+        order: -1;
+        margin-bottom: 10px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .attack-btn {
+        width: 100%;
+        max-width: 250px;
+    }
+}

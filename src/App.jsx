@@ -7,13 +7,16 @@ import CharacterDetail from './components/CharacterDetail/CharacterDetail.jsx'
 import PlayerStats from './components/PlayerStats/PlayerStats.jsx'
 import allCharacters from './data/characters.json'
 import Dungeon from './components/Dungeon/Dungeon.jsx'
+import enemies from './data/enemies.json'
+import Combat from './components/Combat/Combat.jsx'
 
 function App() {
-
-  //states
+  // ========== STATE MANAGEMENT ==========
   const [currentView, setCurrentView] = useState("start")
   const [characterArray, setCharacterArray] = useState([])
   const [pullCount, setPullCount] = useState(0)
+  const [showCombat, setShowCombat] = useState(false)
+  const [currentEnemy, setCurrentEnemy] = useState(null)
   const [playerCharacters, setPlayerCharacters] = useState(() => {
     // Valeria (id 16) is default character
     const valeria = allCharacters.find(char => char.id === 16)
@@ -82,9 +85,7 @@ function App() {
     } : null
   })
 
-
-  //functions
-
+  // ========== CHARACTER COLLECTION MANAGEMENT ==========
   const addToPlayerCollection = (newCharacters) => {
     setPlayerCharacters(prevCollection => {
       const updatedCollection = [...prevCollection]
@@ -95,11 +96,13 @@ function App() {
         )
 
         if (existingCharIndex !== -1) {
+          // Update duplicate count for existing character
           updatedCollection[existingCharIndex] = {
             ...updatedCollection[existingCharIndex],
             duplicates: updatedCollection[existingCharIndex].duplicates + 1
           }
         } else {
+          // Add new character to collection
           updatedCollection.push({
             id: newChar.id,
             name: newChar.name,
@@ -133,6 +136,8 @@ function App() {
 
       return updatedCollection
     })
+
+    // Set first new character as dungeon character if none is selected
     setDungeonCharacter(prev => {
       if (!prev && newCharacters.length > 0) {
         return {
@@ -144,26 +149,33 @@ function App() {
     })
   }
 
+  // ========== DUNGEON CHARACTER MANAGEMENT ==========
   const setDungeonCharacterFromLibrary = (character) => {
     setDungeonCharacter(character)
   }
 
+  // ========== CURRENCY MANAGEMENT ==========
   const addCoinsFromDungeon = (coins) => {
     setPlayerCoins(prevCoins => prevCoins + coins)
   }
 
-  function gachaButton() {
-    const pullCost = 100
+  // ========== GACHA SYSTEM ==========
+  const gachaButton = () => {
+    const pullCost = 50
 
     if (playerCoins < pullCost) {
       alert("No tienes suficientes monedas para hacer un pull!")
       return
     }
+
     if (allCharacters.length > 0) {
+      // Deduct coins and perform gacha pull
       setPlayerCoins(prevCoins => prevCoins - pullCost)
       const rawResults = gachaPull(allCharacters, 5)
       const newPull = pullCount + 1
       setPullCount(newPull)
+
+      // Annotate results with unique identifiers
       const annotated = rawResults.map((char, i) => {
         return {
           name: char.name,
@@ -179,15 +191,40 @@ function App() {
           _drawUid: "pull-" + newPull + "-" + i + "-" + Math.random().toString(36).slice(2, 6)
         }
       })
+
       setCharacterArray(annotated)
       addToPlayerCollection(rawResults)
     }
   }
 
+  // ========== COMBAT MANAGEMENT ==========
+  const startCombat = (enemy) => {
+    setCurrentEnemy(enemy)
+    setShowCombat(true)
+  }
+
+  const endCombat = (result) => {
+    setShowCombat(false)
+    setCurrentEnemy(null)
+
+    // Additional logic based on combat result can be added here
+    // For example: show victory/defeat messages, update player stats, etc.
+    console.log(`Combat ended with result: ${result}`)
+  }
+
+  const resetDungeon = () => {
+    // Reset dungeon-related states when player loses combat
+    setShowCombat(false)
+    setCurrentEnemy(null)
+    // Note: dungeonCharacter remains the same
+  }
+
+  // ========== VIEW NAVIGATION ==========
   const changeView = (view) => {
     setCurrentView(view)
   }
 
+  // ========== CHARACTER SORTING ==========
   const getSortedCollection = () => {
     const sorted = [...playerCharacters]
 
@@ -208,6 +245,7 @@ function App() {
     }
   }
 
+  // ========== CHARACTER DETAIL MANAGEMENT ==========
   const handleCharacterClick = (character) => {
     setSelectedCharacter(character)
   }
@@ -216,8 +254,11 @@ function App() {
     setSelectedCharacter(null)
   }
 
+  // ========== RENDER COMPONENT ==========
   return (
     <div className="app-container">
+
+      {/* ========== START VIEW ========== */}
       {currentView === "start" && (
         <div className="start-view">
           <h1>Soul Echoes</h1>
@@ -226,22 +267,32 @@ function App() {
         </div>
       )}
 
+      {/* ========== GACHA VIEW ========== */}
       {currentView === "gacha" && (
         <div className="gacha-view">
           <h1>Soul Echoes</h1>
           <p>¡Empieza el gacha!</p>
-          <button onClick={gachaButton}>¡Prueba tu suerte!</button>
-          <button onClick={() => changeView("dungeon")}
-            style={{ marginLeft: '10px', backgroundColor: '#8B4513' }}>Explorar Dungeon</button>
-          <button onClick={() => changeView("library")} style={{ marginLeft: '10px' }}>
+          <button onClick={gachaButton}>¡Prueba tu suerte! (100 monedas)</button>
+          <button
+            onClick={() => changeView("dungeon")}
+            style={{ marginLeft: '10px', backgroundColor: '#8B4513' }}
+          >
+            Explorar Dungeon
+          </button>
+          <button
+            onClick={() => changeView("library")}
+            style={{ marginLeft: '10px' }}
+          >
             Ver Mi Colección ({playerCharacters.length})
           </button>
           <GachaCards
             arrayInicial={characterArray}
-            onCharacterClick={handleCharacterClick} />
+            onCharacterClick={handleCharacterClick}
+          />
         </div>
       )}
 
+      {/* ========== LIBRARY VIEW ========== */}
       {currentView === "library" && (
         <PlayerLibrary
           playerCharacters={getSortedCollection()}
@@ -256,6 +307,8 @@ function App() {
           dungeonCharacter={dungeonCharacter}
         />
       )}
+
+      {/* ========== STATS VIEW ========== */}
       {currentView === "stats" && (
         <PlayerStats
           playerCharacters={playerCharacters}
@@ -264,6 +317,8 @@ function App() {
           onBack={() => changeView("library")}
         />
       )}
+
+      {/* ========== DUNGEON VIEW ========== */}
       {currentView === "dungeon" && (
         <Dungeon
           onBack={() => changeView("gacha")}
@@ -271,17 +326,32 @@ function App() {
           playerCoins={playerCoins}
           dungeonCharacter={dungeonCharacter}
           onCharacterClick={handleCharacterClick}
+          onStartCombat={startCombat}
+          enemies={enemies}
         />
       )}
-      {/* Character Detail Modal */}
+
+      {/* ========== CHARACTER DETAIL MODAL ========== */}
       {selectedCharacter && (
         <CharacterDetail
           character={selectedCharacter}
           onClose={closeCharacterDetail}
         />
       )}
+
+      {/* ========== COMBAT OVERLAY ========== */}
+      {showCombat && currentEnemy && (
+        <Combat
+          playerCharacter={dungeonCharacter}
+          enemy={currentEnemy}
+          onCombatEnd={endCombat}
+          onCoinUpdate={addCoinsFromDungeon}
+          onResetDungeon={resetDungeon}
+        />
+      )}
     </div>
   )
 }
+
 export default App
 

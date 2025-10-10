@@ -1,11 +1,21 @@
 import React, { useState, useEffect } from 'react'
 import './Dungeon.css'
 
-const Dungeon = ({ onBack, onCoinEarned, playerCoins, dungeonCharacter, onCharacterClick }) => {
+const Dungeon = ({
+  onBack,
+  onCoinEarned,
+  playerCoins,
+  dungeonCharacter,
+  onCharacterClick,
+  onStartCombat,
+  enemies
+}) => {
+  // ========== STATE MANAGEMENT ==========
   const [playerPos, setPlayerPos] = useState({ x: 1, y: 1 })
   const [coinsCollected, setCoinsCollected] = useState(0)
   const [pendingCoins, setPendingCoins] = useState(0)
 
+  // ========== DUNGEON MAP CONFIGURATION ==========
   const map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1],
@@ -22,20 +32,27 @@ const Dungeon = ({ onBack, onCoinEarned, playerCoins, dungeonCharacter, onCharac
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
   ]
 
-  // Process coins
+  // ========== COIN PROCESSING EFFECT ==========
   useEffect(() => {
     if (pendingCoins > 0) {
-      onCoinEarned(pendingCoins)
-      setPendingCoins(0)
+      // Usar setTimeout para deferir la actualización del estado padre
+      const timer = setTimeout(() => {
+        onCoinEarned(pendingCoins)
+        setCoinsCollected(prev => prev + pendingCoins)
+        setPendingCoins(0)
+      }, 0)
+
+      return () => clearTimeout(timer)
     }
   }, [pendingCoins, onCoinEarned])
 
-  // Move player
+  // ========== PLAYER MOVEMENT LOGIC ==========
   const movePlayer = (direction) => {
     setPlayerPos(prev => {
-      let newX = prev.x;
-      let newY = prev.y;
+      let newX = prev.x
+      let newY = prev.y
 
+      // Calculate new position based on direction
       switch (direction) {
         case 'up': newY--; break
         case 'down': newY++; break
@@ -44,21 +61,28 @@ const Dungeon = ({ onBack, onCoinEarned, playerCoins, dungeonCharacter, onCharac
         default: return prev
       }
 
-      // Check Collision
+      // Check if new position is valid (not a wall)
       if (map[newY]?.[newX] === 0) {
-        // Chance of finding coins while moving
-        if (Math.random() < 0.05) {
-          const newCoins = Math.floor(Math.random() * 10) + 2
-          setCoinsCollected(prev => prev + newCoins)
-          setPendingCoins(newCoins)
+
+        // Chance to find coins while moving (30% probability)
+        if (Math.random() < 0.3) {
+          const coinsFound = Math.floor(Math.random() * 5) + 1 // 1-5 coins
+          setPendingCoins(coinsFound)
         }
+
+        // Chance to encounter enemy (20% probability)
+        if (Math.random() < 0.2 && enemies && enemies.length > 0) {
+          const randomEnemy = enemies[Math.floor(Math.random() * enemies.length)]
+          onStartCombat(randomEnemy)
+        }
+
         return { x: newX, y: newY }
       }
       return prev
     })
   }
 
-  // Controls
+  // ========== KEYBOARD CONTROLS ==========
   useEffect(() => {
     const handleKeyPress = (e) => {
       switch (e.key) {
@@ -72,33 +96,35 @@ const Dungeon = ({ onBack, onCoinEarned, playerCoins, dungeonCharacter, onCharac
         case 'd': case 'D': movePlayer('right'); break
         default: return
       }
-    };
+    }
 
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [])
+  }, [movePlayer])
 
-  // Reset dungeon
+  // ========== DUNGEON RESET FUNCTION ==========
   const resetDungeon = () => {
     setPlayerPos({ x: 1, y: 1 })
     setCoinsCollected(0)
     setPendingCoins(0)
   }
 
-  // Classic render map cells
+  // ========== MAP RENDERING LOGIC ==========
   const renderCell = (cell, x, y) => {
     if (x === playerPos.x && y === playerPos.y) {
-      return '☻'; // player
+      return '☻' // Player character
     }
     if (cell === 1) {
-      return '█'; // wall
+      return '█' // Wall
     }
-    return '·'; // floor
+    return '·' // Floor
   }
 
+  // ========== RENDER COMPONENT ==========
   return (
     <div className="dungeon-container">
-      {/* Header with info */}
+
+      {/* ========== DUNGEON HEADER ========== */}
       <div className="dungeon-header">
         <h2>Dungeon</h2>
         <div className="dungeon-info">
@@ -112,9 +138,9 @@ const Dungeon = ({ onBack, onCoinEarned, playerCoins, dungeonCharacter, onCharac
         </div>
       </div>
 
-      {/* Navigation buttons */}
+      {/* ========== NAVIGATION BUTTONS ========== */}
       <div className="dungeon-navigation">
-        <button onClick={() => onBack()} className="nav-button back-button">
+        <button onClick={onBack} className="nav-button back-button">
           ← Volver al Gacha
         </button>
         <button onClick={resetDungeon} className="nav-button refresh-button">
@@ -122,14 +148,15 @@ const Dungeon = ({ onBack, onCoinEarned, playerCoins, dungeonCharacter, onCharac
         </button>
       </div>
 
-      {/* Instructions */}
+      {/* ========== GAME INSTRUCTIONS ========== */}
       <div className="dungeon-instructions">
         <p>⚔️ Explora la mazmorra y encuentra tesoros</p>
         <p>🎯 Usa las flechas del teclado o los botones táctiles</p>
         <p>💰 Gana monedas mientras exploras</p>
+        <p>👹 Enfréntate a enemigos aleatorios</p>
       </div>
 
-      {/* Dungeon map logic */}
+      {/* ========== DUNGEON MAP DISPLAY ========== */}
       <div className="dungeon-map-container">
         <div className="dungeon-map">
           {map.map((row, y) => (
@@ -148,7 +175,7 @@ const Dungeon = ({ onBack, onCoinEarned, playerCoins, dungeonCharacter, onCharac
         </div>
       </div>
 
-      {/* Leyend */}
+      {/* ========== MAP LEGEND ========== */}
       <div className="dungeon-legend">
         <div className="legend-item">
           <span className="legend-symbol">☻</span>
@@ -164,7 +191,7 @@ const Dungeon = ({ onBack, onCoinEarned, playerCoins, dungeonCharacter, onCharac
         </div>
       </div>
 
-      {/* Direction buttons */}
+      {/* ========== TOUCH CONTROLS ========== */}
       <div className="touch-controls">
         <div className="touch-row">
           <button
@@ -196,7 +223,7 @@ const Dungeon = ({ onBack, onCoinEarned, playerCoins, dungeonCharacter, onCharac
         </div>
       </div>
 
-      {/* Dungeon stats */}
+      {/* ========== DUNGEON STATISTICS ========== */}
       <div className="dungeon-stats">
         <div className="stat-item">
           <span className="stat-label">Posición:</span>
@@ -207,9 +234,14 @@ const Dungeon = ({ onBack, onCoinEarned, playerCoins, dungeonCharacter, onCharac
           <span className="stat-value">+{coinsCollected}</span>
         </div>
       </div>
-      {/* Character Card Sidebar */}
+
+      {/* ========== CHARACTER CARD SIDEBAR ========== */}
       {dungeonCharacter && (
-        <div className="dungeon-character-card" onClick={() => onCharacterClick(dungeonCharacter)}>
+        <div
+          className="dungeon-character-card"
+          onClick={() => onCharacterClick(dungeonCharacter)}
+          style={{ cursor: 'pointer' }}
+        >
           <div className={`dungeon-character-header rarity-${dungeonCharacter.rarityTier}`}>
             <h4>{dungeonCharacter.name}</h4>
             <span className="dungeon-duplicates">x{dungeonCharacter.duplicates}</span>
@@ -218,12 +250,18 @@ const Dungeon = ({ onBack, onCoinEarned, playerCoins, dungeonCharacter, onCharac
             <img src={dungeonCharacter.images?.[0]} alt={dungeonCharacter.name} />
           </div>
           <div className="dungeon-character-info">
-            <p><b>Rareza:</b> <span className={`rarity-${dungeonCharacter.rarityTier}-text`}>{dungeonCharacter.rarity}</span></p>
+            <p>
+              <b>Rareza:</b>
+              <span className={`rarity-${dungeonCharacter.rarityTier}-text`}>
+                {dungeonCharacter.rarity}
+              </span>
+            </p>
             <p><b>Clase:</b> {dungeonCharacter.class}</p>
             <p><b>Fragmento:</b> {dungeonCharacter.fragment}</p>
           </div>
           <div className="dungeon-character-indicator">
-            {dungeonCharacter.rarityTier === 3 ? '★3★' : dungeonCharacter.rarityTier === 2 ? '✦2✦' : '•1•'}
+            {dungeonCharacter.rarityTier === 3 ? '★3★' :
+              dungeonCharacter.rarityTier === 2 ? '✦2✦' : '•1•'}
           </div>
         </div>
       )}

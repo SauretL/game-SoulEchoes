@@ -1,0 +1,22 @@
+[
+    {
+        "id": 1,
+        "name": "Semilla de Dios",
+        "image": "img/enemies/GodSeed.png",
+        "maxHp": 50,
+        "physicalAttack": 8,
+        "psychicAttack": 3,
+        "physicalDefense": 4,
+        "psychicDefense": 2
+    },
+    {
+        "id": 2,
+        "name": "Regalo de Dios",
+        "image": "img/enemies/GodGift.png",
+        "maxHp": 40,
+        "physicalAttack": 5,
+        "psychicAttack": 12,
+        "physicalDefense": 3,
+        "psychicDefense": 8
+    }
+]

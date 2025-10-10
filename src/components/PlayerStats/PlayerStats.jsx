@@ -1,34 +1,35 @@
 import './PlayerStats.css'
 
 function PlayerStats({ playerCharacters, allCharacters, playerCoins, onBack }) {
-
-    // General stats
+    // ========== STATISTICS CALCULATION ==========
     const totalCharacters = allCharacters.length
     const uniqueOwnedCharacters = new Set(playerCharacters.map(char => char.id)).size
 
-    // Rarity
     const rarityStats = calculateRarityStats(playerCharacters, allCharacters)
-
-    // Class
     const classStats = calculateClassStats(playerCharacters, allCharacters)
-
-    // Fragment
     const fragmentStats = calculateFragmentStats(playerCharacters, allCharacters)
-
-    // Gender
     const genderStats = calculateGenderStats(playerCharacters, allCharacters)
-
-    // Fragment
     const fragmentDetailedStats = calculateFragmentDetailedStats(playerCharacters, allCharacters)
 
-    // DEBUG: Ver qué está pasando con los géneros
+    // ========== DEBUG LOGGING ==========
     console.log("=== DEBUG GENDER STATS ===")
-    console.log("All characters genders:", allCharacters.map(char => ({ id: char.id, name: char.name, gender: char.gender })))
-    console.log("Player characters genders:", playerCharacters.map(char => ({ id: char.id, name: char.name, gender: char.gender })))
+    console.log("All characters genders:", allCharacters.map(char => ({
+        id: char.id,
+        name: char.name,
+        gender: char.gender
+    })))
+    console.log("Player characters genders:", playerCharacters.map(char => ({
+        id: char.id,
+        name: char.name,
+        gender: char.gender
+    })))
     console.log("Gender stats result:", genderStats)
 
+    // ========== RENDER COMPONENT ==========
     return (
         <div className="stats-container">
+
+            {/* ========== HEADER SECTION ========== */}
             <div className="stats-header">
                 <h1>Estadísticas de la Colección</h1>
                 <div className="stats-top-info">
@@ -39,6 +40,7 @@ function PlayerStats({ playerCharacters, allCharacters, playerCoins, onBack }) {
                 </div>
             </div>
 
+            {/* ========== GENERAL STATISTICS SECTION ========== */}
             <div className="stats-section">
                 <h2>Resumen General</h2>
                 <div className="general-stats">
@@ -55,6 +57,7 @@ function PlayerStats({ playerCharacters, allCharacters, playerCoins, onBack }) {
                 </div>
             </div>
 
+            {/* ========== RARITY STATISTICS SECTION ========== */}
             <div className="stats-section">
                 <h2>Estadísticas por Rareza</h2>
                 <div className="stats-grid">
@@ -73,6 +76,7 @@ function PlayerStats({ playerCharacters, allCharacters, playerCoins, onBack }) {
                 </div>
             </div>
 
+            {/* ========== CLASS STATISTICS SECTION ========== */}
             <div className="stats-section">
                 <h2>Estadísticas por Clase</h2>
                 <div className="stats-grid">
@@ -91,6 +95,7 @@ function PlayerStats({ playerCharacters, allCharacters, playerCoins, onBack }) {
                 </div>
             </div>
 
+            {/* ========== FRAGMENT STATISTICS SECTION ========== */}
             <div className="stats-section">
                 <h2>Estadísticas por Fragmento</h2>
                 <div className="stats-grid">
@@ -109,6 +114,7 @@ function PlayerStats({ playerCharacters, allCharacters, playerCoins, onBack }) {
                 </div>
             </div>
 
+            {/* ========== GENDER STATISTICS SECTION ========== */}
             <div className="stats-section">
                 <h2>Estadísticas por Género</h2>
                 <div className="stats-grid">
@@ -127,12 +133,15 @@ function PlayerStats({ playerCharacters, allCharacters, playerCoins, onBack }) {
                 </div>
             </div>
 
+            {/* ========== DETAILED FRAGMENT BREAKDOWN SECTION ========== */}
             <div className="stats-section">
                 <h2>Desglose por Fragmento</h2>
                 {fragmentDetailedStats.map(fragmentStat => (
                     <div key={fragmentStat.fragment} className="fragment-detailed">
                         <h3>Fragmento: {fragmentStat.fragment}</h3>
                         <div className="detailed-stats">
+
+                            {/* RARITY BREAKDOWN */}
                             <div className="detailed-category">
                                 <h4>Rarezas</h4>
                                 {fragmentStat.rarities.map(stat => (
@@ -143,6 +152,7 @@ function PlayerStats({ playerCharacters, allCharacters, playerCoins, onBack }) {
                                 ))}
                             </div>
 
+                            {/* CLASS BREAKDOWN */}
                             <div className="detailed-category">
                                 <h4>Clases</h4>
                                 {fragmentStat.classes.map(stat => (
@@ -153,6 +163,7 @@ function PlayerStats({ playerCharacters, allCharacters, playerCoins, onBack }) {
                                 ))}
                             </div>
 
+                            {/* GENDER BREAKDOWN */}
                             <div className="detailed-category">
                                 <h4>Géneros</h4>
                                 {fragmentStat.genders.map(stat => (
@@ -170,7 +181,11 @@ function PlayerStats({ playerCharacters, allCharacters, playerCoins, onBack }) {
     )
 }
 
-// Stats calculation
+// ========== STATISTICS CALCULATION FUNCTIONS ==========
+
+/**
+ * Calculate rarity statistics for owned vs total characters
+ */
 function calculateRarityStats(playerCharacters, allCharacters) {
     const rarityGroups = {}
 
@@ -196,6 +211,9 @@ function calculateRarityStats(playerCharacters, allCharacters) {
     }))
 }
 
+/**
+ * Calculate class statistics for owned vs total characters
+ */
 function calculateClassStats(playerCharacters, allCharacters) {
     const classGroups = {}
 
@@ -221,6 +239,9 @@ function calculateClassStats(playerCharacters, allCharacters) {
     }))
 }
 
+/**
+ * Calculate fragment statistics for owned vs total characters
+ */
 function calculateFragmentStats(playerCharacters, allCharacters) {
     const fragmentGroups = {}
 
@@ -246,6 +267,9 @@ function calculateFragmentStats(playerCharacters, allCharacters) {
     }))
 }
 
+/**
+ * Calculate gender statistics for owned vs total characters
+ */
 function calculateGenderStats(playerCharacters, allCharacters) {
     const genderGroups = {}
 
@@ -271,6 +295,9 @@ function calculateGenderStats(playerCharacters, allCharacters) {
     }))
 }
 
+/**
+ * Calculate detailed fragment statistics including rarities, classes and genders
+ */
 function calculateFragmentDetailedStats(playerCharacters, allCharacters) {
     const fragments = [...new Set(allCharacters.map(char => char.fragment))]
 
@@ -279,9 +306,7 @@ function calculateFragmentDetailedStats(playerCharacters, allCharacters) {
         const ownedFragmentChars = playerCharacters.filter(char => char.fragment === fragment)
 
         const rarities = calculateRarityStats(ownedFragmentChars, fragmentChars)
-
         const classes = calculateClassStats(ownedFragmentChars, fragmentChars)
-
         const genders = calculateGenderStats(ownedFragmentChars, fragmentChars)
 
         return {

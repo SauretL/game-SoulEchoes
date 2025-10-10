@@ -2,13 +2,16 @@ import { useState } from 'react'
 import './CharacterDetail.css'
 
 function CharacterDetail({ character, onClose }) {
+    // ========== STATE MANAGEMENT ==========
     const [activeTab, setActiveTab] = useState('general')
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
     const [isImageModalOpen, setIsImageModalOpen] = useState(false)
     const [modalImageIndex, setModalImageIndex] = useState(0)
 
+    // ========== EARLY RETURN ==========
     if (!character) return null
 
+    // ========== IMAGE NAVIGATION FUNCTIONS ==========
     const nextImage = () => {
         setCurrentImageIndex((prev) =>
             prev < (character.images?.length - 1) ? prev + 1 : 0
@@ -33,6 +36,7 @@ function CharacterDetail({ character, onClose }) {
         )
     }
 
+    // ========== MODAL MANAGEMENT ==========
     const openImageModal = (index) => {
         setModalImageIndex(index)
         setIsImageModalOpen(true)
@@ -41,19 +45,21 @@ function CharacterDetail({ character, onClose }) {
     const closeImageModal = () => {
         setIsImageModalOpen(false)
     }
-    // Tier 1 Rarity simple look
+
+    // ========== RARITY TIER 1 - SIMPLIFIED VIEW ==========
     if (character.rarityTier === 1) {
         return (
             <div className="character-detail-overlay">
                 <div className="character-detail-container simplified-view">
-                    {/* Header */}
+                    {/* HEADER SECTION */}
                     <div className="detail-header">
                         <h1>{character.name}</h1>
                         <button className="close-button" onClick={onClose}>×</button>
                     </div>
 
+                    {/* CONTENT SECTION */}
                     <div className="simplified-content">
-                        {/* Image Gallery */}
+                        {/* IMAGE GALLERY */}
                         <div className="image-section">
                             <div className="main-image-container">
                                 <img
@@ -73,7 +79,9 @@ function CharacterDetail({ character, onClose }) {
                             </div>
                         </div>
 
+                        {/* CHARACTER INFORMATION */}
                         <div className="simplified-info">
+                            {/* BASIC INFO */}
                             <div className="basic-info">
                                 <p><strong>Epitafio:</strong> {character.epitaph}</p>
                                 <p><strong>Género:</strong> {character.gender}</p>
@@ -82,6 +90,7 @@ function CharacterDetail({ character, onClose }) {
                                 <p><strong>Fragmento:</strong> {character.fragment}</p>
                             </div>
 
+                            {/* STORY SECTION */}
                             {character.stories?.[0] && (
                                 <div className="story-section">
                                     <h3>Historia</h3>
@@ -89,16 +98,19 @@ function CharacterDetail({ character, onClose }) {
                                 </div>
                             )}
 
+                            {/* EQUIPMENT SECTION */}
                             <div className="equipment-section">
                                 <h3>Equipamiento</h3>
                                 <p>{character.equipmentNames?.[0] || 'Ninguno'}</p>
                             </div>
 
+                            {/* SKILLS SECTION */}
                             <div className="skills-section">
                                 <h3>Habilidades</h3>
                                 <p>{character.skillsNames?.[0] || 'Ninguno'}</p>
                             </div>
 
+                            {/* QUOTES SECTION */}
                             {character.quotes?.[0] && (
                                 <div className="quotes-section">
                                     <h3>Frase</h3>
@@ -112,18 +124,19 @@ function CharacterDetail({ character, onClose }) {
         )
     }
 
-    // Tier 2 and 3 Rarity complete look
+    // ========== RARITY TIER 2 & 3 - COMPLETE VIEW ==========
     return (
         <div className="character-detail-overlay">
             <div className="character-detail-container">
-                {/* Header */}
+                {/* HEADER SECTION */}
                 <div className="detail-header">
                     <h1>{character.name}</h1>
                     <button className="close-button" onClick={onClose}>×</button>
                 </div>
 
+                {/* MAIN CONTENT SECTION */}
                 <div className="detail-content">
-                    {/* Image Gallery */}
+                    {/* IMAGE GALLERY SECTION */}
                     <div className="image-section">
                         <div className="main-image-container">
                             <img
@@ -143,9 +156,9 @@ function CharacterDetail({ character, onClose }) {
                         </div>
                     </div>
 
-                    {/* Info Section */}
+                    {/* INFORMATION SECTION */}
                     <div className="info-section">
-                        {/* Tabs */}
+                        {/* TAB NAVIGATION */}
                         <div className="tabs">
                             {['general', 'quotes', 'story', 'gallery', 'skills', 'equipment'].map(tab => (
                                 <button
@@ -163,9 +176,9 @@ function CharacterDetail({ character, onClose }) {
                             ))}
                         </div>
 
-                        {/* Tab Content */}
+                        {/* TAB CONTENT AREA */}
                         <div className="tab-content">
-                            {/* General Tab */}
+                            {/* GENERAL TAB CONTENT */}
                             {activeTab === 'general' && (
                                 <div className="general-info">
                                     <p><strong>Epitafio:</strong> {character.epitaph}</p>
@@ -182,7 +195,7 @@ function CharacterDetail({ character, onClose }) {
                                 </div>
                             )}
 
-                            {/* Quotes Tab */}
+                            {/* QUOTES TAB CONTENT */}
                             {activeTab === 'quotes' && (
                                 <div className="quotes-info">
                                     <h3>Frases</h3>
@@ -206,7 +219,7 @@ function CharacterDetail({ character, onClose }) {
                                 </div>
                             )}
 
-                            {/* Story Tab */}
+                            {/* STORY TAB CONTENT */}
                             {activeTab === 'story' && (
                                 <div className="story-info">
                                     {character.stories?.map((story, index) => (
@@ -220,7 +233,7 @@ function CharacterDetail({ character, onClose }) {
                                 </div>
                             )}
 
-                            {/* Gallery Tab */}
+                            {/* GALLERY TAB CONTENT */}
                             {activeTab === 'gallery' && (
                                 <div className="gallery-info">
                                     <div className="gallery-grid">
@@ -239,32 +252,7 @@ function CharacterDetail({ character, onClose }) {
                                 </div>
                             )}
 
-                            {/* Modal for large image */}
-                            {isImageModalOpen && (
-                                <div className="image-modal-overlay" onClick={closeImageModal}>
-                                    <div className="image-modal-container" onClick={(e) => e.stopPropagation()}>
-                                        <button className="image-modal-close" onClick={closeImageModal}>×</button>
-                                        <div className="image-modal-content">
-                                            <img
-                                                src={character.images?.[modalImageIndex]}
-                                                alt={`${character.name} ${modalImageIndex + 1}`}
-                                                className="image-modal-img"
-                                            />
-                                        </div>
-                                        {character.images?.length > 1 && (
-                                            <>
-                                                <button className="image-modal-nav image-modal-prev" onClick={prevModalImage}>‹</button>
-                                                <button className="image-modal-nav image-modal-next" onClick={nextModalImage}>›</button>
-                                                <div className="image-modal-counter">
-                                                    {modalImageIndex + 1} / {character.images.length}
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Skills Tab */}
+                            {/* SKILLS TAB CONTENT */}
                             {activeTab === 'skills' && (
                                 <div className="skills-info">
                                     {character.skillsNames?.map((skillName, index) => (
@@ -278,7 +266,7 @@ function CharacterDetail({ character, onClose }) {
                                 </div>
                             )}
 
-                            {/* Equipment Tab */}
+                            {/* EQUIPMENT TAB CONTENT */}
                             {activeTab === 'equipment' && (
                                 <div className="equipment-info">
                                     {character.equipmentNames?.map((equipName, index) => (
@@ -294,8 +282,33 @@ function CharacterDetail({ character, onClose }) {
                         </div>
                     </div>
                 </div>
+
+                {/* IMAGE MODAL FOR GALLERY */}
+                {isImageModalOpen && (
+                    <div className="image-modal-overlay" onClick={closeImageModal}>
+                        <div className="image-modal-container" onClick={(e) => e.stopPropagation()}>
+                            <button className="image-modal-close" onClick={closeImageModal}>×</button>
+                            <div className="image-modal-content">
+                                <img
+                                    src={character.images?.[modalImageIndex]}
+                                    alt={`${character.name} ${modalImageIndex + 1}`}
+                                    className="image-modal-img"
+                                />
+                            </div>
+                            {character.images?.length > 1 && (
+                                <>
+                                    <button className="image-modal-nav image-modal-prev" onClick={prevModalImage}>‹</button>
+                                    <button className="image-modal-nav image-modal-next" onClick={nextModalImage}>›</button>
+                                    <div className="image-modal-counter">
+                                        {modalImageIndex + 1} / {character.images.length}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
-        </div >
+        </div>
     )
 }
 
