@@ -280,7 +280,7 @@
     },
     {
         "id": 8,
-        "name": "Sacerdote M",
+        "name": "Sacerdote",
         "rarity": "Común",
         "rarityTier": 1,
         "class": "Ninguna",
@@ -305,7 +305,7 @@
     },
     {
         "id": 9,
-        "name": "Sacerdote F",
+        "name": "Sacerdotiza",
         "rarity": "Común",
         "rarityTier": 1,
         "class": "Ninguna",

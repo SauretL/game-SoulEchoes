@@ -117,6 +117,48 @@
     box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
 }
 
+.dungeon-select-button {
+    background: #2a5a2a;
+    color: #98fb98;
+    border: 1px solid #2e8b57;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+    font-family: 'Courier New', monospace;
+    margin-top: 8px;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.dungeon-select-button:hover {
+    background: #3a6a3a;
+    transform: translateY(-1px);
+}
+
+/* Estilo para cuando el personaje está en uso */
+.dungeon-select-button:disabled {
+    background: #1a3a1a;
+    color: #7cfc7c;
+    border-color: #32cd32;
+    cursor: default;
+}
+
+.dungeon-select-button:disabled:hover {
+    transform: none;
+    background: #1a3a1a;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 2px solid #444;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
 /* LIBRARY GRID LAYOUT */
 .library-grid {
     display: grid;

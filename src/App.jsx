@@ -6,6 +6,7 @@ import gachaPull from './utils/gachaPull.js'
 import CharacterDetail from './components/CharacterDetail/CharacterDetail.jsx'
 import PlayerStats from './components/PlayerStats/PlayerStats.jsx'
 import allCharacters from './data/characters.json'
+import Dungeon from './components/Dungeon/Dungeon.jsx'
 
 function App() {
 
@@ -13,10 +14,73 @@ function App() {
   const [currentView, setCurrentView] = useState("start")
   const [characterArray, setCharacterArray] = useState([])
   const [pullCount, setPullCount] = useState(0)
-  const [playerCharacters, setPlayerCharacters] = useState([])
+  const [playerCharacters, setPlayerCharacters] = useState(() => {
+    // Valeria (id 16) is default character
+    const valeria = allCharacters.find(char => char.id === 16)
+    return valeria ? [{
+      id: valeria.id,
+      name: valeria.name,
+      epitaph: valeria.epitaph,
+      rarity: valeria.rarity,
+      rarityTier: valeria.rarityTier,
+      class: valeria.class,
+      fragment: valeria.fragment,
+      images: valeria.images,
+      duplicates: 1,
+      gender: valeria.gender,
+      age: valeria.age,
+      birthday: valeria.birthday,
+      likes: valeria.likes,
+      dislikes: valeria.dislikes,
+      favoriteFood: valeria.favoriteFood,
+      hobbies: valeria.hobbies,
+      stories: valeria.stories,
+      skillsNames: valeria.skillsNames,
+      skillsDescriptions: valeria.skillsDescriptions,
+      quotes: valeria.quotes,
+      equipmentNames: valeria.equipmentNames,
+      equipmentDescriptions: valeria.equipmentDescriptions,
+      opinions: valeria.opinions,
+      fragments: valeria.fragments,
+      birthdayQuoteSelf: valeria.birthdayQuoteSelf,
+      birthdayQuotePlayer: valeria.birthdayQuotePlayer
+    }] : []
+  })
   const [sortBy, setSortBy] = useState("id")
   const [selectedCharacter, setSelectedCharacter] = useState(null)
-  const [playerCoins, setPlayerCoins] = useState(1000)
+  const [playerCoins, setPlayerCoins] = useState(0)
+  const [dungeonCharacter, setDungeonCharacter] = useState(() => {
+    // Valeria as dungeon default character
+    const valeria = allCharacters.find(char => char.id === 16)
+    return valeria ? {
+      id: valeria.id,
+      name: valeria.name,
+      epitaph: valeria.epitaph,
+      rarity: valeria.rarity,
+      rarityTier: valeria.rarityTier,
+      class: valeria.class,
+      fragment: valeria.fragment,
+      images: valeria.images,
+      duplicates: 1,
+      gender: valeria.gender,
+      age: valeria.age,
+      birthday: valeria.birthday,
+      likes: valeria.likes,
+      dislikes: valeria.dislikes,
+      favoriteFood: valeria.favoriteFood,
+      hobbies: valeria.hobbies,
+      stories: valeria.stories,
+      skillsNames: valeria.skillsNames,
+      skillsDescriptions: valeria.skillsDescriptions,
+      quotes: valeria.quotes,
+      equipmentNames: valeria.equipmentNames,
+      equipmentDescriptions: valeria.equipmentDescriptions,
+      opinions: valeria.opinions,
+      fragments: valeria.fragments,
+      birthdayQuoteSelf: valeria.birthdayQuoteSelf,
+      birthdayQuotePlayer: valeria.birthdayQuotePlayer
+    } : null
+  })
 
 
   //functions
@@ -69,6 +133,23 @@ function App() {
 
       return updatedCollection
     })
+    setDungeonCharacter(prev => {
+      if (!prev && newCharacters.length > 0) {
+        return {
+          ...newCharacters[0],
+          duplicates: 1
+        }
+      }
+      return prev
+    })
+  }
+
+  const setDungeonCharacterFromLibrary = (character) => {
+    setDungeonCharacter(character)
+  }
+
+  const addCoinsFromDungeon = (coins) => {
+    setPlayerCoins(prevCoins => prevCoins + coins)
   }
 
   function gachaButton() {
@@ -150,6 +231,8 @@ function App() {
           <h1>Soul Echoes</h1>
           <p>¡Empieza el gacha!</p>
           <button onClick={gachaButton}>¡Prueba tu suerte!</button>
+          <button onClick={() => changeView("dungeon")}
+            style={{ marginLeft: '10px', backgroundColor: '#8B4513' }}>Explorar Dungeon</button>
           <button onClick={() => changeView("library")} style={{ marginLeft: '10px' }}>
             Ver Mi Colección ({playerCharacters.length})
           </button>
@@ -168,6 +251,9 @@ function App() {
           onBack={() => changeView("gacha")}
           onCharacterClick={handleCharacterClick}
           onShowStats={() => changeView("stats")}
+          onExploreDungeon={() => changeView("dungeon")}
+          setDungeonCharacter={setDungeonCharacterFromLibrary}
+          dungeonCharacter={dungeonCharacter}
         />
       )}
       {currentView === "stats" && (
@@ -176,6 +262,15 @@ function App() {
           allCharacters={allCharacters}
           playerCoins={playerCoins}
           onBack={() => changeView("library")}
+        />
+      )}
+      {currentView === "dungeon" && (
+        <Dungeon
+          onBack={() => changeView("gacha")}
+          onCoinEarned={addCoinsFromDungeon}
+          playerCoins={playerCoins}
+          dungeonCharacter={dungeonCharacter}
+          onCharacterClick={handleCharacterClick}
         />
       )}
       {/* Character Detail Modal */}

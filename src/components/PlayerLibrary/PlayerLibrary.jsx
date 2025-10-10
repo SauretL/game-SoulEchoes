@@ -1,6 +1,7 @@
 import './PlayerLibrary.css'
 
-function PlayerLibrary({ playerCharacters, sortBy, setSortBy, onBack, onCharacterClick, onShowStats, playerCoins }) {
+function PlayerLibrary({ playerCharacters, sortBy, setSortBy, onBack, onCharacterClick, onShowStats, playerCoins,
+    onExploreDungeon, setDungeonCharacter, dungeonCharacter }) {
     return (
         <div className="library-container">
             <div className="library-header">
@@ -27,6 +28,7 @@ function PlayerLibrary({ playerCharacters, sortBy, setSortBy, onBack, onCharacte
                 </div>
                 <div className="action-buttons">
                     <button onClick={onShowStats} className="stats-button">Ver Estadísticas</button>
+                    <button onClick={onExploreDungeon} className='dungeon-button'> Explorar Dungeon</button>
                     <button onClick={onBack} className="back-button">Volver al Gacha</button>
                 </div>
 
@@ -71,6 +73,13 @@ function PlayerLibrary({ playerCharacters, sortBy, setSortBy, onBack, onCharacte
                                 <div className={`rarity-indicator rarity-${character.rarityTier}`}>
                                     {character.rarityTier === 3 ? '★3★' : character.rarityTier === 2 ? '✦2✦' : '•1•'}
                                 </div>
+                                <button className="dungeon-select-button"
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        setDungeonCharacter(character)
+                                        alert(`${character.name} seleccionado para el Dungeon!`)
+                                    }}>
+                                    {dungeonCharacter?.id === character.id ? '✅ En Uso' : '🗡️ Usar en Dungeon'}</button>
                             </div>
                         </div>
                     ))
