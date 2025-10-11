@@ -90,7 +90,8 @@
 }
 
 .stats-button,
-.back-button {
+.back-button,
+.dungeon-button {
     background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
     color: white;
     border: none;
@@ -107,7 +108,12 @@
     background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
 }
 
-.stats-button:hover {
+.dungeon-button {
+    background: linear-gradient(135deg, #2a5a2a 0%, #3a8b3a 100%);
+}
+
+.stats-button:hover,
+.dungeon-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(106, 17, 203, 0.4);
 }
@@ -117,36 +123,36 @@
     box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
 }
 
-.dungeon-select-button {
+/* ACTIVE SELECT BUTTON */
+.active-select-button {
     background: #2a5a2a;
     color: #98fb98;
     border: 1px solid #2e8b57;
-    padding: 6px 12px;
-    border-radius: 4px;
+    padding: 8px 16px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 0.8em;
-    font-family: 'Courier New', monospace;
-    margin-top: 8px;
+    font-size: 0.9em;
+    font-weight: 600;
     transition: all 0.3s ease;
     width: 100%;
+    margin-top: 8px;
 }
 
-.dungeon-select-button:hover {
+.active-select-button:hover {
     background: #3a6a3a;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 139, 87, 0.4);
 }
 
-/* Estilo para cuando el personaje está en uso */
-.dungeon-select-button:disabled {
+.active-select-button.active {
     background: #1a3a1a;
     color: #7cfc7c;
     border-color: #32cd32;
-    cursor: default;
 }
 
-.dungeon-select-button:disabled:hover {
-    transform: none;
-    background: #1a3a1a;
+.active-select-button.active:hover {
+    background: #2a4a2a;
+    transform: translateY(-1px);
 }
 
 .card-footer {
@@ -157,6 +163,138 @@
     border-top: 2px solid #444;
     flex-wrap: wrap;
     gap: 8px;
+}
+
+/* ACTIVE SLOT SELECTION MODAL */
+.active-slot-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.active-slot-modal {
+    background: #2a2a2a;
+    border: 2px solid #444;
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.active-slot-modal h3 {
+    color: #ffd700;
+    text-align: center;
+    margin: 0 0 10px 0;
+    font-size: 1.4em;
+}
+
+.active-slot-modal p {
+    color: #e0e0e0;
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 0.95em;
+}
+
+.active-slots-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+.battle-row {
+    background: #1a1a2a;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #444;
+}
+
+.battle-row h4 {
+    color: #ffd700;
+    text-align: center;
+    margin: 0 0 15px 0;
+    font-size: 1.1em;
+}
+
+.slots-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.active-slot {
+    background: #333;
+    color: #e0e0e0;
+    border: 2px solid #555;
+    padding: 12px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85em;
+    transition: all 0.3s ease;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    word-break: break-word;
+}
+
+.active-slot.empty {
+    background: #2a2a2a;
+    border-color: #666;
+    color: #888;
+}
+
+.active-slot.empty:hover {
+    background: #3a3a3a;
+    border-color: #888;
+    color: #e0e0e0;
+    transform: translateY(-2px);
+}
+
+.active-slot.occupied {
+    background: #3a2a2a;
+    border-color: #8b4513;
+    color: #ffa07a;
+}
+
+.active-slot.occupied:hover {
+    background: #4a3a3a;
+    border-color: #a0522d;
+    transform: translateY(-2px);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+}
+
+.cancel-button {
+    background: #5a2a2a;
+    color: #ffa07a;
+    border: 1px solid #8b4513;
+    padding: 10px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.cancel-button:hover {
+    background: #6a3a3a;
+    transform: translateY(-2px);
 }
 
 /* LIBRARY GRID LAYOUT */
@@ -343,6 +481,177 @@
     font-weight: 700;
 }
 
+/* COMBAT POSITIONS STYLES */
+.combat-positions {
+    background: #1a1a2a;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #444;
+    margin-bottom: 20px;
+}
+
+.combat-positions h4 {
+    color: #ffd700;
+    text-align: center;
+    margin: 0 0 15px 0;
+    font-size: 1.1em;
+}
+
+.positions-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.battle-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.battle-row h5 {
+    color: #e0e0e0;
+    margin: 0;
+    text-align: center;
+    font-size: 0.9em;
+}
+
+.slots-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.combat-slot {
+    background: #2a2a2a;
+    border: 2px solid #555;
+    border-radius: 6px;
+    padding: 10px;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.combat-slot.empty {
+    border-style: dashed;
+    border-color: #666;
+    color: #888;
+}
+
+.combat-slot.occupied {
+    border-color: #296ab4;
+    background: rgba(41, 106, 180, 0.1);
+}
+
+.combat-slot.movable:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+.combat-slot.selected {
+    border-color: #ffd700;
+    background: rgba(255, 215, 0, 0.1);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+.slot-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+}
+
+.slot-content img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.slot-name {
+    color: #e0e0e0;
+    font-size: 0.8em;
+    text-align: center;
+    word-break: break-word;
+}
+
+.position-btn {
+    background: #5a2a2a;
+    color: #ffa07a;
+    border: 1px solid #8b4513;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+}
+
+.position-btn:hover:not(:disabled) {
+    background: #6a3a3a;
+    transform: translateY(-1px);
+}
+
+.position-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ACTIVE BUTTONS CONTAINER */
+.active-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+    width: 100%;
+}
+
+.active-position {
+    color: #98fb98;
+    font-size: 0.8em;
+    font-weight: 600;
+    text-align: center;
+    background: rgba(46, 139, 87, 0.2);
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #2e8b57;
+}
+
+.remove-active-button {
+    background: #5a2a2a;
+    color: #ff6b6b;
+    border: 1px solid #8b4513;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.remove-active-button:hover {
+    background: #6a3a3a;
+    transform: translateY(-1px);
+}
+
+.active-select-button.disabled {
+    background: #5a5a5a;
+    color: #cccccc;
+    border-color: #777;
+    cursor: not-allowed;
+}
+
+.active-select-button.disabled:hover {
+    background: #5a5a5a;
+    transform: none;
+    box-shadow: none;
+}
+
 /* RESPONSIVE DESIGN */
 @media (max-width: 768px) {
     .library-container {
@@ -374,7 +683,8 @@
     }
 
     .stats-button,
-    .back-button {
+    .back-button,
+    .dungeon-button {
         width: 100%;
         max-width: 250px;
     }
@@ -382,6 +692,53 @@
     .library-grid {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 20px;
+    }
+
+    /* Mobile modal improvements */
+    .active-slot-modal {
+        padding: 20px;
+        margin: 10px;
+    }
+
+    .slots-container {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .active-slot {
+        min-height: 50px;
+        font-size: 0.8em;
+    }
+
+    /* Combat positions mobile */
+    .combat-positions {
+        padding: 15px;
+    }
+
+    .slots-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .combat-slot {
+        min-height: 60px;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 10px;
+    }
+
+    .slot-content {
+        flex-direction: row;
+        justify-content: flex-start;
+    }
+
+    .slot-content img {
+        width: 30px;
+        height: 30px;
+    }
+
+    .slot-name {
+        font-size: 0.75em;
     }
 }
 
@@ -409,5 +766,53 @@
 
     .character-image-container {
         height: 180px;
+    }
+
+    .active-slot-modal {
+        padding: 15px;
+    }
+
+    .active-slot-modal h3 {
+        font-size: 1.2em;
+    }
+
+    .combat-positions {
+        padding: 10px;
+    }
+
+    .combat-slot {
+        min-height: 50px;
+        padding: 8px;
+    }
+
+    .slot-content img {
+        width: 25px;
+        height: 25px;
+    }
+}
+
+
+
+/* Small mobile devices */
+@media (max-width: 360px) {
+    .library-container {
+        padding: 5px;
+    }
+
+    .library-header {
+        padding: 10px;
+    }
+
+    .library-card {
+        padding: 10px;
+    }
+
+    .character-image-container {
+        height: 150px;
+    }
+
+    .active-slot {
+        font-size: 0.75em;
+        padding: 8px 4px;
     }
 }

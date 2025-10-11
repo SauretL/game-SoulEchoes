@@ -156,14 +156,15 @@
     {
         "id": 3,
         "name": "Teodora",
+        "gender": "Mujer",
         "rarity": "Común",
         "rarityTier": 1,
-        "class": "Ninguna",
+        "class": "Sin clase",
         "fragment": "Aethelgard",
         "images": [
             "img/common-chars/Aethelgard-Teodora.png"
         ],
-        "epitaph": "Vivió con pureza, murió con inocencia.",
+        "epitaph": "Vivió con pureza, murió en su inocencia.",
         "equipmentNames": [
             "Ninguno"
         ],
@@ -175,308 +176,307 @@
         ],
         "quotes": [
             "Mi hermano siempre quiso hacer lo correcto... aunque eso lo hiciera sufrir."
-        ],
-        "gender": "Mujer"
+        ]
     },
     {
         "id": 4,
         "name": "Estudiante M",
+        "gender": "Hombre",
         "rarity": "Común",
         "rarityTier": 1,
-        "class": "Ninguna",
+        "class": "Sin clase",
         "fragment": "Aethelgard",
         "images": [
             "img/common-chars/Aethelgard-StudentM.png"
         ],
-        "epitaph": "Buscó el saber como ofrenda a los dioses.",
+        "epitaph": "La educación nos separa de los bárbaros.",
         "equipmentNames": [
             "Ninguno"
         ],
         "stories": [
-            "Joven aprendiz de las artes y escrituras sagradas, dedicado a comprender los designios de La Orden y el lugar del hombre bajo la mirada divina."
+            "Todos los jóvenes de Aethelgard tenían que concurrir al instituto desde los 3 años hasta que comenzaran su adultez o cambiaran a la escuela militar o al seminarium catedralicio."
         ],
         "skillsNames": [
             "Ninguno"
         ],
         "quotes": [
-            "El conocimiento es la forma más pura de obediencia."
-        ],
-        "gender": "Hombre"
+            "¿Cómo esperan esos profesores que podamos leer todo un libro de ética para la semana que viene?"
+        ]
     },
     {
         "id": 5,
         "name": "Estudiante F",
+        "gender": "Mujer",
         "rarity": "Común",
         "rarityTier": 1,
-        "class": "Ninguna",
+        "class": "Sin clase",
         "fragment": "Aethelgard",
         "images": [
             "img/common-chars/Aethelgard-StudentF.png"
         ],
-        "epitaph": "Aprendió con fé, habló con verdad.",
+        "epitaph": "Sin educación no hay orden.",
         "equipmentNames": [
             "Ninguno"
         ],
         "stories": [
-            "Discípula entusiasta de los sabios de Aethelgard, criada entre pergaminos y oraciones, aspiraba a servir a La Orden con su intelecto."
+            "En Aethelgard siempre fue importante la educación de sus ciudadanos. Era de alta prioridad poder educarlos a todos para que pudieran seguir el orden divino y entender la importancia de la palabra de los dioses."
         ],
         "skillsNames": [
             "Ninguno"
         ],
         "quotes": [
-            "Cada palabra escrita es un mandato de los cielos."
-        ],
-        "gender": "Mujer"
+            "¡Hay que apurarse o llegaremos tarde al instituto!"
+        ]
     },
     {
         "id": 6,
         "name": "Caballero M",
+        "gender": "Hombre",
         "rarity": "Común",
         "rarityTier": 1,
-        "class": "Ninguna",
+        "class": "Sin clase",
         "fragment": "Aethelgard",
         "images": [
             "img/common-chars/Aethelgard-KnightM.png"
         ],
-        "epitaph": "Luchó sin dudar por la voluntad divina.",
+        "epitaph": "Eran el brazo armado de los nobles.",
         "equipmentNames": [
             "Ninguno"
         ],
         "stories": [
-            "Soldado juramentado de La Orden, entrenado para proteger las tierras sagradas y mantener la paz dictada por los dioses."
+            "No todos los soldados se volvían caballeros; antes, tenían que ser nombrados como tales por un noble. Al ser nombrados, obtenían un salario mayor y debían servir a la familia que los había nombrado. Sin embargo, no dejaban de ser militares, por lo que seguían sirviendo a la Orden, pero en una posición superior."
         ],
         "skillsNames": [
             "Ninguno"
         ],
         "quotes": [
-            "El acero sirve al mandato, no al hombre."
-        ],
-        "gender": "Hombre"
+            "La misericordia es un lujo; el orden, una necesidad."
+        ]
     },
     {
         "id": 7,
         "name": "Caballero F",
+        "gender": "Mujer",
         "rarity": "Común",
         "rarityTier": 1,
-        "class": "Ninguna",
+        "class": "Sin clase",
         "fragment": "Aethelgard",
         "images": [
             "img/common-chars/Aethelgard-KnightF.png"
         ],
-        "epitaph": "Defendió la fe con honor y fuego.",
+        "epitaph": "Instrumentos de los dioses, eran forjados en acero y voluntad.",
         "equipmentNames": [
             "Ninguno"
         ],
         "stories": [
-            "Guerrera disciplinada de La Orden, símbolo de rectitud y fuerza, dedicada a mantener la pureza de las ciudades santas."
+            "El título de caballero en Aethelgard es un honor que solo un noble de alto rango puede otorgar, uniendo el nombre de su casa al del guerrero. Sin embargo, el reconocimiento final debe ser validado por La Orden, que verifica que el candidato posea una fe y una conducta intachables."
         ],
         "skillsNames": [
             "Ninguno"
         ],
         "quotes": [
-            "Que mi espada sea la voz de los dioses."
-        ],
-        "gender": "Mujer"
+            "Me inclino ante los dioses, no ante los hombres."
+        ]
     },
     {
         "id": 8,
         "name": "Sacerdote",
+        "gender": "Hombre",
         "rarity": "Común",
         "rarityTier": 1,
-        "class": "Ninguna",
+        "class": "Sin clase",
         "fragment": "Aethelgard",
         "images": [
             "img/common-chars/Aethelgard-PriestM.png"
         ],
-        "epitaph": "Predicó la palabra hasta su último aliento.",
+        "epitaph": "La voluntad divina direccionaba y protegía.",
         "equipmentNames": [
             "Ninguno"
         ],
         "stories": [
-            "Siervo de los templos mayores, guía espiritual del pueblo, encargado de llevar las plegarias humanas a los oídos divinos."
+            "Intérpretes de la palabra divina y administradores de la fe. Los sacerdotes no solo dirigen los ritos, sino que también son consejeros de la nobleza y supervisores de la moral pública. Su influencia es sutil pero omnipresente, tejiendo la voluntad de los dioses en cada aspecto de la ley y la vida cotidiana."
         ],
         "skillsNames": [
             "Ninguno"
         ],
         "quotes": [
-            "La voz de La Orden nunca se equivoca."
-        ],
-        "gender": "Hombre"
+            "La duda es el primer paso hacia el caos. Confía en La Orden."
+        ]
     },
     {
         "id": 9,
-        "name": "Sacerdotiza",
+        "name": "Sacerdotisa",
+        "gender": "Mujer",
         "rarity": "Común",
         "rarityTier": 1,
-        "class": "Ninguna",
+        "class": "Sin clase",
         "fragment": "Aethelgard",
         "images": [
             "img/common-chars/Aethelgard-PriestF.png"
         ],
-        "epitaph": "Sirvió con devoción y pureza eterna.",
+        "epitaph": "Sin la fé, Aethelgard no es nada.",
         "equipmentNames": [
             "Ninguno"
         ],
         "stories": [
-            "Mujer consagrada al servicio divino, encargada de rituales y bendiciones, un faro de fe en tiempos de duda."
+            "Las sacerdotisas son las encargadas de los ritos de la vida y la muerte: nacimientos, matrimonios y funerales. Se las considera más cercanas a los aspectos compasivos y protectores de los dioses. Solo La Orden puede hablar con los dioses pero, además de ellos, los y las sacerdotes son los más cercanos de hacerlo en Aethelgard"
         ],
         "skillsNames": [
             "Ninguno"
         ],
         "quotes": [
-            "La fé no se pregunta, se cumple."
-        ],
-        "gender": "Mujer"
+            "La pureza no está en la sangre, sino en la intención del corazón."
+        ]
     },
     {
         "id": 10,
         "name": "Comerciante M",
+        "gender": "Hombre",
         "rarity": "Común",
         "rarityTier": 1,
-        "class": "Ninguna",
+        "class": "Sin clase",
         "fragment": "Aethelgard",
         "images": [
             "img/common-chars/Aethelgard-ShopkeeperM.png"
         ],
-        "epitaph": "Vendió con justicia y honró las leyes divinas.",
+        "epitaph": "La prosperidad al servicio del orden establecido.",
         "equipmentNames": [
             "Ninguno"
         ],
         "stories": [
-            "Mercader honesto de los mercados de Aethelgard, equilibrando el lucro con la piedad y cumpliendo los decretos del comercio sagrado."
+            "En una sociedad tan regulada, los comerciantes prosperan solo si sus negocios son bendecidos por La Orden y pagan sus impuestos religiosos a tiempo. Un comerciante exitoso sabe más de burocracia divina que de trueques, asegurándose de que cada transacción esté en línea con la doctrina."
         ],
         "skillsNames": [
             "Ninguno"
         ],
         "quotes": [
-            "El valor de una moneda está en la bendición que la respalda."
-        ],
-        "gender": "Hombre"
+            "Mis precios son justos, como manda la doctrina."
+        ]
     },
     {
         "id": 11,
         "name": "Comerciante F",
+        "gender": "Mujer",
         "rarity": "Común",
         "rarityTier": 1,
-        "class": "Ninguna",
+        "class": "Sin clase",
         "fragment": "Aethelgard",
         "images": [
             "img/common-chars/Aethelgard-ShopkeeperF.png"
         ],
-        "epitaph": "Comerció con virtud, prosperó con fe.",
+        "epitaph": "Un buen comercio pone féliz a los dioses.",
         "equipmentNames": [
             "Ninguno"
         ],
         "stories": [
-            "Vendedora conocida en las plazas santas, ejemplo de equilibrio entre trabajo, fe y obediencia a las normas de La Orden."
+            "En las calles abarrotadas de Aethelgard, los comerciantes son el corazón de la ciudad. Más que dueños de tiendas, son maestros del rumor y la información. Saben qué casa noble compra más vino, qué gremio está en desgracia y qué grupos bárbaros según los guardias fronterizos."
         ],
         "skillsNames": [
             "Ninguno"
         ],
         "quotes": [
-            "Que los dioses bendigan cada trato justo."
-        ],
-        "gender": "Mujer"
+            "La calidad de esta fruta es tan fina que honraría a un sacerdote."
+        ]
     },
     {
         "id": 12,
         "name": "Guardia M",
+        "gender": "Hombre",
         "rarity": "Común",
         "rarityTier": 1,
-        "class": "Ninguna",
+        "class": "Sin clase",
         "fragment": "Aethelgard",
         "images": [
             "img/common-chars/Aethelgard-GuardM.png"
         ],
-        "epitaph": "Protegió las murallas con alma de hierro.",
+        "epitaph": "Siempre hay alguien vigilando por bárbaros.",
         "equipmentNames": [
             "Ninguno"
         ],
         "stories": [
-            "Vigilante de las puertas sagradas, dedicado a mantener el orden en nombre de los dioses y proteger a los fieles de Aethelgard."
+            "La columna vertebral de la seguridad en Aethelgard. La mayoría son jóvenes que inician su servicio militar o veteranos que no alcanzaron el rango de caballero. Su labor es monótona pero vital: patrullar murallas, vigilar puertas y asegurar que el orden divino reine en cada calle."
         ],
         "skillsNames": [
             "Ninguno"
         ],
         "quotes": [
-            "El silencio también es una forma de obediencia."
-        ],
-        "gender": "Hombre"
+            "Nada que reportar, todo en orden."
+        ]
     },
     {
         "id": 13,
         "name": "Guardia F",
+        "gender": "Mujer",
         "rarity": "Común",
         "rarityTier": 1,
-        "class": "Ninguna",
+        "class": "Sin clase",
         "fragment": "Aethelgard",
         "images": [
             "img/common-chars/Aethelgard-GuardF.png"
         ],
-        "epitaph": "Custodió la fe sin titubeos ni descanso.",
+        "epitaph": "Los dioses y sus representantes necesitaban ojos y oídos en cada calle.",
         "equipmentNames": [
             "Ninguno"
         ],
         "stories": [
-            "Defensora de las calles y templos, guardiana severa que mantenía la paz y la ley divina en tiempos de agitación."
+            "Al rededor del territorio hay una extensa muralla que protegue Aethelgard de los bárbaros. A lo largo de ella se encuentran estacionados y patrullando cientos de guardias preparados para dar su vida por mantener el orden."
         ],
         "skillsNames": [
             "Ninguno"
         ],
         "quotes": [
-            "La paz se mantiene con disciplina, no con palabras."
-        ],
-        "gender": "Mujer"
+            "Es importante tener siempre algo que hacer para aportar a la comunidad, es lo que nos separa de los bárbaros."
+        ]
     },
     {
         "id": 14,
         "name": "Profesor M",
+        "gender": "Hombre",
         "rarity": "Común",
         "rarityTier": 1,
-        "class": "Ninguna",
+        "class": "Sin clase",
         "fragment": "Aethelgard",
         "images": [
             "img/common-chars/Aethelgard-ProfessorM.png"
         ],
-        "epitaph": "Enseñó la verdad dictada por los dioses.",
+        "epitaph": "Es importante transmitir para que no cuestionen.",
         "equipmentNames": [
             "Ninguno"
         ],
         "stories": [
-            "Maestro erudito, transmisor de las doctrinas y saberes antiguos, encargado de formar a las nuevas generaciones bajo la guía divina."
+            "Los profesores son los guardianes del conocimiento aprobado por La Orden. Su labor no es fomentar el pensamiento crítico, sino inculcar la historia oficial, la ética divina y el respeto absoluto a la jerarquía. Un día de clase exitoso es uno donde ningún estudiante hace una pregunta incómoda."
         ],
         "skillsNames": [
             "Ninguno"
         ],
         "quotes": [
-            "Nada se enseña sin la bendición de La Orden."
-        ],
-        "gender": "Hombre"
+            "Recuerden, niños: la precisión en su caligrafía refleja el orden en vuestro espíritu."
+        ]
     },
     {
         "id": 15,
-        "name": "Profesor F",
+        "name": "Profesora F",
+        "gender": "Mujer",
         "rarity": "Común",
         "rarityTier": 1,
-        "class": "Ninguna",
+        "class": "Sin clase",
         "fragment": "Aethelgard",
         "images": [
             "img/common-chars/Aethelgard-ProfessorF.png"
         ],
-        "epitaph": "Difundió la sabiduría sagrada con humildad.",
+        "epitaph": "La primera línea de fuerza del orden es la formación.",
         "equipmentNames": [
             "Ninguno"
         ],
         "stories": [
-            "Instructora dedicada, guardiana del conocimiento bendito, instruía a los jóvenes en los caminos de la fe y la razón bajo la mirada de los dioses."
+            "En Aethelgard, los profesores son los arquitectos del futuro de la ciudad. Son faros de estabilidad y orden, encargados de forjar a la próxima generación de ciudadanos ejemplares. Su vocación es noble: guiar a los jóvenes, impartiendo no solo conocimiento, sino también valores de disciplina, comunidad y propósito."
         ],
         "skillsNames": [
             "Ninguno"
         ],
         "quotes": [
-            "La verdad no se descubre, se recibe."
-        ],
-        "gender": "Mujer"
+            "Cada regla que aprenden no es una limitación, sino un cimiento para construir una vida de propósito."
+        ]
     },
     {
         "id": 16,

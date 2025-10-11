@@ -1,19 +1,24 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import './Dungeon.css'
 
 const Dungeon = ({
   onBack,
   onCoinEarned,
   playerCoins,
-  dungeonCharacter,
+  activeCharacters,
   onCharacterClick,
   onStartCombat,
-  enemies
+  enemies,
+  inCombat,
+  onForceEndCombat,
+  playerCharactersHp,
+  playerMaxHp
 }) => {
   // ========== STATE MANAGEMENT ==========
   const [playerPos, setPlayerPos] = useState({ x: 1, y: 1 })
   const [coinsCollected, setCoinsCollected] = useState(0)
   const [pendingCoins, setPendingCoins] = useState(0)
+  const [combatTriggered, setCombatTriggered] = useState(false)
 
   // ========== DUNGEON MAP CONFIGURATION ==========
   const map = [
@@ -35,7 +40,6 @@ const Dungeon = ({
   // ========== COIN PROCESSING EFFECT ==========
   useEffect(() => {
     if (pendingCoins > 0) {
-      // Usar setTimeout para deferir la actualización del estado padre
       const timer = setTimeout(() => {
         onCoinEarned(pendingCoins)
         setCoinsCollected(prev => prev + pendingCoins)
@@ -46,8 +50,22 @@ const Dungeon = ({
     }
   }, [pendingCoins, onCoinEarned])
 
+  // ========== COMBAT TRIGGER EFFECT ==========
+  useEffect(() => {
+    if (combatTriggered && enemies && enemies.length > 0) {
+      const randomEnemy = enemies[Math.floor(Math.random() * enemies.length)]
+      onStartCombat(randomEnemy)
+      setCombatTriggered(false)
+    }
+  }, [combatTriggered, enemies, onStartCombat])
+
   // ========== PLAYER MOVEMENT LOGIC ==========
-  const movePlayer = (direction) => {
+  const movePlayer = useCallback((direction) => {
+    if (inCombat) {
+      console.log("Movimiento bloqueado - en combate")
+      return
+    }
+
     setPlayerPos(prev => {
       let newX = prev.x
       let newY = prev.y
@@ -72,19 +90,32 @@ const Dungeon = ({
 
         // Chance to encounter enemy (20% probability)
         if (Math.random() < 0.2 && enemies && enemies.length > 0) {
-          const randomEnemy = enemies[Math.floor(Math.random() * enemies.length)]
-          onStartCombat(randomEnemy)
+          // Trigger combat in useEffect to avoid setState during render
+          setCombatTriggered(true)
         }
 
         return { x: newX, y: newY }
       }
       return prev
     })
-  }
+  }, [inCombat, enemies])
+
+  // ========== MANUAL COMBAT RESET ==========
+  const manualCombatReset = useCallback(() => {
+    console.log("Reset manual de combate (requested from Dungeon UI)")
+    if (typeof onForceEndCombat === 'function') {
+      onForceEndCombat()
+    }
+  }, [onForceEndCombat])
 
   // ========== KEYBOARD CONTROLS ==========
   useEffect(() => {
     const handleKeyPress = (e) => {
+      if (inCombat) {
+        console.log("Teclado bloqueado - en combate")
+        return
+      }
+
       switch (e.key) {
         case 'ArrowUp': movePlayer('up'); break
         case 'ArrowDown': movePlayer('down'); break
@@ -94,19 +125,76 @@ const Dungeon = ({
         case 's': case 'S': movePlayer('down'); break
         case 'a': case 'A': movePlayer('left'); break
         case 'd': case 'D': movePlayer('right'); break
+        case 'r': case 'R': manualCombatReset(); break
         default: return
       }
     }
 
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [movePlayer])
+  }, [movePlayer, inCombat, manualCombatReset])
+
+  // ========== RENDER ACTIVE CHARACTERS ==========
+  const renderActiveCharacters = () => {
+    const allActiveChars = [...activeCharacters.front, ...activeCharacters.back].filter(char => char !== null)
+
+    return (
+      <div className="dungeon-active-characters">
+        <h4>Equipo Activo</h4>
+        <div className="active-characters-grid">
+          {allActiveChars.map(character => (
+            <div
+              key={character.id}
+              className="dungeon-character-card"
+              onClick={() => onCharacterClick(character)}
+              style={{ cursor: 'pointer' }}
+            >
+              <div className={`dungeon-character-header rarity-${character.rarityTier}`}>
+                <h4>{character.name}</h4>
+                <span className="dungeon-duplicates">x{character.duplicates}</span>
+              </div>
+              <div className="dungeon-character-image">
+                <img src={character.images?.[0]} alt={character.name} />
+              </div>
+              <div className="dungeon-character-hp">
+                <div className="hp-bar">
+                  <div
+                    className="hp-fill"
+                    style={{
+                      width: `${Math.max(0, (playerCharactersHp[character.id] || playerMaxHp) / playerMaxHp * 100)}%`
+                    }}
+                  ></div>
+                  <span className="hp-text">
+                    HP: {playerCharactersHp[character.id] || playerMaxHp}/{playerMaxHp}
+                  </span>
+                </div>
+              </div>
+              <div className="dungeon-character-info">
+                <p>
+                  <b>Rareza:</b>
+                  <span className={`rarity-${character.rarityTier}-text`}>
+                    {character.rarity}
+                  </span>
+                </p>
+                <p><b>Clase:</b> {character.class}</p>
+              </div>
+              <div className="dungeon-character-indicator">
+                {character.rarityTier === 3 ? '★3★' :
+                  character.rarityTier === 2 ? '✦2✦' : '•1•'}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   // ========== DUNGEON RESET FUNCTION ==========
   const resetDungeon = () => {
     setPlayerPos({ x: 1, y: 1 })
     setCoinsCollected(0)
     setPendingCoins(0)
+    setCombatTriggered(false)
   }
 
   // ========== MAP RENDERING LOGIC ==========
@@ -138,15 +226,34 @@ const Dungeon = ({
         </div>
       </div>
 
+      {/* ========== COMBAT STATUS INDICATOR ========== */}
+      {inCombat && (
+        <div className="combat-status" style={{
+          backgroundColor: '#ff4444',
+          color: 'white',
+          padding: '10px',
+          borderRadius: '5px',
+          margin: '10px 0',
+          textAlign: 'center'
+        }}>
+          ⚔️ EN COMBATE - Movimiento deshabilitado
+          <br />
+          <small>Presiona 'R' para reset manual si hay errores</small>
+        </div>
+      )}
+
       {/* ========== NAVIGATION BUTTONS ========== */}
       <div className="dungeon-navigation">
         <button onClick={onBack} className="nav-button back-button">
           ← Volver al Gacha
         </button>
         <button onClick={resetDungeon} className="nav-button refresh-button">
-          🔄 Reiniciar
+          🔄 Reiniciar Dungeon
         </button>
       </div>
+
+      {/* ========== ACTIVE CHARACTERS DISPLAY ========== */}
+      {renderActiveCharacters()}
 
       {/* ========== GAME INSTRUCTIONS ========== */}
       <div className="dungeon-instructions">
@@ -154,6 +261,11 @@ const Dungeon = ({
         <p>🎯 Usa las flechas del teclado o los botones táctiles</p>
         <p>💰 Gana monedas mientras exploras</p>
         <p>👹 Enfréntate a enemigos aleatorios</p>
+        {inCombat && (
+          <p style={{ color: '#ff4444', fontWeight: 'bold' }}>
+            ⚠️ Combate en curso - Movimiento bloqueado
+          </p>
+        )}
       </div>
 
       {/* ========== DUNGEON MAP DISPLAY ========== */}
@@ -197,6 +309,7 @@ const Dungeon = ({
           <button
             className="touch-button up-button"
             onClick={() => movePlayer('up')}
+            disabled={inCombat}
           >
             ↑
           </button>
@@ -205,18 +318,21 @@ const Dungeon = ({
           <button
             className="touch-button left-button"
             onClick={() => movePlayer('left')}
+            disabled={inCombat}
           >
             ←
           </button>
           <button
             className="touch-button down-button"
             onClick={() => movePlayer('down')}
+            disabled={inCombat}
           >
             ↓
           </button>
           <button
             className="touch-button right-button"
             onClick={() => movePlayer('right')}
+            disabled={inCombat}
           >
             →
           </button>
@@ -233,38 +349,13 @@ const Dungeon = ({
           <span className="stat-label">Monedas ganadas:</span>
           <span className="stat-value">+{coinsCollected}</span>
         </div>
-      </div>
-
-      {/* ========== CHARACTER CARD SIDEBAR ========== */}
-      {dungeonCharacter && (
-        <div
-          className="dungeon-character-card"
-          onClick={() => onCharacterClick(dungeonCharacter)}
-          style={{ cursor: 'pointer' }}
-        >
-          <div className={`dungeon-character-header rarity-${dungeonCharacter.rarityTier}`}>
-            <h4>{dungeonCharacter.name}</h4>
-            <span className="dungeon-duplicates">x{dungeonCharacter.duplicates}</span>
-          </div>
-          <div className="dungeon-character-image">
-            <img src={dungeonCharacter.images?.[0]} alt={dungeonCharacter.name} />
-          </div>
-          <div className="dungeon-character-info">
-            <p>
-              <b>Rareza:</b>
-              <span className={`rarity-${dungeonCharacter.rarityTier}-text`}>
-                {dungeonCharacter.rarity}
-              </span>
-            </p>
-            <p><b>Clase:</b> {dungeonCharacter.class}</p>
-            <p><b>Fragmento:</b> {dungeonCharacter.fragment}</p>
-          </div>
-          <div className="dungeon-character-indicator">
-            {dungeonCharacter.rarityTier === 3 ? '★3★' :
-              dungeonCharacter.rarityTier === 2 ? '✦2✦' : '•1•'}
-          </div>
+        <div className="stat-item">
+          <span className="stat-label">Estado:</span>
+          <span className="stat-value" style={{ color: inCombat ? '#ff4444' : '#4CAF50' }}>
+            {inCombat ? '⚔️ En Combate' : '🌍 Explorando'}
+          </span>
         </div>
-      )}
+      </div>
     </div>
   )
 }
