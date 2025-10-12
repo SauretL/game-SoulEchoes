@@ -183,9 +183,7 @@ function PlayerStats({ playerCharacters, allCharacters, playerCoins, onBack }) {
 
 // ========== STATISTICS CALCULATION FUNCTIONS ==========
 
-/**
- * Calculate rarity statistics for owned vs total characters
- */
+/*Calculate rarity statistics for owned vs total characters*/
 function calculateRarityStats(playerCharacters, allCharacters) {
     const rarityGroups = {}
 
@@ -211,9 +209,7 @@ function calculateRarityStats(playerCharacters, allCharacters) {
     }))
 }
 
-/**
- * Calculate class statistics for owned vs total characters
- */
+/*Calculate class statistics for owned vs total characters*/
 function calculateClassStats(playerCharacters, allCharacters) {
     const classGroups = {}
 
@@ -239,9 +235,7 @@ function calculateClassStats(playerCharacters, allCharacters) {
     }))
 }
 
-/**
- * Calculate fragment statistics for owned vs total characters
- */
+/*Calculate fragment statistics for owned vs total characters*/
 function calculateFragmentStats(playerCharacters, allCharacters) {
     const fragmentGroups = {}
 
@@ -267,9 +261,7 @@ function calculateFragmentStats(playerCharacters, allCharacters) {
     }))
 }
 
-/**
- * Calculate gender statistics for owned vs total characters
- */
+/*Calculate gender statistics for owned vs total characters*/
 function calculateGenderStats(playerCharacters, allCharacters) {
     const genderGroups = {}
 
@@ -295,9 +287,7 @@ function calculateGenderStats(playerCharacters, allCharacters) {
     }))
 }
 
-/**
- * Calculate detailed fragment statistics including rarities, classes and genders
- */
+/* Calculate detailed fragment statistics including rarities, classes and gender*/
 function calculateFragmentDetailedStats(playerCharacters, allCharacters) {
     const fragments = [...new Set(allCharacters.map(char => char.fragment))]
 

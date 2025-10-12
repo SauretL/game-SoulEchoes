@@ -82,12 +82,6 @@ const Dungeon = ({
       // Check if new position is valid (not a wall)
       if (map[newY]?.[newX] === 0) {
 
-        // Chance to find coins while moving (30% probability)
-        if (Math.random() < 0.3) {
-          const coinsFound = Math.floor(Math.random() * 5) + 1 // 1-5 coins
-          setPendingCoins(coinsFound)
-        }
-
         // Chance to encounter enemy (20% probability)
         if (Math.random() < 0.2 && enemies && enemies.length > 0) {
           // Trigger combat in useEffect to avoid setState during render
@@ -102,7 +96,7 @@ const Dungeon = ({
 
   // ========== MANUAL COMBAT RESET ==========
   const manualCombatReset = useCallback(() => {
-    console.log("Reset manual de combate (requested from Dungeon UI)")
+    console.log("Reset manual de combate (solicitado desde la interfaz de Dungeon)")
     if (typeof onForceEndCombat === 'function') {
       onForceEndCombat()
     }
@@ -134,28 +128,92 @@ const Dungeon = ({
     return () => window.removeEventListener('keydown', handleKeyPress)
   }, [movePlayer, inCombat, manualCombatReset])
 
+  // ========== GET CHARACTER POSITION ==========
+  const getCharacterPosition = (character) => {
+    const frontIndex = activeCharacters.front.findIndex(char => char?.id === character.id)
+    if (frontIndex !== -1) {
+      const positions = ['Izquierda', 'Centro', 'Derecha']
+      return `Delantera ${positions[frontIndex]}`
+    }
+
+    const backIndex = activeCharacters.back.findIndex(char => char?.id === character.id)
+    if (backIndex !== -1) {
+      const positions = ['Izquierda', 'Centro', 'Derecha']
+      return `Trasera ${positions[backIndex]}`
+    }
+
+    return null
+  }
+
   // ========== RENDER ACTIVE CHARACTERS ==========
   const renderActiveCharacters = () => {
-    const allActiveChars = [...activeCharacters.front, ...activeCharacters.back].filter(char => char !== null)
+    // Combine all active characters with their actual positions
+    const allActiveChars = []
+
+    // Add front row characters with their positions
+    activeCharacters.front.forEach((char, index) => {
+      if (char) {
+        const positions = ['Izquierda', 'Centro', 'Derecha']
+        allActiveChars.push({
+          ...char,
+          position: `Delantera ${positions[index]}`,
+          row: 'front',
+          slot: index
+        })
+      }
+    })
+
+    // Add back row characters with their positions
+    activeCharacters.back.forEach((char, index) => {
+      if (char) {
+        const positions = ['Izquierda', 'Centro', 'Derecha']
+        allActiveChars.push({
+          ...char,
+          position: `Trasera ${positions[index]}`,
+          row: 'back',
+          slot: index
+        })
+      }
+    })
+
+    // If no active characters, show empty state
+    if (allActiveChars.length === 0) {
+      return (
+        <div className="dungeon-active-characters">
+          <h4>Almas Elegidas (0/6)</h4>
+          <div className="no-active-characters">
+            <p>No hay almas elegidas activas</p>
+            <small>Ve a tu biblioteca para elegir almas para la aventura</small>
+          </div>
+        </div>
+      )
+    }
 
     return (
       <div className="dungeon-active-characters">
-        <h4>Equipo Activo</h4>
+        <h4>Almas Elegidas ({allActiveChars.length}/6)</h4>
         <div className="active-characters-grid">
-          {allActiveChars.map(character => (
+          {allActiveChars.map((character, index) => (
             <div
-              key={character.id}
+              key={`${character.id}-${index}`}
               className="dungeon-character-card"
               onClick={() => onCharacterClick(character)}
               style={{ cursor: 'pointer' }}
             >
+              {/* Position Badge */}
+              <div className="position-badge">
+                {character.position}
+              </div>
+
               <div className={`dungeon-character-header rarity-${character.rarityTier}`}>
                 <h4>{character.name}</h4>
                 <span className="dungeon-duplicates">x{character.duplicates}</span>
               </div>
+
               <div className="dungeon-character-image">
                 <img src={character.images?.[0]} alt={character.name} />
               </div>
+
               <div className="dungeon-character-hp">
                 <div className="hp-bar">
                   <div
@@ -165,10 +223,11 @@ const Dungeon = ({
                     }}
                   ></div>
                   <span className="hp-text">
-                    HP: {playerCharactersHp[character.id] || playerMaxHp}/{playerMaxHp}
+                    PV: {playerCharactersHp[character.id] || playerMaxHp}/{playerMaxHp}
                   </span>
                 </div>
               </div>
+
               <div className="dungeon-character-info">
                 <p>
                   <b>Rareza:</b>
@@ -178,6 +237,7 @@ const Dungeon = ({
                 </p>
                 <p><b>Clase:</b> {character.class}</p>
               </div>
+
               <div className="dungeon-character-indicator">
                 {character.rarityTier === 3 ? '★3★' :
                   character.rarityTier === 2 ? '✦2✦' : '•1•'}
@@ -214,7 +274,7 @@ const Dungeon = ({
 
       {/* ========== DUNGEON HEADER ========== */}
       <div className="dungeon-header">
-        <h2>Dungeon</h2>
+        <h2>Mazmorra</h2>
         <div className="dungeon-info">
           <div className="coins-display">
             <span className="coins-label">Monedas:</span>
@@ -245,10 +305,10 @@ const Dungeon = ({
       {/* ========== NAVIGATION BUTTONS ========== */}
       <div className="dungeon-navigation">
         <button onClick={onBack} className="nav-button back-button">
-          ← Volver al Gacha
+          ← Volver a Invocaciones
         </button>
         <button onClick={resetDungeon} className="nav-button refresh-button">
-          🔄 Reiniciar Dungeon
+          🔄 Reiniciar Mazmorra
         </button>
       </div>
 
@@ -257,10 +317,11 @@ const Dungeon = ({
 
       {/* ========== GAME INSTRUCTIONS ========== */}
       <div className="dungeon-instructions">
-        <p>⚔️ Explora la mazmorra y encuentra tesoros</p>
+        <p>⚔️ Explora la mazmorra y encuentra enemigos</p>
         <p>🎯 Usa las flechas del teclado o los botones táctiles</p>
-        <p>💰 Gana monedas mientras exploras</p>
         <p>👹 Enfréntate a enemigos aleatorios</p>
+        <p>💰 Gana monedas al derrotar enemigos</p>
+        <p>¡Cuidado! Pierdes monedas si eres derrotado</p>
         {inCombat && (
           <p style={{ color: '#ff4444', fontWeight: 'bold' }}>
             ⚠️ Combate en curso - Movimiento bloqueado

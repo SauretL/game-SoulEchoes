@@ -11,25 +11,28 @@ function PlayerLibrary({
     playerCoins,
     onExploreDungeon,
     setActiveCharacter,
+    setActiveCharacters,
     activeCharacters
 }) {
-    // ========== ACTIVE CHARACTERS MANAGEMENT ==========
+    // ========== STATE MANAGEMENT ==========
     const [showActiveSelection, setShowActiveSelection] = useState(false)
     const [selectedCharacterForActive, setSelectedCharacterForActive] = useState(null)
 
-    // ========== GET ACTIVE CHARACTERS COUNT ==========
+    // ========== ACTIVE CHARACTERS UTILITIES ==========
+
+    /* Counts total active characters*/
     const getActiveCharactersCount = () => {
         return activeCharacters.front.filter(char => char).length +
             activeCharacters.back.filter(char => char).length
     }
 
-    // ========== CHECK IF CHARACTER IS ACTIVE ==========
+    /*Checks if a character is currently active*/
     const isCharacterActive = (character) => {
         return activeCharacters.front.some(char => char?.id === character.id) ||
             activeCharacters.back.some(char => char?.id === character.id)
     }
 
-    // ========== GET CHARACTER POSITION ==========
+    /*Gets the current position of an active character*/
     const getCharacterPosition = (character) => {
         const frontIndex = activeCharacters.front.findIndex(char => char?.id === character.id)
         if (frontIndex !== -1) return `Delantera ${frontIndex + 1}`
@@ -40,20 +43,22 @@ function PlayerLibrary({
         return null
     }
 
-    // ========== HANDLE CHARACTER SELECTION FOR ACTIVE ==========
+    // ========== ACTIVE CHARACTER MANAGEMENT ==========
+
+    /*Handles character selection for activation*/
     const handleCharacterSelectForActive = (character, e) => {
         e.stopPropagation()
 
         // Check if character is already active
         if (isCharacterActive(character)) {
-            alert(`${character.name} ya está activo en posición: ${getCharacterPosition(character)}`)
+            alert(`${character.name} ya está en la posición: ${getCharacterPosition(character)}`)
             return
         }
 
         // Check max active characters
         const activeCount = getActiveCharactersCount()
         if (activeCount >= 3) {
-            alert("¡Máximo 3 personajes activos! Remueve uno primero.")
+            alert("Solo puedes tener hasta 3 Almas Elegidas. Retira una antes de continuar.")
             return
         }
 
@@ -61,47 +66,65 @@ function PlayerLibrary({
         setShowActiveSelection(true)
     }
 
-    // ========== HANDLE ACTIVE SLOT SELECTION ==========
+    /* Handles slot selection for active character*/
     const handleActiveSlotSelect = (position, slot) => {
         if (selectedCharacterForActive) {
             setActiveCharacter(selectedCharacterForActive, position, slot)
             setShowActiveSelection(false)
             setSelectedCharacterForActive(null)
-            alert(`${selectedCharacterForActive.name} asignado a ${position === 'front' ? 'fila delantera' : 'fila trasera'} posición ${slot + 1}`)
+            alert(`${selectedCharacterForActive.name} asignado a la posición ${position === 'front' ? 'delantera' : 'trasera'} ${slot + 1}`)
         }
     }
 
-    // ========== REMOVE ACTIVE CHARACTER ==========
+    /* Removes a character from active team*/
     const removeActiveCharacter = (character, e) => {
         e.stopPropagation()
 
         // Prevent removing the last active character
         const activeCount = getActiveCharactersCount()
         if (activeCount <= 1) {
-            alert("¡No puedes remover tu último personaje activo!")
+            alert("¡No puedes retirar tu última Alma Elegida!")
             return
         }
 
-        setActiveCharacter(prev => {
-            const newActive = { ...prev }
-            Object.keys(newActive).forEach(row => {
-                newActive[row] = newActive[row].map(posChar =>
-                    posChar?.id === character.id ? null : posChar
-                )
-            })
+        // Remove character using setActiveCharacters
+        setActiveCharacters(prev => {
+            const newActive = {
+                front: [...prev.front],
+                back: [...prev.back]
+            }
+
+            // Remove character from front row
+            newActive.front = newActive.front.map(posChar =>
+                posChar?.id === character.id ? null : posChar
+            )
+
+            // Remove character from back row
+            newActive.back = newActive.back.map(posChar =>
+                posChar?.id === character.id ? null : posChar
+            )
+
             return newActive
         })
-        alert(`${character.name} removido del equipo activo`)
+
+        alert(`${character.name} retirado del equipo activo`)
     }
 
     // ========== RENDER FUNCTIONS ==========
+
+    /**
+     * Renders empty state when no characters
+     */
     const renderEmptyState = () => (
         <div className="empty-library">
-            <p>No tienes personajes en tu colección aún.</p>
-            <p>¡Haz algunos pulls en el gacha para empezar!</p>
+            <p>No tienes ninguna alma en tu colección aún.</p>
+            <p>¡Realiza algunas invocaciones para comenzar!</p>
         </div>
     )
 
+    /**
+     * Renders individual character card
+     */
     const renderCharacterCard = (character) => (
         <div
             key={character.id}
@@ -152,7 +175,7 @@ function PlayerLibrary({
                             <button
                                 className="remove-active-button"
                                 onClick={(e) => removeActiveCharacter(character, e)}>
-                                ❌ Remover
+                                ❌ Retirar
                             </button>
                         </>
                     ) : (
@@ -160,7 +183,7 @@ function PlayerLibrary({
                             className={`active-select-button ${getActiveCharactersCount() >= 3 ? 'disabled' : ''}`}
                             onClick={(e) => handleCharacterSelectForActive(character, e)}
                             disabled={getActiveCharactersCount() >= 3}>
-                            {getActiveCharactersCount() >= 3 ? '❌ Lleno' : '⚔️ Activar'}
+                            {getActiveCharactersCount() >= 3 ? '❌ Lleno' : '⚔️ Elegir'}
                         </button>
                     )}
                 </div>
@@ -178,9 +201,9 @@ function PlayerLibrary({
 
                 {/* LIBRARY INFORMATION */}
                 <div className="library-info">
-                    <p>Personajes coleccionados: {playerCharacters.length}</p>
+                    <p>Almas coleccionadas: {playerCharacters.length}</p>
                     <p>Monedas: {playerCoins}</p>
-                    <p>Personajes activos: {getActiveCharactersCount()}/3</p>
+                    <p>Almas Elegidas: {getActiveCharactersCount()}/3</p>
                 </div>
 
                 {/* SORTING CONTROLS */}
@@ -206,10 +229,10 @@ function PlayerLibrary({
                         Ver Estadísticas
                     </button>
                     <button onClick={onExploreDungeon} className='dungeon-button'>
-                        Explorar Dungeon
+                        Explorar Mazmorra
                     </button>
                     <button onClick={onBack} className="back-button">
-                        Volver al Gacha
+                        Volver a Invocaciones
                     </button>
                 </div>
             </div>
@@ -219,7 +242,7 @@ function PlayerLibrary({
                 <div className="active-slot-modal-overlay">
                     <div className="active-slot-modal">
                         <h3>Seleccionar Posición para {selectedCharacterForActive.name}</h3>
-                        <p>Elige una posición de combate (máximo 3 personajes activos)</p>
+                        <p>Elige una posición de combate (máximo 3 Almas Elegidas)</p>
 
                         <div className="active-slots-grid">
                             {/* Front Row */}

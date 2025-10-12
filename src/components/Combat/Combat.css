@@ -101,6 +101,13 @@
 .player-combatant {
     border-color: #296ab4;
     background: rgba(41, 106, 180, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.player-combatant:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
 }
 
 .player-combatant.active-turn {
@@ -136,6 +143,9 @@
     margin: 8px 0;
     position: relative;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .hp-fill {
@@ -143,21 +153,19 @@
     background: linear-gradient(90deg, #ef4444, #22c55e);
     transition: width 0.3s ease;
     border-radius: 8px;
+    position: absolute;
+    left: 0;
+    top: 0;
 }
 
 .hp-text {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: relative;
+    z-index: 2;
     font-size: 0.65em;
     font-weight: bold;
     color: white;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    padding: 0 5px;
 }
 
 /* STATS */
@@ -715,4 +723,149 @@
 
 .log-messages::-webkit-scrollbar-thumb:hover {
     background: #555;
+}
+
+/* Player side with position columns */
+.player-side {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    width: 100%;
+}
+
+.position-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.position-label {
+    text-align: center;
+    color: #ffd700;
+    font-weight: bold;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 4px;
+    border-radius: 4px;
+}
+
+/* Position badges */
+.position-badge {
+    font-size: 0.7em;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-top: 4px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.front-badge {
+    background: #dc2626;
+    color: white;
+}
+
+.back-badge {
+    background: #3b82f6;
+    color: white;
+}
+
+/* Empty slots */
+.empty-slot {
+    background: rgba(42, 42, 42, 0.3);
+    border: 2px dashed #666;
+    border-radius: 8px;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+}
+
+.empty-slot-content {
+    text-align: center;
+    font-size: 0.8em;
+}
+
+/* Responsive battle field */
+@media (max-width: 768px) {
+    .battle-field {
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+    }
+
+    .player-side {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .position-column {
+        gap: 6px;
+    }
+
+    /* Simplified mobile cards */
+    .combatant {
+        min-width: auto;
+        padding: 8px;
+    }
+
+    .combatant-info h3 {
+        font-size: 0.9em;
+        margin-bottom: 5px;
+    }
+
+    .hp-bar {
+        height: 12px;
+        margin: 4px 0;
+    }
+
+    .hp-text {
+        font-size: 0.6em;
+    }
+
+    .stats {
+        display: none;
+        /* Hide stats on mobile for simplicity */
+    }
+
+    .combatant-image img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .position-label {
+        font-size: 0.8em;
+    }
+
+    .position-badge {
+        font-size: 0.6em;
+        padding: 1px 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .player-side {
+        gap: 5px;
+    }
+
+    .combatant {
+        padding: 6px;
+    }
+
+    .combatant-info h3 {
+        font-size: 0.8em;
+    }
+
+    .combatant-image img {
+        width: 35px;
+        height: 35px;
+    }
+
+    .empty-slot {
+        min-height: 60px;
+    }
+
+    .position-label {
+        font-size: 0.75em;
+    }
 }

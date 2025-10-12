@@ -23,7 +23,7 @@
             ""
         ],
         "gender": "Hombre",
-        "age": 27,
+        "age": "27",
         "birthday": "Junio 15",
         "likes": "La Justicia, La Orden, su hermana Teodora.",
         "dislikes": "Valeria, los pecados, los perros, los bárbaros.",
@@ -100,7 +100,7 @@
             ""
         ],
         "gender": "Mujer",
-        "age": 24,
+        "age": "24",
         "birthday": "",
         "likes": "",
         "dislikes": "",
@@ -180,7 +180,7 @@
     },
     {
         "id": 4,
-        "name": "Estudiante M",
+        "name": "Estudiante M de Aethelgard",
         "gender": "Hombre",
         "rarity": "Común",
         "rarityTier": 1,
@@ -205,7 +205,7 @@
     },
     {
         "id": 5,
-        "name": "Estudiante F",
+        "name": "Estudiante F de Aethelgard",
         "gender": "Mujer",
         "rarity": "Común",
         "rarityTier": 1,
@@ -230,7 +230,7 @@
     },
     {
         "id": 6,
-        "name": "Caballero M",
+        "name": "Caballero M de Aethelgard",
         "gender": "Hombre",
         "rarity": "Común",
         "rarityTier": 1,
@@ -255,7 +255,7 @@
     },
     {
         "id": 7,
-        "name": "Caballero F",
+        "name": "Caballero F de Aethelgard",
         "gender": "Mujer",
         "rarity": "Común",
         "rarityTier": 1,
@@ -280,7 +280,7 @@
     },
     {
         "id": 8,
-        "name": "Sacerdote",
+        "name": "Sacerdote de Aethelgard",
         "gender": "Hombre",
         "rarity": "Común",
         "rarityTier": 1,
@@ -305,7 +305,7 @@
     },
     {
         "id": 9,
-        "name": "Sacerdotisa",
+        "name": "Sacerdotisa de Aethelgard",
         "gender": "Mujer",
         "rarity": "Común",
         "rarityTier": 1,
@@ -330,7 +330,7 @@
     },
     {
         "id": 10,
-        "name": "Comerciante M",
+        "name": "Comerciante M de Aethelgard",
         "gender": "Hombre",
         "rarity": "Común",
         "rarityTier": 1,
@@ -355,7 +355,7 @@
     },
     {
         "id": 11,
-        "name": "Comerciante F",
+        "name": "Comerciante F de Aethelgard",
         "gender": "Mujer",
         "rarity": "Común",
         "rarityTier": 1,
@@ -380,7 +380,7 @@
     },
     {
         "id": 12,
-        "name": "Guardia M",
+        "name": "Guardia M de Aethelgard",
         "gender": "Hombre",
         "rarity": "Común",
         "rarityTier": 1,
@@ -405,7 +405,7 @@
     },
     {
         "id": 13,
-        "name": "Guardia F",
+        "name": "Guardia F de Aethelgard",
         "gender": "Mujer",
         "rarity": "Común",
         "rarityTier": 1,
@@ -430,7 +430,7 @@
     },
     {
         "id": 14,
-        "name": "Profesor M",
+        "name": "Profesor M de Aethelgard",
         "gender": "Hombre",
         "rarity": "Común",
         "rarityTier": 1,
@@ -455,7 +455,7 @@
     },
     {
         "id": 15,
-        "name": "Profesora F",
+        "name": "Profesora F de Aethelgard",
         "gender": "Mujer",
         "rarity": "Común",
         "rarityTier": 1,
@@ -788,7 +788,7 @@
     },
     {
         "id": 20,
-        "name": "Cazador M",
+        "name": "Cazador M de Skarnfell",
         "rarity": "Común",
         "rarityTier": 1,
         "class": "Ninguna",
@@ -813,7 +813,7 @@
     },
     {
         "id": 21,
-        "name": "Cazador F",
+        "name": "Cazador F de Skarnfell",
         "rarity": "Común",
         "rarityTier": 1,
         "class": "Ninguna",
@@ -838,7 +838,7 @@
     },
     {
         "id": 22,
-        "name": "Artesano M",
+        "name": "Artesano M de Skarnfell",
         "rarity": "Común",
         "rarityTier": 1,
         "class": "Ninguna",
@@ -863,7 +863,7 @@
     },
     {
         "id": 23,
-        "name": "Artesano F",
+        "name": "Artesano F de Skarnfell",
         "rarity": "Común",
         "rarityTier": 1,
         "class": "Ninguna",
@@ -888,7 +888,7 @@
     },
     {
         "id": 24,
-        "name": "Shaman F",
+        "name": "Shaman F de Skarnfell",
         "rarity": "Común",
         "rarityTier": 1,
         "class": "Ninguna",
@@ -913,7 +913,7 @@
     },
     {
         "id": 25,
-        "name": "Shaman M",
+        "name": "Shaman M de Skarnfell",
         "rarity": "Común",
         "rarityTier": 1,
         "class": "Ninguna",

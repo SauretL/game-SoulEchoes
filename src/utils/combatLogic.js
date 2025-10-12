@@ -58,14 +58,14 @@ export const checkBattleEnd = (playerCharacters, enemy) => {
 
 // Calculate coins rewarded for winning battle
 export const getBattleReward = () => {
-    const baseCoins = Math.floor(Math.random() * 5) + 1 // 1-5 coins
-    const bonus = 2 // +2 bonus coins
+    const baseCoins = Math.floor(Math.random() * 10) + 1 // 1-10 coins
+    const bonus = 3 // +3 bonus coins
     return baseCoins + bonus
 }
 
 // Calculate coins lost for losing battle
 export const getBattlePenalty = () => {
-    return 25 // Lose 25 coins when losing
+    return 50 // Lose 50 coins when losing
 }
 
 // ========== CHARACTER HP MANAGEMENT ==========
