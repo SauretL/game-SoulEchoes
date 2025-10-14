@@ -1,3 +1,5 @@
+// ========== DAMAGE CALCULATION ==========
+
 // Calculate base damage between attack and defense
 export const calculateDamage = (attack, defense) => {
     const damage = Math.max(attack - defense, 1) // Minimum 1 damage
@@ -96,31 +98,6 @@ export const getFirstAlivePlayer = (playerCharacters) => {
     return playerCharacters.find(player => player.currentHp > 0) || null
 }
 
-// ========== COMBAT UTILITIES ==========
-
-// Check if a character can perform actions
-export const canCharacterAct = (character) => {
-    return character.currentHp > 0
-}
-
-// Calculate total party HP percentage
-export const getPartyHpPercentage = (playerCharacters, maxHp) => {
-    const totalCurrentHp = playerCharacters.reduce((sum, player) => sum + player.currentHp, 0)
-    const totalMaxHp = playerCharacters.length * maxHp
-    return (totalCurrentHp / totalMaxHp) * 100
-}
-
-// Get character position in formation
-export const getCharacterPosition = (character, activeCharacters) => {
-    const frontIndex = activeCharacters.front.findIndex(char => char?.id === character.id)
-    if (frontIndex !== -1) return { position: 'front', slot: frontIndex }
-
-    const backIndex = activeCharacters.back.findIndex(char => char?.id === character.id)
-    if (backIndex !== -1) return { position: 'back', slot: backIndex }
-
-    return null
-}
-
 // ========== ENEMY TARGETING LOGIC ==========
 
 // Get random alive player target
@@ -132,40 +109,138 @@ export const getRandomAlivePlayer = (playerCharacters) => {
     return alivePlayers[randomIndex]
 }
 
-// Get weakest player (lowest HP)
-export const getWeakestPlayer = (playerCharacters) => {
-    const alivePlayers = playerCharacters.filter(player => player.currentHp > 0)
-    if (alivePlayers.length === 0) return null
+// ========== PLAYER TURN MANAGEMENT ==========
 
-    return alivePlayers.reduce((weakest, player) => {
-        if (!weakest) return player
-        return player.currentHp < weakest.currentHp ? player : weakest
-    }, null)
+// Find next alive player for turn rotation
+export const findNextAlivePlayer = (playerCharacters, currentIndex) => {
+    const totalPlayers = playerCharacters.length
+    for (let i = 1; i <= totalPlayers; i++) {
+        const nextIndex = (currentIndex + i) % totalPlayers
+        if (playerCharacters[nextIndex].currentHp > 0) {
+            return nextIndex
+        }
+    }
+    return -1 // No players found alive
 }
 
-// Get front row players
-export const getFrontRowPlayers = (playerCharacters, activeCharacters) => {
-    return playerCharacters.filter(player =>
-        activeCharacters.front.some(char => char?.id === player.id)
-    )
+// ========== UI UTILITY FUNCTIONS ==========
+
+// Calculate HP percentage for health bars
+export const getHpPercentage = (current, max) => {
+    return Math.max((current / max) * 100, 0)
 }
 
-// ========== BATTLE STATISTICS ==========
+// ========== POSITION MANAGEMENT ==========
 
-// Calculate battle statistics
-export const getBattleStats = (playerCharacters, enemy) => {
-    const alivePlayers = playerCharacters.filter(player => player.currentHp > 0)
-    const totalDamageTaken = playerCharacters.reduce((sum, player) =>
-        sum + (player.maxHp - player.currentHp), 0
-    )
-    const enemyDamageTaken = enemy.maxHp - enemy.currentHp
+// Calculate position swap data for character movement
+export const calculatePositionSwap = (combatPositions, currentPlayer) => {
+    let currentPosition = null
+    let currentSlot = null
+
+    // Check front row
+    for (let i = 0; i < combatPositions.front.length; i++) {
+        if (combatPositions.front[i]?.id === currentPlayer.id) {
+            currentPosition = 'front'
+            currentSlot = i
+            break
+        }
+    }
+
+    // Check back row if not found in front
+    if (!currentPosition) {
+        for (let i = 0; i < combatPositions.back.length; i++) {
+            if (combatPositions.back[i]?.id === currentPlayer.id) {
+                currentPosition = 'back'
+                currentSlot = i
+                break
+            }
+        }
+    }
+
+    if (!currentPosition) return null
+
+    const targetPosition = currentPosition === 'front' ? 'back' : 'front'
+    const targetSlot = combatPositions[targetPosition].findIndex(slot => slot === null)
+
+    if (targetSlot === -1) return null
 
     return {
-        alivePlayers: alivePlayers.length,
-        totalPlayers: playerCharacters.length,
-        totalDamageTaken,
-        enemyDamageTaken,
-        isBattleWon: enemy.currentHp <= 0,
-        isBattleLost: alivePlayers.length === 0
+        currentPosition,
+        currentSlot,
+        targetPosition,
+        targetSlot
+    }
+}
+
+// Execute position swap between rows
+export const executePositionSwap = (combatPositions, swapData, currentPlayer) => {
+    const newPositions = { ...combatPositions }
+    const { currentPosition, currentSlot, targetPosition, targetSlot } = swapData
+
+    newPositions[currentPosition][currentSlot] = null
+    newPositions[targetPosition][targetSlot] = currentPlayer
+
+    return newPositions
+}
+
+// ========== COMBAT STATE INITIALIZATION ==========
+
+// Initialize combat state with player characters and enemy
+export const initializeCombatState = (activeCharacters, enemy, playerCharactersHp, playerMaxHp) => {
+    const playerCharacters = activeCharacters.front.concat(activeCharacters.back)
+        .filter(char => char !== null)
+        .map(char => ({
+            ...char,
+            currentHp: playerCharactersHp[char.id] || playerMaxHp,
+            maxHp: playerMaxHp,
+            physicalAttack: 12,
+            psychicAttack: 10,
+            physicalDefense: 8,
+            psychicDefense: 6
+        }))
+
+    return {
+        playerCharacters,
+        enemy: {
+            ...enemy,
+            currentHp: enemy.maxHp || 80
+        },
+        currentTurn: 'player',
+        currentPlayerTurnIndex: 0,
+        battleLog: [],
+        battleStatus: 'ongoing'
+    }
+}
+
+// ========== BATTLE LOG MANAGEMENT ==========
+
+// Add message to battle log
+export const addToBattleLog = (battleLog, message) => {
+    return [...battleLog, { message, timestamp: Date.now() }]
+}
+
+// Get last N battle log messages
+export const getLastBattleLogs = (battleLog, count = 6) => {
+    return battleLog.slice(-count)
+}
+
+// ========== COMBAT TEXT UTILITIES ==========
+
+// Get position text for battle log
+export const getPositionText = (position) => {
+    return position === 'front' ? 'delantera' : 'trasera'
+}
+
+// Get attack type text for battle log
+export const getAttackTypeText = (attackType) => {
+    return attackType === 'physical' ? 'Ataque Físico' : 'Ataque Psíquico'
+}
+
+// Get battle result text
+export const getBattleResultText = (result, enemyName) => {
+    if (result === 'victory') {
+        return `¡Victoria! Derrotaste a ${enemyName}`
+    } else {
+        return `¡Derrota! Fuiste derrotado por ${enemyName}`
     }
 }

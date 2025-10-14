@@ -505,11 +505,11 @@
         "age": null,
         "birthday": "",
         "likes": "",
-        "dislikes": "",
+        "dislikes": "Leandros",
         "favoriteFood": "",
         "hobbies": "",
         "stories": [
-            "",
+            "Hija menor de una prestigiosa familia de nobles, Valeria podía haber probado su valor en Aethelgard como sacerdotisa, pero decidió unirse a la escuela militar. Debido a su sangre noble, se convirtió en caballera apenas terminó su entrenamiento. ",
             "",
             "",
             "",
@@ -2192,6 +2192,237 @@
             ""
         ],
         "gender": "Femenino",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 44,
+        "name": "Victoria",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Shield",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Victoria01.png",
+            "img/characters/Aethelgard-Victoria02.png",
+            "img/characters/Aethelgard-Victoria03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 45,
+        "name": "Victor",
+        "rarity": "Épico",
+        "rarityTier": 3,
+        "class": "Mage",
+        "fragment": "Aethelgard",
+        "images": [
+            "img/characters/Aethelgard-Victor01.png",
+            "img/characters/Aethelgard-Victor02.png",
+            "img/characters/Aethelgard-Victor03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "",
+        "age": null,
+        "birthday": "",
+        "likes": "",
+        "dislikes": "",
+        "favoriteFood": "",
+        "hobbies": "",
+        "stories": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "skillsNames": [
+            "",
+            "",
+            ""
+        ],
+        "skillsDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "quotes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "birthdayQuoteSelf": "",
+        "birthdayQuotePlayer": "",
+        "opinions": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "fragments": {
+            "aethelgard": "",
+            "skarnfell": "",
+            "mycelondra": "",
+            "alsahra": "",
+            "grimfrost": "",
+            "yancan": ""
+        }
+    },
+    {
+        "id": 46,
+        "name": "Pimara",
+        "rarity": "Raro",
+        "rarityTier": 2,
+        "class": "Jumper",
+        "fragment": "Skarnfell",
+        "images": [
+            "img/characters/Skarnfell-Pimara01.png",
+            "img/characters/Skarnfell-Pimara02.png",
+            "img/characters/Skarnfell-Pimara03.png"
+        ],
+        "epitaph": "",
+        "equipmentNames": [
+            "",
+            "",
+            ""
+        ],
+        "equipmentDescriptions": [
+            "",
+            "",
+            ""
+        ],
+        "gender": "",
         "age": null,
         "birthday": "",
         "likes": "",

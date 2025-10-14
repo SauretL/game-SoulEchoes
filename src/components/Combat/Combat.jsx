@@ -1,6 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import './Combat.css'
-import { performAttack, enemyAI, checkBattleEnd, getBattleReward, getBattlePenalty } from '../../utils/combatLogic'
+import {
+    performAttack,
+    enemyAI,
+    checkBattleEnd,
+    getBattleReward,
+    getBattlePenalty,
+    getAlivePlayersCount as getAlivePlayersCountLogic,
+    findNextAlivePlayer,
+    getHpPercentage,
+    calculatePositionSwap,
+    executePositionSwap,
+    initializeCombatState,
+    addToBattleLog,
+    getLastBattleLogs
+} from '../../utils/combatLogic'
 import CharacterDetail from '../CharacterDetail/CharacterDetail'
 
 const Combat = ({
@@ -15,25 +29,9 @@ const Combat = ({
     onResetCharacterHp
 }) => {
     // ========== STATE MANAGEMENT ==========
-    const [combatState, setCombatState] = useState({
-        playerCharacters: activeCharacters.front.concat(activeCharacters.back).filter(char => char !== null).map(char => ({
-            ...char,
-            currentHp: playerCharactersHp[char.id] || playerMaxHp,
-            maxHp: playerMaxHp,
-            physicalAttack: 12,
-            psychicAttack: 10,
-            physicalDefense: 8,
-            psychicDefense: 6
-        })),
-        enemy: {
-            ...enemy,
-            currentHp: enemy.maxHp || 80
-        },
-        currentTurn: 'player',
-        currentPlayerTurnIndex: 0,
-        battleLog: [],
-        battleStatus: 'ongoing'
-    })
+    const [combatState, setCombatState] = useState(() =>
+        initializeCombatState(activeCharacters, enemy, playerCharactersHp, playerMaxHp)
+    )
 
     // ========== POSITION MANAGEMENT STATE ==========
     const [combatPositions, setCombatPositions] = useState({
@@ -50,24 +48,26 @@ const Combat = ({
         setCombatPositions(activeCharacters)
     }, [activeCharacters])
 
-    // ========== SYNC HP FROM PARENT ==========
-    useEffect(() => {
-        setCombatState(prev => ({
-            ...prev,
-            playerCharacters: prev.playerCharacters.map(char => ({
-                ...char,
-                currentHp: playerCharactersHp[char.id] || char.currentHp
-            }))
-        }))
-    }, [playerCharactersHp])
-
     // ========== BATTLE LOG MANAGEMENT ==========
-    const addToBattleLog = (message) => {
+    const handleAddToBattleLog = (message) => {
         setCombatState(prev => ({
             ...prev,
-            battleLog: [...prev.battleLog, { message, timestamp: Date.now() }]
+            battleLog: addToBattleLog(prev.battleLog, message)
         }))
     }
+
+    // ========== ENEMY TURN AUTOMATION ==========
+    useEffect(() => {
+        // When turn changes to enemy and battle is ongoing, execute enemy turn
+        if (combatState.currentTurn === 'enemy' && combatState.battleStatus === 'ongoing') {
+            // Delay for better UX
+            const timer = setTimeout(() => {
+                enemyTurn()
+            }, 1000)
+
+            return () => clearTimeout(timer)
+        }
+    }, [combatState.currentTurn, combatState.battleStatus])
 
     // ========== GET CURRENT PLAYER TURN ==========
     const getCurrentPlayerTurn = () => {
@@ -76,7 +76,7 @@ const Combat = ({
 
     // ========== GET ALIVE PLAYERS COUNT ==========
     const getAlivePlayersCount = () => {
-        return combatState.playerCharacters.filter(char => char.currentHp > 0).length
+        return getAlivePlayersCountLogic(combatState.playerCharacters)
     }
 
     // ========== POSITION SWAPPING ACTION ==========
@@ -86,57 +86,19 @@ const Combat = ({
         const currentPlayer = getCurrentPlayerTurn()
         if (!currentPlayer || currentPlayer.currentHp <= 0) return
 
-        // Find current position of the player
-        let currentPosition = null
-        let currentSlot = null
-
-        // Check front row
-        for (let i = 0; i < combatPositions.front.length; i++) {
-            if (combatPositions.front[i]?.id === currentPlayer.id) {
-                currentPosition = 'front'
-                currentSlot = i
-                break
-            }
-        }
-
-        // Check back row if not found in front
-        if (!currentPosition) {
-            for (let i = 0; i < combatPositions.back.length; i++) {
-                if (combatPositions.back[i]?.id === currentPlayer.id) {
-                    currentPosition = 'back'
-                    currentSlot = i
-                    break
-                }
-            }
-        }
-
-        if (!currentPosition) return
-
-        // Determine target position
-        const targetPosition = currentPosition === 'front' ? 'back' : 'front'
-
-        // Find empty slot in target position
-        const targetSlot = combatPositions[targetPosition].findIndex(slot => slot === null)
-        if (targetSlot === -1) {
-            addToBattleLog(`No space available in ${targetPosition === 'front' ? 'front' : 'back'} row`)
+        // Calculate position swap using combatLogic
+        const swapData = calculatePositionSwap(combatPositions, currentPlayer)
+        if (!swapData) {
+            handleAddToBattleLog(`No hay espacio disponible en la fila ${swapData?.targetPosition === 'front' ? 'delantera' : 'trasera'}`)
             return
         }
 
-        // Perform the position swap
-        setCombatPositions(prev => {
-            const newPositions = { ...prev }
+        // Execute the position swap
+        const newPositions = executePositionSwap(combatPositions, swapData, currentPlayer)
+        setCombatPositions(newPositions)
 
-            // Remove from current position
-            newPositions[currentPosition][currentSlot] = null
-
-            // Add to target position
-            newPositions[targetPosition][targetSlot] = currentPlayer
-
-            return newPositions
-        })
-
-        const positionText = targetPosition === 'front' ? 'front' : 'back'
-        addToBattleLog(`${currentPlayer.name} moved to ${positionText} row`)
+        const positionText = swapData.targetPosition === 'front' ? 'delantera' : 'trasera'
+        handleAddToBattleLog(`${currentPlayer.name} se mueve a la fila ${positionText}`)
 
         // End player turn after position swap
         endPlayerTurn()
@@ -174,9 +136,9 @@ const Combat = ({
         const actualDamage = Math.max(1, result.damage)
 
         // Create battle log message
-        const attackName = attackType === 'physical' ? 'Physical Attack' : 'Psychic Attack'
-        const criticalText = result.isCritical ? ' CRITICAL!' : ''
-        addToBattleLog(`${currentPlayer.name} uses ${attackName} - ${actualDamage} damage${criticalText}`)
+        const attackName = attackType === 'physical' ? 'Ataque Físico' : 'Ataque Psíquico'
+        const criticalText = result.isCritical ? ' ¡CRÍTICO!' : ''
+        handleAddToBattleLog(`${currentPlayer.name} usa ${attackName} - ${actualDamage} daño${criticalText}`)
 
         // Calculate enemy HP after attack
         const updatedEnemyHp = Math.max(0, combatState.enemy.currentHp - actualDamage)
@@ -201,56 +163,43 @@ const Combat = ({
 
     // ========== END PLAYER TURN ==========
     const endPlayerTurn = () => {
-        // Find next alive player
-        const nextPlayerIndex = findNextAlivePlayer(combatState.currentPlayerTurnIndex)
+        console.log("Finalizando turno del jugador actual")
+
+        const nextPlayerIndex = findNextAlivePlayer(combatState.playerCharacters, combatState.currentPlayerTurnIndex)
 
         if (nextPlayerIndex !== -1) {
-            // Continue with next player
+            console.log("Siguiente jugador encontrado:", combatState.playerCharacters[nextPlayerIndex].name)
+            // Continue with the next alive character
             setCombatState(prev => ({
                 ...prev,
                 currentPlayerTurnIndex: nextPlayerIndex
             }))
         } else {
-            // No more alive players, enemy turn
+            console.log("No hay más jugadores vivos, turno del enemigo")
+            // If there are no more alive characters, switch to enemy turn
             setCombatState(prev => ({
                 ...prev,
                 currentTurn: 'enemy',
-                currentPlayerTurnIndex: 0
+                currentPlayerTurnIndex: 0 // Reset for next round
             }))
-            setTimeout(() => {
-                enemyTurn()
-            }, 0)
         }
-    }
-
-    // ========== FIND NEXT ALIVE PLAYER ==========
-    const findNextAlivePlayer = (currentIndex) => {
-        const players = combatState.playerCharacters
-        let nextIndex = (currentIndex + 1) % players.length
-        let attempts = 0
-
-        while (attempts < players.length) {
-            if (players[nextIndex].currentHp > 0) {
-                return nextIndex
-            }
-            nextIndex = (nextIndex + 1) % players.length
-            attempts++
-        }
-
-        return -1 // No alive players found
     }
 
     // ========== ENEMY AI TURN ==========
     const enemyTurn = () => {
+        console.log("Turno enemigo comenzado")
+
         // Validate if enemy can attack
         if (combatState.battleStatus !== 'ongoing') return
+        console.log("La batalla continúa")
 
-        // Select random alive player character to attack
+        // Use imported function to get random alive player
         const alivePlayers = combatState.playerCharacters.filter(char => char.currentHp > 0)
         if (alivePlayers.length === 0) {
             endBattle('defeat')
             return
         }
+        console.log("Jugador está vivo")
 
         const randomPlayerIndex = Math.floor(Math.random() * alivePlayers.length)
         const targetPlayer = alivePlayers[randomPlayerIndex]
@@ -262,9 +211,9 @@ const Combat = ({
         const actualDamage = Math.max(1, result.damage)
 
         // Create battle log message
-        const attackName = result.attackType === 'physical' ? 'Physical Attack' : 'Psychic Attack'
-        const criticalText = result.isCritical ? ' CRITICAL!' : ''
-        addToBattleLog(`${enemy.name} uses ${attackName} against ${targetPlayer.name} - ${actualDamage} damage${criticalText}`)
+        const attackName = result.attackType === 'physical' ? 'Ataque Físico' : 'Ataque Psíquico'
+        const criticalText = result.isCritical ? ' ¡CRÍTICO!' : ''
+        handleAddToBattleLog(`${enemy.name} usa ${attackName} contra ${targetPlayer.name} - ${actualDamage} daño${criticalText}`)
 
         // Calculate player HP after attack
         const updatedPlayerHp = Math.max(0, targetPlayer.currentHp - actualDamage)
@@ -293,12 +242,14 @@ const Combat = ({
                 return prev // Return previous state since battle is ending
             }
 
+            console.log("Turno enemigo terminado")
+
             // Continue with updated players and switch back to player turn
             return {
                 ...prev,
                 playerCharacters: updatedPlayers,
                 currentTurn: 'player',
-                currentPlayerTurnIndex: findNextAlivePlayer(-1) // Find first alive player
+                currentPlayerTurnIndex: findNextAlivePlayer(updatedPlayers, -1) // Find first alive player
             }
         })
     }
@@ -308,10 +259,10 @@ const Combat = ({
         // Reset positions to original active characters setup
         setCombatPositions(activeCharacters)
 
-        // Reset HP for surviving characters if victory
-        if (result === 'victory') {
+        // ONLY reset HP for surviving characters if DEFEAT (not victory)
+        if (result === 'defeat') {
             combatState.playerCharacters.forEach(char => {
-                if (char.currentHp > 0 && typeof onResetCharacterHp === 'function') {
+                if (typeof onResetCharacterHp === 'function') {
                     onResetCharacterHp(char.id)
                 }
             })
@@ -323,11 +274,11 @@ const Combat = ({
         // Handle rewards or penalties
         if (result === 'victory') {
             const coinsWon = getBattleReward()
-            addToBattleLog(`Victory! You win ${coinsWon} coins`)
+            handleAddToBattleLog(`¡Victoria! Ganaste ${coinsWon} monedas`)
             onCoinUpdate(coinsWon)
         } else {
             const coinsLost = getBattlePenalty()
-            addToBattleLog(`Defeat! You lose ${coinsLost} coins`)
+            handleAddToBattleLog(`¡Derrota! Perdiste ${coinsLost} monedas`)
             onCoinUpdate(-coinsLost)
             onResetDungeon()
         }
@@ -338,11 +289,6 @@ const Combat = ({
         }, 3000)
     }
 
-    // ========== UTILITY FUNCTIONS ==========
-    const getHpPercentage = (current, max) => {
-        return Math.max((current / max) * 100, 0)
-    }
-
     // ========== RENDER COMPONENT ==========
     return (
         <div className="combat-overlay">
@@ -350,12 +296,12 @@ const Combat = ({
 
                 {/* ========== COMBAT HEADER ========== */}
                 <div className="combat-header">
-                    <h2>⚔️ Turn-Based Combat</h2>
+                    <h2>⚔️ Combate por Turnos</h2>
                     <div className="turn-indicator">
-                        Turn: {combatState.currentTurn === 'player' ? `PLAYER - ${getCurrentPlayerTurn()?.name || 'No player'}` : 'ENEMY'}
+                        Turno: {combatState.currentTurn === 'player' ? `JUGADOR - ${getCurrentPlayerTurn()?.name || 'Sin jugador'}` : 'ENEMIGO'}
                     </div>
                     <div className="alive-players-count">
-                        Alive players: {getAlivePlayersCount()}/{combatState.playerCharacters.length}
+                        Jugadores vivos: {getAlivePlayersCount()}/{combatState.playerCharacters.length}
                     </div>
                 </div>
 
@@ -366,7 +312,7 @@ const Combat = ({
                     <div className="player-side">
                         {/* Back Row Column */}
                         <div className="position-column back-row-column">
-                            <div className="position-label">Back Row</div>
+                            <div className="position-label">Fila Trasera</div>
                             {combatPositions.back.map((char, index) => (
                                 char ? (
                                     <div
@@ -382,10 +328,10 @@ const Combat = ({
                                                     style={{ width: `${getHpPercentage(combatState.playerCharacters.find(p => p.id === char.id)?.currentHp || 0, playerMaxHp)}%` }}
                                                 ></div>
                                                 <span className="hp-text">
-                                                    HP: {combatState.playerCharacters.find(p => p.id === char.id)?.currentHp || 0}/{playerMaxHp}
+                                                    PV: {combatState.playerCharacters.find(p => p.id === char.id)?.currentHp || 0}/{playerMaxHp}
                                                 </span>
                                             </div>
-                                            <div className="position-badge back-badge">Back</div>
+                                            <div className="position-badge back-badge">Trasero</div>
                                         </div>
                                         <div className="combatant-image">
                                             <img src={char.images?.[0]} alt={char.name} />
@@ -394,7 +340,7 @@ const Combat = ({
                                     </div>
                                 ) : (
                                     <div key={`back-empty-${index}`} className="combatant empty-slot">
-                                        <div className="empty-slot-content">Empty</div>
+                                        <div className="empty-slot-content">Vacío</div>
                                     </div>
                                 )
                             ))}
@@ -402,7 +348,7 @@ const Combat = ({
 
                         {/* Front Row Column */}
                         <div className="position-column front-row-column">
-                            <div className="position-label">Front Row</div>
+                            <div className="position-label">Fila Delantera</div>
                             {combatPositions.front.map((char, index) => (
                                 char ? (
                                     <div
@@ -418,10 +364,10 @@ const Combat = ({
                                                     style={{ width: `${getHpPercentage(combatState.playerCharacters.find(p => p.id === char.id)?.currentHp || 0, playerMaxHp)}%` }}
                                                 ></div>
                                                 <span className="hp-text">
-                                                    HP: {combatState.playerCharacters.find(p => p.id === char.id)?.currentHp || 0}/{playerMaxHp}
+                                                    PV: {combatState.playerCharacters.find(p => p.id === char.id)?.currentHp || 0}/{playerMaxHp}
                                                 </span>
                                             </div>
-                                            <div className="position-badge front-badge">Front</div>
+                                            <div className="position-badge front-badge">Delantero</div>
                                         </div>
                                         <div className="combatant-image">
                                             <img src={char.images?.[0]} alt={char.name} />
@@ -430,7 +376,7 @@ const Combat = ({
                                     </div>
                                 ) : (
                                     <div key={`front-empty-${index}`} className="combatant empty-slot">
-                                        <div className="empty-slot-content">Empty</div>
+                                        <div className="empty-slot-content">Vacío</div>
                                     </div>
                                 )
                             ))}
@@ -451,14 +397,14 @@ const Combat = ({
                                         style={{ width: `${getHpPercentage(combatState.enemy.currentHp, enemy.maxHp)}%` }}
                                     ></div>
                                     <span className="hp-text">
-                                        HP: {combatState.enemy.currentHp}/{enemy.maxHp}
+                                        PV: {combatState.enemy.currentHp}/{enemy.maxHp}
                                     </span>
                                 </div>
                                 <div className="stats">
-                                    <span>Phys ATK: {enemy.physicalAttack}</span>
-                                    <span>Psy ATK: {enemy.psychicAttack}</span>
-                                    <span>Phys DEF: {enemy.physicalDefense}</span>
-                                    <span>Psy DEF: {enemy.psychicDefense}</span>
+                                    <span>Ataque Fís: {enemy.physicalAttack}</span>
+                                    <span>Ataque Psí: {enemy.psychicAttack}</span>
+                                    <span>Defensa Fís: {enemy.physicalDefense}</span>
+                                    <span>Defensa Psí: {enemy.psychicDefense}</span>
                                 </div>
                             </div>
                             <div className="combatant-image">
@@ -472,34 +418,34 @@ const Combat = ({
                 {combatState.currentTurn === 'player' && combatState.battleStatus === 'ongoing' && getCurrentPlayerTurn()?.currentHp > 0 && (
                     <div className="action-buttons">
                         <div className="current-turn-indicator">
-                            Turn: {getCurrentPlayerTurn()?.name}
+                            Turno: {getCurrentPlayerTurn()?.name}
                         </div>
                         <button
                             className="attack-btn physical-attack"
                             onClick={() => playerAttack('physical')}
                         >
-                            🗡️ Physical Attack
+                            🗡️ Ataque Físico
                         </button>
                         <button
                             className="attack-btn psychic-attack"
                             onClick={() => playerAttack('psychic')}
                         >
-                            🔮 Psychic Attack
+                            🔮 Ataque Psíquico
                         </button>
                         <button
                             className="position-btn"
                             onClick={handlePositionSwap}
                         >
-                            🔄 Change Position
+                            🔄 Cambiar Posición
                         </button>
                     </div>
                 )}
 
                 {/* ========== BATTLE LOG ========== */}
                 <div className="battle-log">
-                    <h4>Combat Log:</h4>
+                    <h4>Registro de Combate:</h4>
                     <div className="log-messages">
-                        {combatState.battleLog.slice(-6).map((log, index) => (
+                        {getLastBattleLogs(combatState.battleLog).map((log, index) => (
                             <div key={index} className="log-message">
                                 {log.message}
                             </div>
@@ -511,12 +457,12 @@ const Combat = ({
                 {combatState.battleStatus !== 'ongoing' && (
                     <div className={`battle-result ${combatState.battleStatus}`}>
                         <h2>
-                            {combatState.battleStatus === 'victory' ? 'VICTORY!' : 'DEFEAT!'}
+                            {combatState.battleStatus === 'victory' ? '¡VICTORIA!' : '¡DERROTA!'}
                         </h2>
                         <p>
                             {combatState.battleStatus === 'victory'
-                                ? `You defeated ${enemy.name}`
-                                : `You were defeated by ${enemy.name}`
+                                ? `Derrotaste a ${enemy.name}`
+                                : `Fuiste derrotado por ${enemy.name}`
                             }
                         </p>
                     </div>

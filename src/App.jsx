@@ -9,43 +9,21 @@ import allCharacters from './data/characters.json'
 import Dungeon from './components/Dungeon/Dungeon.jsx'
 import enemies from './data/enemies.json'
 import Combat from './components/Combat/Combat.jsx'
+import { getActiveCharactersCount, isCharacterActive, getFirstActiveCharacter } from './utils/formationUtils'
 
 // ========== GAME CONSTANTS ==========
 const GACHA_PULL_COST = 50
 const DEFAULT_CHARACTER_ID = 16
 const PULL_COUNT = 5
+const MAX_CHARACTERS = 3
 
 // ========== CHARACTER OBJECT CREATOR ==========
 const createCharacterObject = (characterData, duplicates = 1) => {
   if (!characterData) return null
 
   return {
-    id: characterData.id,
-    name: characterData.name,
-    epitaph: characterData.epitaph,
-    rarity: characterData.rarity,
-    rarityTier: characterData.rarityTier,
-    class: characterData.class,
-    fragment: characterData.fragment,
-    images: characterData.images,
-    duplicates: duplicates,
-    gender: characterData.gender,
-    age: characterData.age,
-    birthday: characterData.birthday,
-    likes: characterData.likes,
-    dislikes: characterData.dislikes,
-    favoriteFood: characterData.favoriteFood,
-    hobbies: characterData.hobbies,
-    stories: characterData.stories,
-    skillsNames: characterData.skillsNames,
-    skillsDescriptions: characterData.skillsDescriptions,
-    quotes: characterData.quotes,
-    equipmentNames: characterData.equipmentNames,
-    equipmentDescriptions: characterData.equipmentDescriptions,
-    opinions: characterData.opinions,
-    fragments: characterData.fragments,
-    birthdayQuoteSelf: characterData.birthdayQuoteSelf,
-    birthdayQuotePlayer: characterData.birthdayQuotePlayer
+    ...characterData,    // Copy all character data
+    duplicates: duplicates  // Adds duplicate numbers
   }
 }
 
@@ -61,15 +39,13 @@ function App() {
   const [playerCoins, setPlayerCoins] = useState(50)
   const [isInCombat, setIsInCombat] = useState(false)
   const [playerMaxHp] = useState(100)
+  const [playerCharactersHp, setPlayerCharactersHp] = useState({})
 
   // ========== CHARACTER DATA MANAGEMENT ==========
   const [playerCharacters, setPlayerCharacters] = useState(() => {
-    const valeria = allCharacters.find(char => char.id === DEFAULT_CHARACTER_ID)
-    return valeria ? [createCharacterObject(valeria, 1)] : []
+    const defaultChar = allCharacters.find(char => char.id === DEFAULT_CHARACTER_ID)
+    return defaultChar ? [createCharacterObject(defaultChar, 1)] : []
   })
-
-  // ========== PLAYER HP MANAGEMENT ==========
-  const [playerCharactersHp, setPlayerCharactersHp] = useState({})
 
   // ========== ACTIVE CHARACTERS MANAGEMENT ==========
   const [activeCharacters, setActiveCharacters] = useState({
@@ -77,49 +53,13 @@ function App() {
     back: [null, null, null]   // [left, center, right]
   })
 
-  // ========== UTILITY FUNCTIONS ==========
-
-  /**
-   * Counts total active characters
-   */
-  const getActiveCharactersCount = useCallback(() => {
-    const frontCount = activeCharacters.front.filter(char => char !== null).length
-    const backCount = activeCharacters.back.filter(char => char !== null).length
-    return frontCount + backCount
-  }, [activeCharacters])
-
-  /**
-   * Checks if a character is active
-   */
-  const isCharacterActive = useCallback((character) => {
-    return activeCharacters.front.some(char => char?.id === character.id) ||
-      activeCharacters.back.some(char => char?.id === character.id)
-  }, [activeCharacters])
-
-  /**
-   * Gets the first active character
-   */
-  const getFirstActiveCharacter = useCallback(() => {
-    // Check front row first
-    for (let char of activeCharacters.front) {
-      if (char) return char
-    }
-    // Then check back row
-    for (let char of activeCharacters.back) {
-      if (char) return char
-    }
-    return null
-  }, [activeCharacters])
-
   // ========== ACTIVE CHARACTER SLOT MANAGEMENT ==========
 
-  /**
-   * Sets a character to active slot
-   */
+  /* Sets a character to active slot*/
   const setActiveCharacter = useCallback((character, position, slot) => {
     setActiveCharacters(prev => {
-      const currentActiveCount = getActiveCharactersCount()
-      const isAlreadyActive = isCharacterActive(character)
+      const currentActiveCount = getActiveCharactersCount(prev)
+      const isAlreadyActive = isCharacterActive(prev, character)
 
       // If character is null, we're removing from that position
       if (character === null) {
@@ -129,8 +69,8 @@ function App() {
       }
 
       // If already 3 active characters and adding new one
-      if (currentActiveCount >= 3 && !isAlreadyActive) {
-        alert("Maximum 3 active characters! Remove one first.")
+      if (currentActiveCount >= MAX_CHARACTERS && !isAlreadyActive) {
+        alert(`¡Máximo de ${MAX_CHARACTERS} personajes activos! Remueve uno primero.`)
         return prev
       }
 
@@ -148,21 +88,21 @@ function App() {
 
       return newActive
     })
-  }, [getActiveCharactersCount, isCharacterActive])
+  }, [])
 
   // ========== DEFAULT CHARACTER SETUP ==========
   useEffect(() => {
-    const valeria = allCharacters.find(char => char.id === DEFAULT_CHARACTER_ID)
+    const defaultChar = allCharacters.find(char => char.id === DEFAULT_CHARACTER_ID)
 
-    // Only auto-assign Valeria if NO characters are active at all
-    const totalActive = getActiveCharactersCount()
-    if (valeria && totalActive === 0) {
+    const totalActive = getActiveCharactersCount(activeCharacters)
+
+    if (defaultChar && totalActive === 0) {
       setActiveCharacters(prev => ({
         ...prev,
-        front: [createCharacterObject(valeria, 1), null, null]
+        front: [createCharacterObject(defaultChar, 1), null, null]
       }))
     }
-  }, [allCharacters, getActiveCharactersCount])
+  }, [allCharacters, activeCharacters])
 
   // ========== INITIALIZE CHARACTER HP ==========
   useEffect(() => {
@@ -178,9 +118,7 @@ function App() {
 
   // ========== CHARACTER COLLECTION MANAGEMENT ==========
 
-  /**
-   * Adds characters to player collection
-   */
+  /*Adds characters to player collection*/
   const addToPlayerCollection = useCallback((newCharacters) => {
     setPlayerCharacters(prevCollection => {
       const updatedCollection = [...prevCollection]
@@ -204,27 +142,18 @@ function App() {
 
       return updatedCollection
     })
-
-    // Auto-assign first character to active slot if no active characters
-    if (getFirstActiveCharacter() === null && newCharacters.length > 0) {
-      setActiveCharacter(newCharacters[0], 'front', 0)
-    }
-  }, [setActiveCharacter, getFirstActiveCharacter])
+  }, [setActiveCharacter, activeCharacters])
 
   // ========== CURRENCY MANAGEMENT ==========
 
-  /**
-   * Adds coins earned from dungeon
-   */
+  /*Adds coins earned from dungeon*/
   const addCoinsFromDungeon = useCallback((coins) => {
     setPlayerCoins(prevCoins => prevCoins + coins)
   }, [])
 
   // ========== CHARACTER HP MANAGEMENT ==========
 
-  /**
-   * Updates character HP
-   */
+  /*Updates character HP*/
   const updateCharacterHp = useCallback((characterId, newHp) => {
     setPlayerCharactersHp(prev => ({
       ...prev,
@@ -232,9 +161,7 @@ function App() {
     }))
   }, [])
 
-  /**
-   * Resets character HP to max
-   */
+  /*Resets character HP to max*/
   const resetCharacterHp = useCallback((characterId) => {
     setPlayerCharactersHp(prev => ({
       ...prev,
@@ -244,19 +171,11 @@ function App() {
 
   // ========== GACHA SYSTEM ==========
 
-  /**
-   * Handles gacha pull
-   */
+  /*Handles gacha pull*/
   const gachaButton = () => {
     // Validate player has enough coins
     if (playerCoins < GACHA_PULL_COST) {
-      alert("Not enough coins to do a pull!")
-      return
-    }
-
-    // Validate characters data is available
-    if (!allCharacters || allCharacters.length === 0) {
-      alert("Error: No characters available in the system")
+      alert("No tienes suficientes monedas para sacar más Almas")
       return
     }
 
@@ -280,18 +199,14 @@ function App() {
 
   // ========== COMBAT MANAGEMENT ==========
 
-  /**
-   * Starts combat with enemy
-   */
+  /*Starts combat with enemy*/
   const startCombat = useCallback((enemy) => {
     setCurrentEnemy(enemy)
     setShowCombat(true)
     setIsInCombat(true)
   }, [])
 
-  /**
-   * Ends combat
-   */
+  /*Ends combat*/
   const endCombat = useCallback((result) => {
     setShowCombat(false)
     setCurrentEnemy(null)
@@ -301,15 +216,6 @@ function App() {
 
   /* Resets dungeon state*/
   const resetDungeon = useCallback(() => {
-    setShowCombat(false)
-    setCurrentEnemy(null)
-    setIsInCombat(false)
-    // Reset player HP if needed
-    // setPlayerHp(playerMaxHp)
-  }, []) // Removed playerMaxHp dependency as setPlayerHp is not defined
-
-  /** Force ends combat from dungeon*/
-  const forceEndCombatFromDungeon = useCallback(() => {
     setShowCombat(false)
     setCurrentEnemy(null)
     setIsInCombat(false)
@@ -439,7 +345,7 @@ function App() {
           onStartCombat={startCombat}
           enemies={enemies}
           inCombat={isInCombat}
-          onForceEndCombat={forceEndCombatFromDungeon}
+          onResetDungeon={resetDungeon}
           playerCharactersHp={playerCharactersHp}
           playerMaxHp={playerMaxHp}
         />
@@ -456,7 +362,7 @@ function App() {
       {/* ========== COMBAT OVERLAY ========== */}
       {showCombat && currentEnemy && (
         <Combat
-          playerCharacters={playerCharacters}
+          // FIXED: Removed duplicate playerCharacters prop that conflicts with activeCharacters
           activeCharacters={activeCharacters}
           enemy={currentEnemy}
           onCombatEnd={(result) => {

@@ -10,7 +10,7 @@ const Dungeon = ({
   onStartCombat,
   enemies,
   inCombat,
-  onForceEndCombat,
+  onResetDungeon,
   playerCharactersHp,
   playerMaxHp
 }) => {
@@ -97,10 +97,10 @@ const Dungeon = ({
   // ========== MANUAL COMBAT RESET ==========
   const manualCombatReset = useCallback(() => {
     console.log("Reset manual de combate (solicitado desde la interfaz de Dungeon)")
-    if (typeof onForceEndCombat === 'function') {
-      onForceEndCombat()
+    if (typeof onResetDungeon === 'function') {
+      onResetDungeon()
     }
-  }, [onForceEndCombat])
+  }, [onResetDungeon])
 
   // ========== KEYBOARD CONTROLS ==========
   useEffect(() => {
@@ -180,7 +180,7 @@ const Dungeon = ({
     if (allActiveChars.length === 0) {
       return (
         <div className="dungeon-active-characters">
-          <h4>Almas Elegidas (0/6)</h4>
+          <h4>Almas Elegidas (0/3)</h4>
           <div className="no-active-characters">
             <p>No hay almas elegidas activas</p>
             <small>Ve a tu biblioteca para elegir almas para la aventura</small>
@@ -255,6 +255,18 @@ const Dungeon = ({
     setCoinsCollected(0)
     setPendingCoins(0)
     setCombatTriggered(false)
+
+    // Reset all character HP when resetting dungeon
+    if (activeCharacters) {
+      const allCharacters = [...activeCharacters.front, ...activeCharacters.back].filter(char => char !== null)
+      allCharacters.forEach(character => {
+        // Call parent function to reset HP for each character
+        if (typeof onCharacterHpChange === 'function') {
+          // Reset to max HP
+          onCharacterHpChange(character.id, playerMaxHp)
+        }
+      })
+    }
   }
 
   // ========== MAP RENDERING LOGIC ==========
