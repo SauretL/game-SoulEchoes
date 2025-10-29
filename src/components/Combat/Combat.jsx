@@ -165,22 +165,52 @@ const Combat = ({
     const endPlayerTurn = () => {
         console.log("Finalizando turno del jugador actual")
 
-        const nextPlayerIndex = findNextAlivePlayer(combatState.playerCharacters, combatState.currentPlayerTurnIndex)
+        const alivePlayers = combatState.playerCharacters.filter(player => player.currentHp > 0)
 
-        if (nextPlayerIndex !== -1) {
-            console.log("Siguiente jugador encontrado:", combatState.playerCharacters[nextPlayerIndex].name)
-            // Continue with the next alive character
+        // If no alive players, end battle
+        if (alivePlayers.length === 0) {
+            endBattle('defeat')
+            return
+        }
+
+        // Try to find the next alive player
+        let nextIndex = (combatState.currentPlayerTurnIndex + 1) % combatState.playerCharacters.length
+        let attempts = 0
+        let foundNextPlayer = false
+
+        // Search for next alive player
+        while (attempts < combatState.playerCharacters.length) {
+            if (combatState.playerCharacters[nextIndex].currentHp > 0) {
+                // Found an alive player
+                foundNextPlayer = true
+                break
+            }
+            nextIndex = (nextIndex + 1) % combatState.playerCharacters.length
+            attempts++
+        }
+
+        // Check if we've cycled through all players
+        if (foundNextPlayer && nextIndex > combatState.currentPlayerTurnIndex) {
+            // There's another player in this round, continue with them
             setCombatState(prev => ({
                 ...prev,
-                currentPlayerTurnIndex: nextPlayerIndex
+                currentPlayerTurnIndex: nextIndex
+            }))
+        } else if (foundNextPlayer && nextIndex <= combatState.currentPlayerTurnIndex) {
+            // We've wrapped around - all players have had their turn, switch to enemy
+            console.log("Todos los jugadores han jugado, pasando al enemigo")
+            setCombatState(prev => ({
+                ...prev,
+                currentTurn: 'enemy', // ADDED: Actually switch to enemy turn
+                currentPlayerTurnIndex: nextIndex // ADDED: Save next player for next round
             }))
         } else {
-            console.log("No hay más jugadores vivos, turno del enemigo")
-            // If there are no more alive characters, switch to enemy turn
+            // Shouldn't happen due to initial validation, but switch to enemy as fallback
+            console.log("No se encontraron más jugadores vivos, pasando al enemigo")
             setCombatState(prev => ({
                 ...prev,
                 currentTurn: 'enemy',
-                currentPlayerTurnIndex: 0 // Reset for next round
+                currentPlayerTurnIndex: 0
             }))
         }
     }
