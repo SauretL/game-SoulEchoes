@@ -1,5 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import './Dungeon.css'
+import {
+  getInitialDungeonState,
+  resetDungeonState,
+  executePlayerMovement,
+  getCellDisplay,
+  getAllActiveCharacters,
+  getActiveCharactersCount,
+  hasActiveCharacters,
+  isMovementAllowed,
+  getDirectionFromKey,
+  isResetKey,
+  resetAllCharactersHP
+} from '../../utils/dungeonLogic'
+import { getDefaultDungeon } from '../../utils/dungeonMaps'
 
 const Dungeon = ({
   onBack,
@@ -14,28 +28,20 @@ const Dungeon = ({
   playerCharactersHp,
   playerMaxHp
 }) => {
-  // ========== STATE MANAGEMENT ==========
-  const [playerPos, setPlayerPos] = useState({ x: 1, y: 1 })
-  const [coinsCollected, setCoinsCollected] = useState(0)
-  const [pendingCoins, setPendingCoins] = useState(0)
-  const [combatTriggered, setCombatTriggered] = useState(false)
+  // ========== DUNGEON CONFIGURATION ==========
+  const currentDungeon = getDefaultDungeon()
+  const map = currentDungeon.map
+  const startPosition = currentDungeon.startPos
+  const encounterRate = currentDungeon.encounterRate
 
-  // ========== DUNGEON MAP CONFIGURATION ==========
-  const map = [
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1],
-    [1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1],
-    [1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
-    [1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1],
-    [1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1],
-    [1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1],
-    [1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1],
-    [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-  ]
+  // ========== STATE MANAGEMENT ==========
+  // Use dungeon's start position
+  const initialState = getInitialDungeonState(startPosition)
+
+  const [playerPos, setPlayerPos] = useState(initialState.playerPos)
+  const [coinsCollected, setCoinsCollected] = useState(initialState.coinsCollected)
+  const [pendingCoins, setPendingCoins] = useState(initialState.pendingCoins)
+  const [combatTriggered, setCombatTriggered] = useState(initialState.combatTriggered)
 
   // ========== COIN PROCESSING EFFECT ==========
   useEffect(() => {
@@ -53,46 +59,37 @@ const Dungeon = ({
   // ========== COMBAT TRIGGER EFFECT ==========
   useEffect(() => {
     if (combatTriggered && enemies && enemies.length > 0) {
-      const randomEnemy = enemies[Math.floor(Math.random() * enemies.length)]
-      onStartCombat(randomEnemy)
       setCombatTriggered(false)
     }
-  }, [combatTriggered, enemies, onStartCombat])
+  }, [combatTriggered, enemies])
 
   // ========== PLAYER MOVEMENT LOGIC ==========
   const movePlayer = useCallback((direction) => {
-    if (inCombat) {
+    // Check if movement is allowed
+    if (!isMovementAllowed(inCombat)) {
       console.log("Movimiento bloqueado - en combate")
       return
     }
 
-    setPlayerPos(prev => {
-      let newX = prev.x
-      let newY = prev.y
+    // Use dungeon's encounter rate
+    const movementResult = executePlayerMovement(
+      playerPos,
+      direction,
+      map,
+      enemies,
+      encounterRate // Use dungeon-specific encounter rate
+    )
 
-      // Calculate new position based on direction
-      switch (direction) {
-        case 'up': newY--; break
-        case 'down': newY++; break
-        case 'left': newX--; break
-        case 'right': newX++; break
-        default: return prev
+    // If movement was successful, update position
+    if (movementResult.moved) {
+      setPlayerPos(movementResult.newPosition)
+
+      // If combat was triggered, start combat with the enemy
+      if (movementResult.combatTriggered && movementResult.enemy) {
+        onStartCombat(movementResult.enemy)
       }
-
-      // Check if new position is valid (not a wall)
-      if (map[newY]?.[newX] === 0) {
-
-        // Chance to encounter enemy (20% probability)
-        if (Math.random() < 0.2 && enemies && enemies.length > 0) {
-          // Trigger combat in useEffect to avoid setState during render
-          setCombatTriggered(true)
-        }
-
-        return { x: newX, y: newY }
-      }
-      return prev
-    })
-  }, [inCombat, enemies])
+    }
+  }, [inCombat, enemies, playerPos, map, onStartCombat, encounterRate])
 
   // ========== MANUAL COMBAT RESET ==========
   const manualCombatReset = useCallback(() => {
@@ -105,22 +102,22 @@ const Dungeon = ({
   // ========== KEYBOARD CONTROLS ==========
   useEffect(() => {
     const handleKeyPress = (e) => {
-      if (inCombat) {
+      // Check for reset key
+      if (isResetKey(e.key)) {
+        manualCombatReset()
+        return
+      }
+
+      // Check if movement is allowed
+      if (!isMovementAllowed(inCombat)) {
         console.log("Teclado bloqueado - en combate")
         return
       }
 
-      switch (e.key) {
-        case 'ArrowUp': movePlayer('up'); break
-        case 'ArrowDown': movePlayer('down'); break
-        case 'ArrowLeft': movePlayer('left'); break
-        case 'ArrowRight': movePlayer('right'); break
-        case 'w': case 'W': movePlayer('up'); break
-        case 's': case 'S': movePlayer('down'); break
-        case 'a': case 'A': movePlayer('left'); break
-        case 'd': case 'D': movePlayer('right'); break
-        case 'r': case 'R': manualCombatReset(); break
-        default: return
+      // Get direction from key
+      const direction = getDirectionFromKey(e.key)
+      if (direction) {
+        movePlayer(direction)
       }
     }
 
@@ -128,59 +125,16 @@ const Dungeon = ({
     return () => window.removeEventListener('keydown', handleKeyPress)
   }, [movePlayer, inCombat, manualCombatReset])
 
-  // ========== GET CHARACTER POSITION ==========
-  const getCharacterPosition = (character) => {
-    const frontIndex = activeCharacters.front.findIndex(char => char?.id === character.id)
-    if (frontIndex !== -1) {
-      const positions = ['Izquierda', 'Centro', 'Derecha']
-      return `Delantera ${positions[frontIndex]}`
-    }
-
-    const backIndex = activeCharacters.back.findIndex(char => char?.id === character.id)
-    if (backIndex !== -1) {
-      const positions = ['Izquierda', 'Centro', 'Derecha']
-      return `Trasera ${positions[backIndex]}`
-    }
-
-    return null
-  }
-
   // ========== RENDER ACTIVE CHARACTERS ==========
   const renderActiveCharacters = () => {
-    // Combine all active characters with their actual positions
-    const allActiveChars = []
-
-    // Add front row characters with their positions
-    activeCharacters.front.forEach((char, index) => {
-      if (char) {
-        const positions = ['Izquierda', 'Centro', 'Derecha']
-        allActiveChars.push({
-          ...char,
-          position: `Delantera ${positions[index]}`,
-          row: 'front',
-          slot: index
-        })
-      }
-    })
-
-    // Add back row characters with their positions
-    activeCharacters.back.forEach((char, index) => {
-      if (char) {
-        const positions = ['Izquierda', 'Centro', 'Derecha']
-        allActiveChars.push({
-          ...char,
-          position: `Trasera ${positions[index]}`,
-          row: 'back',
-          slot: index
-        })
-      }
-    })
+    const activeCount = getActiveCharactersCount(activeCharacters)
+    const allActiveChars = getAllActiveCharacters(activeCharacters)
 
     // If no active characters, show empty state
-    if (allActiveChars.length === 0) {
+    if (!hasActiveCharacters(activeCharacters)) {
       return (
         <div className="dungeon-active-characters">
-          <h4>Almas Elegidas (0/3)</h4>
+          <h4>Almas Elegidas (0/6)</h4>
           <div className="no-active-characters">
             <p>No hay almas elegidas activas</p>
             <small>Ve a tu biblioteca para elegir almas para la aventura</small>
@@ -191,7 +145,7 @@ const Dungeon = ({
 
     return (
       <div className="dungeon-active-characters">
-        <h4>Almas Elegidas ({allActiveChars.length}/6)</h4>
+        <h4>Almas Elegidas ({activeCount}/6)</h4>
         <div className="active-characters-grid">
           {allActiveChars.map((character, index) => (
             <div
@@ -200,7 +154,6 @@ const Dungeon = ({
               onClick={() => onCharacterClick(character)}
               style={{ cursor: 'pointer' }}
             >
-              {/* Position Badge */}
               <div className="position-badge">
                 {character.position}
               </div>
@@ -251,33 +204,23 @@ const Dungeon = ({
 
   // ========== DUNGEON RESET FUNCTION ==========
   const resetDungeon = () => {
-    setPlayerPos({ x: 1, y: 1 })
-    setCoinsCollected(0)
-    setPendingCoins(0)
-    setCombatTriggered(false)
+    // MODIFIED: Use dungeon's start position for reset
+    const newState = resetDungeonState(startPosition)
+    setPlayerPos(newState.playerPos)
+    setCoinsCollected(newState.coinsCollected)
+    setPendingCoins(newState.pendingCoins)
+    setCombatTriggered(newState.combatTriggered)
 
-    // Reset all character HP when resetting dungeon
+    // Reset all character HP using logic function
     if (activeCharacters) {
-      const allCharacters = [...activeCharacters.front, ...activeCharacters.back].filter(char => char !== null)
-      allCharacters.forEach(character => {
-        // Call parent function to reset HP for each character
+      const hpResets = resetAllCharactersHP(activeCharacters, playerMaxHp)
+
+      hpResets.forEach(({ characterId, newHp }) => {
         if (typeof onCharacterHpChange === 'function') {
-          // Reset to max HP
-          onCharacterHpChange(character.id, playerMaxHp)
+          onCharacterHpChange(characterId, newHp)
         }
       })
     }
-  }
-
-  // ========== MAP RENDERING LOGIC ==========
-  const renderCell = (cell, x, y) => {
-    if (x === playerPos.x && y === playerPos.y) {
-      return '☻' // Player character
-    }
-    if (cell === 1) {
-      return '█' // Wall
-    }
-    return '·' // Floor
   }
 
   // ========== RENDER COMPONENT ==========
@@ -286,7 +229,8 @@ const Dungeon = ({
 
       {/* ========== DUNGEON HEADER ========== */}
       <div className="dungeon-header">
-        <h2>Mazmorra</h2>
+        {/* Show dungeon name */}
+        <h2>{currentDungeon.name}</h2>
         <div className="dungeon-info">
           <div className="coins-display">
             <span className="coins-label">Monedas:</span>
@@ -296,6 +240,17 @@ const Dungeon = ({
             <span>Recolectadas: +{coinsCollected}</span>
           </div>
         </div>
+      </div>
+
+      {/* ADDED: Dungeon difficulty badge */}
+      <div style={{
+        textAlign: 'center',
+        padding: '5px',
+        backgroundColor: '#333',
+        borderRadius: '5px',
+        margin: '10px 0'
+      }}>
+        <small>Dificultad: <strong>{currentDungeon.difficulty}</strong></small>
       </div>
 
       {/* ========== COMBAT STATUS INDICATOR ========== */}
@@ -329,9 +284,9 @@ const Dungeon = ({
 
       {/* ========== GAME INSTRUCTIONS ========== */}
       <div className="dungeon-instructions">
-        <p>⚔️ Explora la mazmorra y encuentra enemigos</p>
+        <p>⚔️ {currentDungeon.description}</p>
         <p>🎯 Usa las flechas del teclado o los botones táctiles</p>
-        <p>👹 Enfréntate a enemigos aleatorios</p>
+        <p>👹 Tasa de encuentros: {(encounterRate * 100).toFixed(0)}%</p>
         <p>💰 Gana monedas al derrotar enemigos</p>
         <p>¡Cuidado! Pierdes monedas si eres derrotado</p>
         {inCombat && (
@@ -350,9 +305,9 @@ const Dungeon = ({
                 <div
                   key={x}
                   className={`map-cell ${cell === 1 ? 'wall' : 'floor'}
-                    ${x === playerPos.x && y === playerPos.y ? 'player' : ''}`}
+                                        ${x === playerPos.x && y === playerPos.y ? 'player' : ''}`}
                 >
-                  {renderCell(cell, x, y)}
+                  {getCellDisplay(cell, x, y, playerPos)}
                 </div>
               ))}
             </div>

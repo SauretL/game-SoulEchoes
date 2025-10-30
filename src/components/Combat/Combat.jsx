@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import './Combat.css'
 import {
-    performAttack,
-    enemyAI,
-    checkBattleEnd,
-    getBattleReward,
-    getBattlePenalty,
     getAlivePlayersCount as getAlivePlayersCountLogic,
-    findNextAlivePlayer,
     getHpPercentage,
-    calculatePositionSwap,
-    executePositionSwap,
     initializeCombatState,
     addToBattleLog,
-    getLastBattleLogs
+    getLastBattleLogs,
+    handleEndPlayerTurn,
+    executeEnemyTurn,
+    executePlayerAttack,
+    executePlayerPositionSwap,
+    getBattleReward,
+    getBattlePenalty
 } from '../../utils/combatLogic'
 import CharacterDetail from '../CharacterDetail/CharacterDetail'
 
@@ -33,23 +31,20 @@ const Combat = ({
         initializeCombatState(activeCharacters, enemy, playerCharactersHp, playerMaxHp)
     )
 
-    // ========== POSITION MANAGEMENT STATE ==========
     const [combatPositions, setCombatPositions] = useState({
         front: [null, null, null],
         back: [null, null, null]
     })
 
-    // ========== CHARACTER DETAIL STATE ==========
     const [selectedCharacter, setSelectedCharacter] = useState(null)
 
     // ========== INITIALIZE COMBAT POSITIONS ==========
     useEffect(() => {
-        // Set initial positions from active characters
         setCombatPositions(activeCharacters)
     }, [activeCharacters])
 
-    // ========== BATTLE LOG MANAGEMENT ==========
-    const handleAddToBattleLog = (message) => {
+    // ========== BATTLE LOG HELPER ==========
+    const addLog = (message) => {
         setCombatState(prev => ({
             ...prev,
             battleLog: addToBattleLog(prev.battleLog, message)
@@ -58,9 +53,7 @@ const Combat = ({
 
     // ========== ENEMY TURN AUTOMATION ==========
     useEffect(() => {
-        // When turn changes to enemy and battle is ongoing, execute enemy turn
         if (combatState.currentTurn === 'enemy' && combatState.battleStatus === 'ongoing') {
-            // Delay for better UX
             const timer = setTimeout(() => {
                 enemyTurn()
             }, 1000)
@@ -69,39 +62,13 @@ const Combat = ({
         }
     }, [combatState.currentTurn, combatState.battleStatus])
 
-    // ========== GET CURRENT PLAYER TURN ==========
+    // ========== GETTERS ==========
     const getCurrentPlayerTurn = () => {
         return combatState.playerCharacters[combatState.currentPlayerTurnIndex]
     }
 
-    // ========== GET ALIVE PLAYERS COUNT ==========
     const getAlivePlayersCount = () => {
         return getAlivePlayersCountLogic(combatState.playerCharacters)
-    }
-
-    // ========== POSITION SWAPPING ACTION ==========
-    const handlePositionSwap = () => {
-        if (combatState.currentTurn !== 'player' || combatState.battleStatus !== 'ongoing') return
-
-        const currentPlayer = getCurrentPlayerTurn()
-        if (!currentPlayer || currentPlayer.currentHp <= 0) return
-
-        // Calculate position swap using combatLogic
-        const swapData = calculatePositionSwap(combatPositions, currentPlayer)
-        if (!swapData) {
-            handleAddToBattleLog(`No hay espacio disponible en la fila ${swapData?.targetPosition === 'front' ? 'delantera' : 'trasera'}`)
-            return
-        }
-
-        // Execute the position swap
-        const newPositions = executePositionSwap(combatPositions, swapData, currentPlayer)
-        setCombatPositions(newPositions)
-
-        const positionText = swapData.targetPosition === 'front' ? 'delantera' : 'trasera'
-        handleAddToBattleLog(`${currentPlayer.name} se mueve a la fila ${positionText}`)
-
-        // End player turn after position swap
-        endPlayerTurn()
     }
 
     // ========== CHARACTER CLICK HANDLER ==========
@@ -111,51 +78,56 @@ const Combat = ({
         }
     }
 
-    // ========== CLOSE CHARACTER DETAIL ==========
     const closeCharacterDetail = () => {
         setSelectedCharacter(null)
     }
 
-    // ========== PLAYER ATTACK ACTIONS ==========
-    const playerAttack = (attackType) => {
-        // Validate if player can attack
+    // ========== POSITION SWAP ACTION ==========
+    const handlePositionSwap = () => {
         if (combatState.currentTurn !== 'player' || combatState.battleStatus !== 'ongoing') return
 
         const currentPlayer = getCurrentPlayerTurn()
+        if (!currentPlayer || currentPlayer.currentHp <= 0) return
 
-        // Skip defeated players
-        if (currentPlayer.currentHp <= 0) {
+        // Use combat logic for position swap
+        const swapResult = executePlayerPositionSwap(combatPositions, currentPlayer)
+
+        if (!swapResult.success) {
+            addLog(swapResult.message)
+            return
+        }
+
+        setCombatPositions(swapResult.newPositions)
+        addLog(swapResult.logMessage)
+        endPlayerTurn()
+    }
+
+    // ========== PLAYER ATTACK ACTION ==========
+    const playerAttack = (attackType) => {
+        if (combatState.currentTurn !== 'player' || combatState.battleStatus !== 'ongoing') return
+
+        // Use combat logic for player attack
+        const attackResult = executePlayerAttack(combatState, attackType)
+
+        if (attackResult.shouldSkipTurn) {
             endPlayerTurn()
             return
         }
 
-        // Use current player stats and current enemy stats
-        const result = performAttack(currentPlayer, combatState.enemy, attackType)
+        addLog(attackResult.logMessage)
 
-        // Ensure minimum 1 damage
-        const actualDamage = Math.max(1, result.damage)
-
-        // Create battle log message
-        const attackName = attackType === 'physical' ? 'Ataque Físico' : 'Ataque Psíquico'
-        const criticalText = result.isCritical ? ' ¡CRÍTICO!' : ''
-        handleAddToBattleLog(`${currentPlayer.name} usa ${attackName} - ${actualDamage} daño${criticalText}`)
-
-        // Calculate enemy HP after attack
-        const updatedEnemyHp = Math.max(0, combatState.enemy.currentHp - actualDamage)
-
-        // Check if battle ends with this attack
-        const battleResult = checkBattleEnd(combatState.playerCharacters, {
-            ...combatState.enemy,
-            currentHp: updatedEnemyHp
-        })
-
-        if (battleResult === 'player_won') {
-            endBattle('victory')
-        } else {
-            // Update enemy HP and end player turn
+        if (attackResult.shouldEndBattle) {
+            // Update enemy HP before ending battle
             setCombatState(prev => ({
                 ...prev,
-                enemy: { ...prev.enemy, currentHp: updatedEnemyHp }
+                enemy: { ...prev.enemy, currentHp: attackResult.updatedEnemyHp }
+            }))
+            endBattle(attackResult.result)
+        } else {
+            // Update enemy HP and continue
+            setCombatState(prev => ({
+                ...prev,
+                enemy: { ...prev.enemy, currentHp: attackResult.updatedEnemyHp }
             }))
             endPlayerTurn()
         }
@@ -163,133 +135,57 @@ const Combat = ({
 
     // ========== END PLAYER TURN ==========
     const endPlayerTurn = () => {
-        console.log("Finalizando turno del jugador actual")
+        // Use combat logic for turn management
+        const turnResult = handleEndPlayerTurn(combatState)
 
-        const alivePlayers = combatState.playerCharacters.filter(player => player.currentHp > 0)
-
-        // If no alive players, end battle
-        if (alivePlayers.length === 0) {
-            endBattle('defeat')
+        if (turnResult.shouldEndBattle) {
+            endBattle(turnResult.result)
             return
         }
 
-        // Try to find the next alive player
-        let nextIndex = (combatState.currentPlayerTurnIndex + 1) % combatState.playerCharacters.length
-        let attempts = 0
-        let foundNextPlayer = false
-
-        // Search for next alive player
-        while (attempts < combatState.playerCharacters.length) {
-            if (combatState.playerCharacters[nextIndex].currentHp > 0) {
-                // Found an alive player
-                foundNextPlayer = true
-                break
-            }
-            nextIndex = (nextIndex + 1) % combatState.playerCharacters.length
-            attempts++
-        }
-
-        // Check if we've cycled through all players
-        if (foundNextPlayer && nextIndex > combatState.currentPlayerTurnIndex) {
-            // There's another player in this round, continue with them
-            setCombatState(prev => ({
-                ...prev,
-                currentPlayerTurnIndex: nextIndex
-            }))
-        } else if (foundNextPlayer && nextIndex <= combatState.currentPlayerTurnIndex) {
-            // We've wrapped around - all players have had their turn, switch to enemy
-            console.log("Todos los jugadores han jugado, pasando al enemigo")
-            setCombatState(prev => ({
-                ...prev,
-                currentTurn: 'enemy', // ADDED: Actually switch to enemy turn
-                currentPlayerTurnIndex: nextIndex // ADDED: Save next player for next round
-            }))
-        } else {
-            // Shouldn't happen due to initial validation, but switch to enemy as fallback
-            console.log("No se encontraron más jugadores vivos, pasando al enemigo")
-            setCombatState(prev => ({
-                ...prev,
-                currentTurn: 'enemy',
-                currentPlayerTurnIndex: 0
-            }))
-        }
+        // Update state based on turn result
+        setCombatState(prev => ({
+            ...prev,
+            ...turnResult.newState
+        }))
     }
 
-    // ========== ENEMY AI TURN ==========
+    // ========== ENEMY TURN ==========
     const enemyTurn = () => {
-        console.log("Turno enemigo comenzado")
+        // Use combat logic for enemy turn
+        const enemyResult = executeEnemyTurn(combatState, combatState.enemy)
 
-        // Validate if enemy can attack
-        if (combatState.battleStatus !== 'ongoing') return
-        console.log("La batalla continúa")
+        if (enemyResult.error) return
 
-        // Use imported function to get random alive player
-        const alivePlayers = combatState.playerCharacters.filter(char => char.currentHp > 0)
-        if (alivePlayers.length === 0) {
-            endBattle('defeat')
+        // Update parent component HP
+        if (enemyResult.targetPlayerId && typeof onCharacterHpChange === 'function') {
+            onCharacterHpChange(enemyResult.targetPlayerId, enemyResult.updatedPlayerHp)
+        }
+
+        addLog(enemyResult.logMessage)
+
+        if (enemyResult.shouldEndBattle) {
+            // Update players before ending
+            setCombatState(prev => ({
+                ...prev,
+                playerCharacters: enemyResult.updatedPlayers
+            }))
+            endBattle(enemyResult.result)
             return
         }
-        console.log("Jugador está vivo")
 
-        const randomPlayerIndex = Math.floor(Math.random() * alivePlayers.length)
-        const targetPlayer = alivePlayers[randomPlayerIndex]
-
-        // Enemy attacks selected player
-        const result = enemyAI(combatState.enemy, targetPlayer)
-
-        // Ensure minimum 1 damage
-        const actualDamage = Math.max(1, result.damage)
-
-        // Create battle log message
-        const attackName = result.attackType === 'physical' ? 'Ataque Físico' : 'Ataque Psíquico'
-        const criticalText = result.isCritical ? ' ¡CRÍTICO!' : ''
-        handleAddToBattleLog(`${enemy.name} usa ${attackName} contra ${targetPlayer.name} - ${actualDamage} daño${criticalText}`)
-
-        // Calculate player HP after attack
-        const updatedPlayerHp = Math.max(0, targetPlayer.currentHp - actualDamage)
-
-        // Update HP in parent component AND in local combat state
-        if (typeof onCharacterHpChange === 'function') {
-            onCharacterHpChange(targetPlayer.id, updatedPlayerHp)
-        }
-
-        // Update local combat state with the HP change
-        setCombatState(prev => {
-            const updatedPlayers = prev.playerCharacters.map(char =>
-                char.id === targetPlayer.id
-                    ? { ...char, currentHp: updatedPlayerHp }
-                    : char
-            )
-
-            // Check if battle ends with this attack
-            const battleResult = checkBattleEnd(updatedPlayers, {
-                ...prev.enemy,
-                currentHp: prev.enemy.currentHp
-            })
-
-            if (battleResult === 'player_lost') {
-                endBattle('defeat')
-                return prev // Return previous state since battle is ending
-            }
-
-            console.log("Turno enemigo terminado")
-
-            // Continue with updated players and switch back to player turn
-            return {
-                ...prev,
-                playerCharacters: updatedPlayers,
-                currentTurn: 'player',
-                currentPlayerTurnIndex: findNextAlivePlayer(updatedPlayers, -1) // Find first alive player
-            }
-        })
+        // Continue battle with updated state
+        setCombatState(prev => ({
+            ...prev,
+            ...enemyResult.newState
+        }))
     }
 
     // ========== BATTLE CONCLUSION ==========
     const endBattle = (result) => {
-        // Reset positions to original active characters setup
         setCombatPositions(activeCharacters)
 
-        // ONLY reset HP for surviving characters if DEFEAT (not victory)
+        // Reset HP on defeat only
         if (result === 'defeat') {
             combatState.playerCharacters.forEach(char => {
                 if (typeof onResetCharacterHp === 'function') {
@@ -298,22 +194,20 @@ const Combat = ({
             })
         }
 
-        // Update battle status
         setCombatState(prev => ({ ...prev, battleStatus: result }))
 
-        // Handle rewards or penalties
+        // Handle rewards/penalties
         if (result === 'victory') {
             const coinsWon = getBattleReward()
-            handleAddToBattleLog(`¡Victoria! Ganaste ${coinsWon} monedas`)
+            addLog(`¡Victoria! Ganaste ${coinsWon} monedas`)
             onCoinUpdate(coinsWon)
         } else {
             const coinsLost = getBattlePenalty()
-            handleAddToBattleLog(`¡Derrota! Perdiste ${coinsLost} monedas`)
+            addLog(`¡Derrota! Perdiste ${coinsLost} monedas`)
             onCoinUpdate(-coinsLost)
             onResetDungeon()
         }
 
-        // Delay before closing combat
         setTimeout(() => {
             onCombatEnd(result)
         }, 3000)
@@ -335,12 +229,12 @@ const Combat = ({
                     </div>
                 </div>
 
-                {/* ========== BATTLE FIELD WITH POSITION COLUMNS ========== */}
+                {/* ========== BATTLE FIELD ========== */}
                 <div className="battle-field">
 
-                    {/* ========== PLAYER SIDE WITH POSITION COLUMNS ========== */}
+                    {/* ========== PLAYER SIDE ========== */}
                     <div className="player-side">
-                        {/* Back Row Column */}
+                        {/* Back Row */}
                         <div className="position-column back-row-column">
                             <div className="position-label">Fila Trasera</div>
                             {combatPositions.back.map((char, index) => (
@@ -376,7 +270,7 @@ const Combat = ({
                             ))}
                         </div>
 
-                        {/* Front Row Column */}
+                        {/* Front Row */}
                         <div className="position-column front-row-column">
                             <div className="position-label">Fila Delantera</div>
                             {combatPositions.front.map((char, index) => (

@@ -244,3 +244,199 @@ export const getBattleResultText = (result, enemyName) => {
         return `¡Derrota! Fuiste derrotado por ${enemyName}`
     }
 }
+
+// ========== TURN MANAGEMENT ==========
+
+// Handle end of player turn and determine next action (next player or enemy turn)
+export const handleEndPlayerTurn = (combatState) => {
+    const alivePlayers = combatState.playerCharacters.filter(player => player.currentHp > 0)
+
+    // If no alive players, battle should end in defeat
+    if (alivePlayers.length === 0) {
+        return { shouldEndBattle: true, result: 'defeat' }
+    }
+
+    // Try to find the next alive player
+    let nextIndex = (combatState.currentPlayerTurnIndex + 1) % combatState.playerCharacters.length
+    let attempts = 0
+    let foundNextPlayer = false
+
+    // Search for next alive player
+    while (attempts < combatState.playerCharacters.length) {
+        if (combatState.playerCharacters[nextIndex].currentHp > 0) {
+            foundNextPlayer = true
+            break
+        }
+        nextIndex = (nextIndex + 1) % combatState.playerCharacters.length
+        attempts++
+    }
+
+    // Check if we've cycled through all players
+    if (foundNextPlayer && nextIndex > combatState.currentPlayerTurnIndex) {
+        // There's another player in this round, continue with them
+        return {
+            shouldEndBattle: false,
+            newState: {
+                currentPlayerTurnIndex: nextIndex,
+                currentTurn: 'player'
+            }
+        }
+    } else if (foundNextPlayer && nextIndex <= combatState.currentPlayerTurnIndex) {
+        // We've wrapped around - all players have had their turn, switch to enemy
+        return {
+            shouldEndBattle: false,
+            newState: {
+                currentTurn: 'enemy',
+                currentPlayerTurnIndex: nextIndex
+            }
+        }
+    } else {
+        // Fallback: switch to enemy
+        return {
+            shouldEndBattle: false,
+            newState: {
+                currentTurn: 'enemy',
+                currentPlayerTurnIndex: 0
+            }
+        }
+    }
+}
+
+// Execute enemy turn logic
+export const executeEnemyTurn = (combatState, enemy) => {
+    // Validate if enemy can attack
+    if (combatState.battleStatus !== 'ongoing') {
+        return { shouldEndBattle: false, error: 'Battle already ended' }
+    }
+
+    // Check for alive players
+    const alivePlayers = combatState.playerCharacters.filter(char => char.currentHp > 0)
+    if (alivePlayers.length === 0) {
+        return { shouldEndBattle: true, result: 'defeat' }
+    }
+
+    // Select random alive player as target
+    const randomPlayerIndex = Math.floor(Math.random() * alivePlayers.length)
+    const targetPlayer = alivePlayers[randomPlayerIndex]
+
+    // Enemy attacks selected player
+    const result = enemyAI(enemy, targetPlayer)
+
+    // Ensure minimum 1 damage
+    const actualDamage = Math.max(1, result.damage)
+
+    // Calculate player HP after attack
+    const updatedPlayerHp = Math.max(0, targetPlayer.currentHp - actualDamage)
+
+    // Update players with new HP
+    const updatedPlayers = combatState.playerCharacters.map(char =>
+        char.id === targetPlayer.id
+            ? { ...char, currentHp: updatedPlayerHp }
+            : char
+    )
+
+    // Create battle log message
+    const attackName = result.attackType === 'physical' ? 'Ataque Físico' : 'Ataque Psíquico'
+    const criticalText = result.isCritical ? ' ¡CRÍTICO!' : ''
+    const logMessage = `${enemy.name} usa ${attackName} contra ${targetPlayer.name} - ${actualDamage} daño${criticalText}`
+
+    // Check if battle ends with this attack
+    const battleResult = checkBattleEnd(updatedPlayers, enemy)
+
+    if (battleResult === 'player_lost') {
+        return {
+            shouldEndBattle: true,
+            result: 'defeat',
+            updatedPlayers,
+            logMessage,
+            targetPlayerId: targetPlayer.id,
+            updatedPlayerHp
+        }
+    }
+
+    // Return updated state for continuing battle
+    return {
+        shouldEndBattle: false,
+        updatedPlayers,
+        logMessage,
+        targetPlayerId: targetPlayer.id,
+        updatedPlayerHp,
+        newState: {
+            playerCharacters: updatedPlayers,
+            currentTurn: 'player',
+            currentPlayerTurnIndex: findNextAlivePlayer(updatedPlayers, -1)
+        }
+    }
+}
+
+// Execute player attack logic
+export const executePlayerAttack = (combatState, attackType) => {
+    const currentPlayer = combatState.playerCharacters[combatState.currentPlayerTurnIndex]
+
+    // Skip defeated players
+    if (currentPlayer.currentHp <= 0) {
+        return { shouldSkipTurn: true }
+    }
+
+    // Perform attack
+    const result = performAttack(currentPlayer, combatState.enemy, attackType)
+
+    // Ensure minimum 1 damage
+    const actualDamage = Math.max(1, result.damage)
+
+    // Create battle log message
+    const attackName = attackType === 'physical' ? 'Ataque Físico' : 'Ataque Psíquico'
+    const criticalText = result.isCritical ? ' ¡CRÍTICO!' : ''
+    const logMessage = `${currentPlayer.name} usa ${attackName} - ${actualDamage} daño${criticalText}`
+
+    // Calculate enemy HP after attack
+    const updatedEnemyHp = Math.max(0, combatState.enemy.currentHp - actualDamage)
+
+    // Check if battle ends with this attack
+    const battleResult = checkBattleEnd(combatState.playerCharacters, {
+        ...combatState.enemy,
+        currentHp: updatedEnemyHp
+    })
+
+    if (battleResult === 'player_won') {
+        return {
+            shouldEndBattle: true,
+            result: 'victory',
+            updatedEnemyHp,
+            logMessage
+        }
+    }
+
+    // Battle continues
+    return {
+        shouldEndBattle: false,
+        shouldSkipTurn: false,
+        updatedEnemyHp,
+        logMessage
+    }
+}
+
+// Execute position swap logic
+export const executePlayerPositionSwap = (combatPositions, currentPlayer) => {
+    // Calculate position swap
+    const swapData = calculatePositionSwap(combatPositions, currentPlayer)
+
+    if (!swapData) {
+        return {
+            success: false,
+            message: `No hay espacio disponible en la fila ${swapData?.targetPosition === 'front' ? 'delantera' : 'trasera'}`
+        }
+    }
+
+    // Execute the position swap
+    const newPositions = executePositionSwap(combatPositions, swapData, currentPlayer)
+
+    const positionText = swapData.targetPosition === 'front' ? 'delantera' : 'trasera'
+    const logMessage = `${currentPlayer.name} se mueve a la fila ${positionText}`
+
+    return {
+        success: true,
+        newPositions,
+        logMessage
+    }
+}
