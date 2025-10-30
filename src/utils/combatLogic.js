@@ -1,11 +1,37 @@
 // ========== DAMAGE CALCULATION ==========
 
-// Calculate base damage between attack and defense
 export const calculateDamage = (attack, defense) => {
-    const damage = Math.max(attack - defense, 1) // Minimum 1 damage
-    return damage
-}
+    // STEP 1: Calculate base damage
+    const baseDamage = attack - defense
 
+    // STEP 2: Determine multiplier range based on stat difference
+    const difference = Math.abs(baseDamage)
+    let minMultiplier, maxMultiplier
+
+    if (difference <= 5) {
+        // Close stats: wider variance (0.8x - 1.2x)
+        minMultiplier = 0.8
+        maxMultiplier = 1.2
+    } else if (difference >= 6 && difference <= 10) {
+        // Medium difference: moderate variance (0.85x - 1.15x)
+        minMultiplier = 0.85
+        maxMultiplier = 1.15
+    } else {
+        // Large difference: narrow variance (0.9x - 1.1x)
+        minMultiplier = 0.9
+        maxMultiplier = 1.1
+    }
+
+    // STEP 3: Apply random multiplier to base damage
+    const randomMultiplier = minMultiplier + Math.random() * (maxMultiplier - minMultiplier)
+    let finalDamage = baseDamage * randomMultiplier
+
+    // STEP 4: Round up and ensure minimum damage of 1
+    finalDamage = Math.ceil(finalDamage)
+    finalDamage = Math.max(finalDamage, 1)
+
+    return finalDamage
+}
 // ========== COMBAT ACTIONS ==========
 
 // Perform an attack between attacker and defender

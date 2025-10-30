@@ -791,7 +791,7 @@
         "name": "Cazador M de Skarnfell",
         "rarity": "Común",
         "rarityTier": 1,
-        "class": "Ninguna",
+        "class": "Sin clase",
         "fragment": "Skarnfell",
         "images": [
             "img/common-chars/Skarnfell-HunterM.png"
@@ -816,7 +816,7 @@
         "name": "Cazador F de Skarnfell",
         "rarity": "Común",
         "rarityTier": 1,
-        "class": "Ninguna",
+        "class": "Sin clase",
         "fragment": "Skarnfell",
         "images": [
             "img/common-chars/Skarnfell-HunterF.png"
@@ -841,7 +841,7 @@
         "name": "Artesano M de Skarnfell",
         "rarity": "Común",
         "rarityTier": 1,
-        "class": "Ninguna",
+        "class": "Sin clase",
         "fragment": "Skarnfell",
         "images": [
             "img/common-chars/Skarnfell-ArtisanM.png"
@@ -866,7 +866,7 @@
         "name": "Artesano F de Skarnfell",
         "rarity": "Común",
         "rarityTier": 1,
-        "class": "Ninguna",
+        "class": "Sin clase",
         "fragment": "Skarnfell",
         "images": [
             "img/common-chars/Skarnfell-ArtisanF.png"
@@ -891,7 +891,7 @@
         "name": "Shaman F de Skarnfell",
         "rarity": "Común",
         "rarityTier": 1,
-        "class": "Ninguna",
+        "class": "Sin clase",
         "fragment": "Skarnfell",
         "images": [
             "img/common-chars/Skarnfell-ShamanF.png"
@@ -916,7 +916,7 @@
         "name": "Shaman M de Skarnfell",
         "rarity": "Común",
         "rarityTier": 1,
-        "class": "Ninguna",
+        "class": "Sin clase",
         "fragment": "Skarnfell",
         "images": [
             "img/common-chars/Skarnfell-ShamanM.png"
@@ -2037,7 +2037,7 @@
             "",
             ""
         ],
-        "gender": "Masculino",
+        "gender": "Hombre",
         "age": null,
         "birthday": "",
         "likes": "",
@@ -2114,7 +2114,7 @@
             "",
             ""
         ],
-        "gender": "Masculino",
+        "gender": "Hombre",
         "age": null,
         "birthday": "",
         "likes": "",
@@ -2191,7 +2191,7 @@
             "",
             ""
         ],
-        "gender": "Femenino",
+        "gender": "Mujer",
         "age": null,
         "birthday": "",
         "likes": "",
@@ -2268,7 +2268,7 @@
             "",
             ""
         ],
-        "gender": "",
+        "gender": "Mujer",
         "age": null,
         "birthday": "",
         "likes": "",
@@ -2345,7 +2345,7 @@
             "",
             ""
         ],
-        "gender": "",
+        "gender": "Hombre",
         "age": null,
         "birthday": "",
         "likes": "",
@@ -2422,7 +2422,7 @@
             "",
             ""
         ],
-        "gender": "",
+        "gender": "Hembra",
         "age": null,
         "birthday": "",
         "likes": "",
