@@ -2,30 +2,31 @@ import './App.css'
 import { useState, useCallback, useEffect } from 'react'
 import GachaCards from './components/GachaCards/GachaCards.jsx'
 import PlayerLibrary from './components/PlayerLibrary/PlayerLibrary.jsx'
-import gachaPull from './utils/gachaPull.js'
 import CharacterDetail from './components/CharacterDetail/CharacterDetail.jsx'
 import PlayerStats from './components/PlayerStats/PlayerStats.jsx'
-import allCharacters from './data/characters.json'
 import Dungeon from './components/Dungeon/Dungeon.jsx'
-import enemies from './data/enemies.json'
 import Combat from './components/Combat/Combat.jsx'
-import { getActiveCharactersCount, isCharacterActive, getFirstActiveCharacter } from './utils/formationUtils'
-
-// ========== GAME CONSTANTS ==========
-const GACHA_PULL_COST = 50
-const DEFAULT_CHARACTER_ID = 16
-const PULL_COUNT = 5
-const MAX_CHARACTERS = 3
-
-// ========== CHARACTER OBJECT CREATOR ==========
-const createCharacterObject = (characterData, duplicates = 1) => {
-  if (!characterData) return null
-
-  return {
-    ...characterData,    // Copy all character data
-    duplicates: duplicates  // Adds duplicate numbers
-  }
-}
+import gachaPull from './utils/gachaPull.js'
+import allCharacters from './data/characters.json'
+import enemies from './data/enemies.json'
+import {
+  GACHA_PULL_COST,
+  PULL_COUNT,
+  MAX_ACTIVE_CHARACTERS,
+  PLAYER_MAX_HP
+} from './utils/gameConstants.js'
+import {
+  createCharacterObject,
+  addToPlayerCollection,
+  getSortedCollection,
+  getDefaultCharacter,
+  initializeCharacterHp
+} from './utils/characterUtils.js'
+import {
+  getActiveCharactersCount,
+  isCharacterActive
+} from './utils/activeCharactersLogic.js'
+import { changeView as changeViewUtil } from './utils/viewNavigation.js'
 
 function App() {
   // ========== STATE MANAGEMENT ==========
@@ -36,26 +37,44 @@ function App() {
   const [currentEnemy, setCurrentEnemy] = useState(null)
   const [sortBy, setSortBy] = useState("id")
   const [selectedCharacter, setSelectedCharacter] = useState(null)
-  const [playerCoins, setPlayerCoins] = useState(50)
+  const [playerCoins, setPlayerCoins] = useState(GACHA_PULL_COST)
   const [isInCombat, setIsInCombat] = useState(false)
-  const [playerMaxHp] = useState(100)
   const [playerCharactersHp, setPlayerCharactersHp] = useState({})
 
   // ========== CHARACTER DATA MANAGEMENT ==========
   const [playerCharacters, setPlayerCharacters] = useState(() => {
-    const defaultChar = allCharacters.find(char => char.id === DEFAULT_CHARACTER_ID)
+    const defaultChar = getDefaultCharacter(allCharacters)
     return defaultChar ? [createCharacterObject(defaultChar, 1)] : []
   })
 
   // ========== ACTIVE CHARACTERS MANAGEMENT ==========
   const [activeCharacters, setActiveCharacters] = useState({
-    front: [null, null, null], // [left, center, right]
-    back: [null, null, null]   // [left, center, right]
+    front: [null, null, null],
+    back: [null, null, null]
   })
+
+  // ========== DEFAULT CHARACTER SETUP ==========
+  useEffect(() => {
+    const defaultChar = getDefaultCharacter(allCharacters)
+    const totalActive = getActiveCharactersCount(activeCharacters)
+
+    if (defaultChar && totalActive === 0) {
+      setActiveCharacters(prev => ({
+        ...prev,
+        front: [createCharacterObject(defaultChar, 1), null, null]
+      }))
+    }
+  }, [])
+
+  // ========== INITIALIZE CHARACTER HP ==========
+  useEffect(() => {
+    const initialHp = initializeCharacterHp(playerCharacters, PLAYER_MAX_HP)
+    setPlayerCharactersHp(prev => ({ ...prev, ...initialHp }))
+  }, [playerCharacters])
 
   // ========== ACTIVE CHARACTER SLOT MANAGEMENT ==========
 
-  /* Sets a character to active slot*/
+  /* Sets a character to active slot */
   const setActiveCharacter = useCallback((character, position, slot) => {
     setActiveCharacters(prev => {
       const currentActiveCount = getActiveCharactersCount(prev)
@@ -68,9 +87,9 @@ function App() {
         return newActive
       }
 
-      // If already 3 active characters and adding new one
-      if (currentActiveCount >= MAX_CHARACTERS && !isAlreadyActive) {
-        alert(`¡Máximo de ${MAX_CHARACTERS} personajes activos! Remueve uno primero.`)
+      // If already max active characters and adding new one
+      if (currentActiveCount >= MAX_ACTIVE_CHARACTERS && !isAlreadyActive) {
+        alert(`¡Máximo de ${MAX_ACTIVE_CHARACTERS} personajes activos! Remueve uno primero.`)
         return prev
       }
 
@@ -90,70 +109,25 @@ function App() {
     })
   }, [])
 
-  // ========== DEFAULT CHARACTER SETUP ==========
-  useEffect(() => {
-    const defaultChar = allCharacters.find(char => char.id === DEFAULT_CHARACTER_ID)
-
-    const totalActive = getActiveCharactersCount(activeCharacters)
-
-    if (defaultChar && totalActive === 0) {
-      setActiveCharacters(prev => ({
-        ...prev,
-        front: [createCharacterObject(defaultChar, 1), null, null]
-      }))
-    }
-  }, [allCharacters, activeCharacters])
-
-  // ========== INITIALIZE CHARACTER HP ==========
-  useEffect(() => {
-    // Initialize HP for all player characters
-    const initialHp = {}
-    playerCharacters.forEach(char => {
-      if (!initialHp[char.id]) {
-        initialHp[char.id] = playerMaxHp
-      }
-    })
-    setPlayerCharactersHp(prev => ({ ...prev, ...initialHp }))
-  }, [playerCharacters, playerMaxHp])
-
   // ========== CHARACTER COLLECTION MANAGEMENT ==========
 
-  /*Adds characters to player collection*/
-  const addToPlayerCollection = useCallback((newCharacters) => {
+  /* Adds characters to player collection */
+  const handleAddToPlayerCollection = useCallback((newCharacters) => {
     setPlayerCharacters(prevCollection => {
-      const updatedCollection = [...prevCollection]
-
-      newCharacters.forEach(newChar => {
-        const existingCharIndex = updatedCollection.findIndex(
-          char => char.id === newChar.id
-        )
-
-        if (existingCharIndex !== -1) {
-          // Update duplicate count for existing character
-          updatedCollection[existingCharIndex] = {
-            ...updatedCollection[existingCharIndex],
-            duplicates: updatedCollection[existingCharIndex].duplicates + 1
-          }
-        } else {
-          // Add new character to collection
-          updatedCollection.push(createCharacterObject(newChar, 1))
-        }
-      })
-
-      return updatedCollection
+      return addToPlayerCollection(prevCollection, newCharacters)
     })
-  }, [setActiveCharacter, activeCharacters])
+  }, [])
 
   // ========== CURRENCY MANAGEMENT ==========
 
-  /*Adds coins earned from dungeon*/
+  /* Adds coins earned from dungeon */
   const addCoinsFromDungeon = useCallback((coins) => {
     setPlayerCoins(prevCoins => prevCoins + coins)
   }, [])
 
   // ========== CHARACTER HP MANAGEMENT ==========
 
-  /*Updates character HP*/
+  /* Updates character HP */
   const updateCharacterHp = useCallback((characterId, newHp) => {
     setPlayerCharactersHp(prev => ({
       ...prev,
@@ -161,17 +135,17 @@ function App() {
     }))
   }, [])
 
-  /*Resets character HP to max*/
+  /* Resets character HP to max */
   const resetCharacterHp = useCallback((characterId) => {
     setPlayerCharactersHp(prev => ({
       ...prev,
-      [characterId]: playerMaxHp
+      [characterId]: PLAYER_MAX_HP
     }))
-  }, [playerMaxHp])
+  }, [])
 
   // ========== GACHA SYSTEM ==========
 
-  /*Handles gacha pull*/
+  /* Handles gacha pull */
   const gachaButton = () => {
     // Validate player has enough coins
     if (playerCoins < GACHA_PULL_COST) {
@@ -194,19 +168,19 @@ function App() {
     })
 
     setCharacterArray(annotated)
-    addToPlayerCollection(rawResults)
+    handleAddToPlayerCollection(rawResults)
   }
 
   // ========== COMBAT MANAGEMENT ==========
 
-  /*Starts combat with enemy*/
+  /* Starts combat with enemy */
   const startCombat = useCallback((enemy) => {
     setCurrentEnemy(enemy)
     setShowCombat(true)
     setIsInCombat(true)
   }, [])
 
-  /*Ends combat*/
+  /* Ends combat */
   const endCombat = useCallback((result) => {
     setShowCombat(false)
     setCurrentEnemy(null)
@@ -214,7 +188,7 @@ function App() {
     console.log(`Combat ended with result: ${result}`)
   }, [])
 
-  /* Resets dungeon state*/
+  /* Resets dungeon state */
   const resetDungeon = useCallback(() => {
     setShowCombat(false)
     setCurrentEnemy(null)
@@ -223,42 +197,19 @@ function App() {
 
   // ========== VIEW NAVIGATION ==========
 
-  /* Changes current view*/
+  /* Changes current view */
   const changeView = useCallback((view) => {
-    setCurrentView(view)
+    changeViewUtil(view, setCurrentView)
   }, [])
-
-  // ========== CHARACTER SORTING ==========
-
-  /* Gets sorted character collection*/
-  const getSortedCollection = useCallback(() => {
-    const sorted = [...playerCharacters]
-
-    switch (sortBy) {
-      case "name":
-        return sorted.sort((a, b) => a.name.localeCompare(b.name))
-      case "rarity":
-        return sorted.sort((a, b) => b.rarityTier - a.rarityTier || a.name.localeCompare(b.name))
-      case "fragment":
-        return sorted.sort((a, b) => a.fragment.localeCompare(b.fragment) || a.name.localeCompare(b.name))
-      case "class":
-        return sorted.sort((a, b) => a.class.localeCompare(b.class) || a.name.localeCompare(b.name))
-      case "duplicates":
-        return sorted.sort((a, b) => b.duplicates - a.duplicates || a.name.localeCompare(b.name))
-      case "id":
-      default:
-        return sorted.sort((a, b) => a.id - b.id)
-    }
-  }, [playerCharacters, sortBy])
 
   // ========== CHARACTER DETAIL MANAGEMENT ==========
 
-  /* Handles character click for details*/
+  /* Handles character click for details */
   const handleCharacterClick = useCallback((character) => {
     setSelectedCharacter(character)
   }, [])
 
-  /* Closes character detail view*/
+  /* Closes character detail view */
   const closeCharacterDetail = useCallback(() => {
     setSelectedCharacter(null)
   }, [])
@@ -281,7 +232,7 @@ function App() {
         <div className="gacha-view">
           <h1>Soul Echoes</h1>
 
-          {/* ========== COINS DISPLAY IN GACHA VIEW ========== */}
+          {/* COINS DISPLAY */}
           <div className="coins-display" style={{ marginBottom: '15px', fontSize: '18px', fontWeight: 'bold' }}>
             Monedas: {playerCoins}
           </div>
@@ -310,7 +261,7 @@ function App() {
       {/* ========== LIBRARY VIEW ========== */}
       {currentView === "library" && (
         <PlayerLibrary
-          playerCharacters={getSortedCollection()}
+          playerCharacters={getSortedCollection(playerCharacters, sortBy)}
           sortBy={sortBy}
           setSortBy={setSortBy}
           playerCoins={playerCoins}
@@ -347,7 +298,7 @@ function App() {
           inCombat={isInCombat}
           onResetDungeon={resetDungeon}
           playerCharactersHp={playerCharactersHp}
-          playerMaxHp={playerMaxHp}
+          playerMaxHp={PLAYER_MAX_HP}
         />
       )}
 
@@ -362,7 +313,6 @@ function App() {
       {/* ========== COMBAT OVERLAY ========== */}
       {showCombat && currentEnemy && (
         <Combat
-          // FIXED: Removed duplicate playerCharacters prop that conflicts with activeCharacters
           activeCharacters={activeCharacters}
           enemy={currentEnemy}
           onCombatEnd={(result) => {
@@ -370,11 +320,9 @@ function App() {
             setIsInCombat(false)
           }}
           onCoinUpdate={addCoinsFromDungeon}
-          onResetDungeon={() => {
-            resetDungeon()
-          }}
+          onResetDungeon={resetDungeon}
           playerCharactersHp={playerCharactersHp}
-          playerMaxHp={playerMaxHp}
+          playerMaxHp={PLAYER_MAX_HP}
           onCharacterHpChange={updateCharacterHp}
           onResetCharacterHp={resetCharacterHp}
         />

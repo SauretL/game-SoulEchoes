@@ -145,7 +145,7 @@ const Dungeon = ({
 
     return (
       <div className="dungeon-active-characters">
-        <h4>Almas Elegidas ({activeCount}/6)</h4>
+        <h4>Almas Elegidas ({activeCount}/3)</h4>
         <div className="active-characters-grid">
           {allActiveChars.map((character, index) => (
             <div

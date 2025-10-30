@@ -4,17 +4,17 @@
         "name": "Semilla de Dios",
         "image": "img/enemies/GodSeed.png",
         "maxHp": 50,
-        "physicalAttack": 8,
-        "psychicAttack": 3,
-        "physicalDefense": 4,
-        "psychicDefense": 2
+        "physicalAttack": 11,
+        "psychicAttack": 4,
+        "physicalDefense": 6,
+        "psychicDefense": 3
     },
     {
         "id": 2,
         "name": "Regalo de Dios",
         "image": "img/enemies/GodGift.png",
         "maxHp": 40,
-        "physicalAttack": 5,
+        "physicalAttack": 8,
         "psychicAttack": 12,
         "physicalDefense": 3,
         "psychicDefense": 8

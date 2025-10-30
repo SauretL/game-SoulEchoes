@@ -195,8 +195,8 @@ export const initializeCombatState = (activeCharacters, enemy, playerCharactersH
             maxHp: playerMaxHp,
             physicalAttack: 12,
             psychicAttack: 10,
-            physicalDefense: 8,
-            psychicDefense: 6
+            physicalDefense: 6,
+            psychicDefense: 2
         }))
 
     return {
