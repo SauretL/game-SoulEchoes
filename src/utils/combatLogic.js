@@ -32,6 +32,7 @@ export const calculateDamage = (attack, defense) => {
 
     return finalDamage
 }
+
 // ========== COMBAT ACTIONS ==========
 
 // Perform an attack between attacker and defender
@@ -211,8 +212,8 @@ export const executePositionSwap = (combatPositions, swapData, currentPlayer) =>
 
 // ========== COMBAT STATE INITIALIZATION ==========
 
-// Initialize combat state with player characters and enemy
-export const initializeCombatState = (activeCharacters, enemy, playerCharactersHp, playerMaxHp) => {
+// Initialize combat state with player characters and enemies
+export const initializeCombatState = (activeCharacters, enemies, playerCharactersHp, playerMaxHp) => {
     const playerCharacters = activeCharacters.front.concat(activeCharacters.back)
         .filter(char => char !== null)
         .map(char => ({
@@ -225,12 +226,15 @@ export const initializeCombatState = (activeCharacters, enemy, playerCharactersH
             psychicDefense: 2
         }))
 
+    // enemies is an array
+    const enemiesArray = Array.isArray(enemies) ? enemies : [enemies]
+
     return {
         playerCharacters,
-        enemy: {
+        enemies: enemiesArray.map(enemy => ({
             ...enemy,
-            currentHp: enemy.maxHp || 80
-        },
+            currentHp: enemy.currentHp || enemy.maxHp
+        })),
         currentTurn: 'player',
         currentPlayerTurnIndex: 0,
         battleLog: [],
@@ -396,7 +400,7 @@ export const executeEnemyTurn = (combatState, enemy) => {
 }
 
 // Execute player attack logic
-export const executePlayerAttack = (combatState, attackType) => {
+export const executePlayerAttack = (combatState, attackType, targetEnemy) => {
     const currentPlayer = combatState.playerCharacters[combatState.currentPlayerTurnIndex]
 
     // Skip defeated players
@@ -404,8 +408,8 @@ export const executePlayerAttack = (combatState, attackType) => {
         return { shouldSkipTurn: true }
     }
 
-    // Perform attack
-    const result = performAttack(currentPlayer, combatState.enemy, attackType)
+    // Perform attack against specific enemy
+    const result = performAttack(currentPlayer, targetEnemy, attackType)
 
     // Ensure minimum 1 damage
     const actualDamage = Math.max(1, result.damage)
@@ -413,32 +417,20 @@ export const executePlayerAttack = (combatState, attackType) => {
     // Create battle log message
     const attackName = attackType === 'physical' ? 'Ataque Físico' : 'Ataque Psíquico'
     const criticalText = result.isCritical ? ' ¡CRÍTICO!' : ''
-    const logMessage = `${currentPlayer.name} usa ${attackName} - ${actualDamage} daño${criticalText}`
+    const logMessage = `${currentPlayer.name} usa ${attackName} contra ${targetEnemy.name} - ${actualDamage} daño${criticalText}`
 
     // Calculate enemy HP after attack
-    const updatedEnemyHp = Math.max(0, combatState.enemy.currentHp - actualDamage)
+    const updatedEnemyHp = Math.max(0, targetEnemy.currentHp - actualDamage)
 
-    // Check if battle ends with this attack
-    const battleResult = checkBattleEnd(combatState.playerCharacters, {
-        ...combatState.enemy,
-        currentHp: updatedEnemyHp
-    })
+    // Check if this specific enemy is defeated
+    const enemyDefeated = updatedEnemyHp <= 0
 
-    if (battleResult === 'player_won') {
-        return {
-            shouldEndBattle: true,
-            result: 'victory',
-            updatedEnemyHp,
-            logMessage
-        }
-    }
-
-    // Battle continues
     return {
-        shouldEndBattle: false,
+        shouldEndBattle: enemyDefeated,
         shouldSkipTurn: false,
         updatedEnemyHp,
-        logMessage
+        logMessage,
+        enemyDefeated
     }
 }
 
@@ -465,4 +457,50 @@ export const executePlayerPositionSwap = (combatPositions, currentPlayer) => {
         newPositions,
         logMessage
     }
+}
+
+// ========== MULTI-ENEMY COMBAT FUNCTIONS ==========
+
+// Check if all enemies are defeated
+export const areAllEnemiesDefeated = (enemies) => {
+    return enemies.every(enemy => enemy.currentHp <= 0 || !enemy.isAlive)
+}
+
+// Get random alive enemy for player targeting
+export const getRandomAliveEnemy = (enemies) => {
+    const aliveEnemies = enemies.filter(e => e.currentHp > 0 && e.isAlive)
+    if (aliveEnemies.length === 0) return null
+
+    const randomIndex = Math.floor(Math.random() * aliveEnemies.length)
+    return aliveEnemies[randomIndex]
+}
+
+// Get all alive enemies for targeting
+export const getAliveEnemies = (enemies) => {
+    return enemies.filter(e => e.currentHp > 0 && e.isAlive)
+}
+
+// Check if enemy is targetable
+export const isEnemyTargetable = (enemy) => {
+    return enemy && enemy.currentHp > 0 && enemy.isAlive
+}
+
+// ========== TARGETING MODE MANAGEMENT ==========
+
+// Validate attack type selection
+export const canSelectAttackType = (currentTurn, battleStatus, currentPlayer) => {
+    if (currentTurn !== 'player' || battleStatus !== 'ongoing') return false
+    if (!currentPlayer || currentPlayer.currentHp <= 0) return false
+    return true
+}
+
+// Get attack type display name
+export const getAttackTypeName = (attackType) => {
+    return attackType === 'physical' ? 'Ataque Físico' : 'Ataque Psíquico'
+}
+
+// Create targeting message for battle log
+export const createTargetingMessage = (attackType) => {
+    const attackName = getAttackTypeName(attackType)
+    return `🎯 ${attackName} seleccionado - Haz clic en un enemigo para atacar`
 }

@@ -11,9 +11,10 @@ import {
   isMovementAllowed,
   getDirectionFromKey,
   isResetKey,
-  resetAllCharactersHP
+  resetAllCharactersHP,
+  generateRandomEnemyParty
 } from '../../utils/dungeonLogic'
-import { getDefaultDungeon } from '../../utils/dungeonMaps'
+import { getDefaultDungeon, getRandomFormationForDungeon } from '../../utils/dungeonMaps'
 
 const Dungeon = ({
   onBack,
@@ -71,25 +72,34 @@ const Dungeon = ({
       return
     }
 
-    // Use dungeon's encounter rate
+    // Execute movement (no longer needs enemies parameter)
     const movementResult = executePlayerMovement(
       playerPos,
       direction,
       map,
-      enemies,
-      encounterRate // Use dungeon-specific encounter rate
+      encounterRate
     )
 
     // If movement was successful, update position
     if (movementResult.moved) {
       setPlayerPos(movementResult.newPosition)
 
-      // If combat was triggered, start combat with the enemy
-      if (movementResult.combatTriggered && movementResult.enemy) {
-        onStartCombat(movementResult.enemy)
+      // If combat was triggered, generate enemy party and start combat
+      if (movementResult.combatTriggered) {
+        // Generate random enemy party based on current dungeon
+        const enemyParty = generateRandomEnemyParty(
+          currentDungeon.id,
+          enemies,
+          getRandomFormationForDungeon
+        )
+
+        console.log('Starting combat with enemy party:', enemyParty)
+
+        // Start combat with the generated party
+        onStartCombat(enemyParty)
       }
     }
-  }, [inCombat, enemies, playerPos, map, onStartCombat, encounterRate])
+  }, [inCombat, enemies, playerPos, map, onStartCombat, encounterRate, currentDungeon.id])
 
   // ========== MANUAL COMBAT RESET ==========
   const manualCombatReset = useCallback(() => {

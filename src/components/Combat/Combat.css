@@ -58,13 +58,41 @@
     font-size: 0.9em;
 }
 
-.alive-players-count {
+.alive-players-count,
+.alive-enemies-count {
     background: #1e3a5f;
     color: #e0e0e0;
     padding: 4px 10px;
     border-radius: 12px;
     font-size: 0.8em;
     border: 1px solid #444;
+}
+
+/* TARGETING MODE INDICATOR */
+.targeting-indicator {
+    width: 100%;
+    background: #ff9800;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    animation: pulse-targeting 1.5s ease-in-out infinite;
+    box-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
+}
+
+@keyframes pulse-targeting {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(1.02);
+    }
 }
 
 /* BATTLE FIELD - CENTRAL AND PROMINENT */
@@ -80,14 +108,7 @@
     border: 1px solid #444;
 }
 
-/* PLAYER COMBATANTS GRID */
-.player-combatants {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
-    justify-items: center;
-}
-
+/* COMBATANT STYLES */
 .combatant {
     text-align: center;
     padding: 15px;
@@ -96,6 +117,7 @@
     background: rgba(42, 42, 42, 0.8);
     min-width: 140px;
     transition: all 0.3s ease;
+    position: relative;
 }
 
 .player-combatant {
@@ -123,9 +145,65 @@
     border-color: #666;
 }
 
+/* ENEMY COMBATANT STYLES */
 .enemy-combatant {
     border-color: #dc2626;
     background: rgba(220, 38, 38, 0.1);
+    cursor: default;
+    transition: all 0.3s ease;
+}
+
+/* TARGETABLE ENEMY - ACTIVE STATE */
+.enemy-combatant.targetable {
+    cursor: crosshair !important;
+    border-color: #ff9800;
+    background: rgba(255, 152, 0, 0.2);
+    animation: glow-target 1s ease-in-out infinite;
+    transform: scale(1.05);
+}
+
+.enemy-combatant.targetable:hover {
+    border-color: #ffd700;
+    background: rgba(255, 215, 0, 0.3);
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+    transform: scale(1.1) !important;
+}
+
+@keyframes glow-target {
+
+    0%,
+    100% {
+        box-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(255, 152, 0, 0.8);
+    }
+}
+
+/* TARGET ICON */
+.target-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    pointer-events: none;
+    animation: bounce-target 1s ease-in-out infinite;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    z-index: 10;
+}
+
+@keyframes bounce-target {
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+    }
 }
 
 .combatant-info h3 {
@@ -225,116 +303,102 @@
     justify-content: center;
 }
 
-/* COMBAT POSITIONS GRID - COMPACT */
-.combat-positions {
-    background: #0a0a14;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #444;
-    margin-top: 10px;
+/* Player side with position columns */
+.player-side {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    width: 100%;
 }
 
-.combat-positions h4 {
-    color: #ffd700;
-    text-align: center;
-    margin: 0 0 12px 0;
-    font-size: 1em;
-}
-
-.positions-grid {
+.position-column {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.battle-row {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.battle-row h5 {
-    color: #e0e0e0;
-    margin: 0;
+.position-label {
     text-align: center;
-    font-size: 0.8em;
-    font-weight: 600;
+    color: #ffd700;
+    font-weight: bold;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 4px;
+    border-radius: 4px;
 }
 
-.slots-row {
+/* ENEMY SIDE - MIRROR LAYOUT */
+.enemy-side {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-}
-
-.combat-slot {
-    background: #2a2a2a;
-    border: 2px solid #555;
-    border-radius: 6px;
-    padding: 8px;
-    min-height: 50px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    position: relative;
-}
-
-.combat-slot.empty {
-    border-style: dashed;
-    border-color: #666;
-    color: #888;
-    background: rgba(42, 42, 42, 0.5);
-}
-
-.combat-slot.occupied {
-    border-color: #296ab4;
-    background: rgba(41, 106, 180, 0.15);
-}
-
-.combat-slot.movable:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
-    border-color: #ffd700;
-}
-
-.combat-slot.selected {
-    border-color: #ffd700;
-    background: rgba(255, 215, 0, 0.1);
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
-}
-
-.slot-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
     width: 100%;
 }
 
-.slot-content img {
-    width: 25px;
-    height: 25px;
-    object-fit: contain;
-    border-radius: 4px;
-    border: 1px solid #444;
+.enemy-position-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
-.slot-name {
-    color: #e0e0e0;
-    font-size: 0.6em;
-    text-align: center;
-    word-break: break-word;
-    line-height: 1.1;
+.enemy-row-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
-.slot-hp {
-    font-size: 0.55em;
+.enemy-slot {
+    min-height: 100px;
+}
+
+.empty-enemy-slot {
+    background: rgba(42, 42, 42, 0.3);
+    border: 2px dashed #666;
+    border-radius: 8px;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: #888;
+    font-size: 0.8em;
+}
+
+/* Position badges */
+.position-badge {
+    font-size: 0.7em;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-top: 4px;
     text-align: center;
+    font-weight: bold;
+}
+
+.front-badge {
+    background: #dc2626;
+    color: white;
+}
+
+.back-badge {
+    background: #3b82f6;
+    color: white;
+}
+
+/* Empty slots */
+.empty-slot {
+    background: rgba(42, 42, 42, 0.3);
+    border: 2px dashed #666;
+    border-radius: 8px;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+}
+
+.empty-slot-content {
+    text-align: center;
+    font-size: 0.8em;
 }
 
 /* ACTION BUTTONS - BELOW BATTLE FIELD */
@@ -358,13 +422,14 @@
 }
 
 .attack-btn,
-.position-btn {
-    padding: 10px 14px;
+.position-btn,
+.cancel-btn {
+    padding: 12px 16px;
     border: none;
     border-radius: 6px;
     font-family: 'Courier New', monospace;
     font-weight: bold;
-    font-size: 0.85em;
+    font-size: 0.9em;
     cursor: pointer;
     transition: all 0.3s ease;
     min-width: 110px;
@@ -389,8 +454,30 @@
     min-width: 180px;
 }
 
+.cancel-btn {
+    background: linear-gradient(135deg, #dc2626, #991b1b);
+    color: white;
+    grid-column: 1 / -1;
+    font-size: 1em;
+    padding: 15px 30px;
+    animation: pulse-cancel 1s ease-in-out infinite;
+}
+
+@keyframes pulse-cancel {
+
+    0%,
+    100% {
+        box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(220, 38, 38, 0.8);
+    }
+}
+
 .attack-btn:hover:not(:disabled),
-.position-btn:hover:not(:disabled) {
+.position-btn:hover:not(:disabled),
+.cancel-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
@@ -498,14 +585,18 @@
         padding: 15px;
     }
 
-    .player-combatants {
-        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-        gap: 10px;
+    .player-side {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .position-column {
+        gap: 6px;
     }
 
     .combatant {
-        min-width: 120px;
-        padding: 12px;
+        min-width: auto;
+        padding: 8px;
     }
 
     .vs-separator {
@@ -516,23 +607,12 @@
         font-size: 0.8em;
     }
 
-    .combat-positions {
-        padding: 12px;
-        margin-top: 5px;
+    .enemy-row-container {
+        gap: 6px;
     }
 
-    .slots-row {
-        grid-template-columns: repeat(3, 1fr);
-    }
-
-    .combat-slot {
-        min-height: 45px;
-        padding: 6px;
-    }
-
-    .slot-content img {
-        width: 22px;
-        height: 22px;
+    .enemy-slot {
+        min-height: 80px;
     }
 
     .action-buttons {
@@ -541,16 +621,21 @@
     }
 
     .attack-btn,
-    .position-btn {
+    .position-btn,
+    .cancel-btn {
         width: 100%;
-        padding: 8px 12px;
-        font-size: 0.8em;
+        padding: 10px 12px;
+        font-size: 0.85em;
         min-width: auto;
     }
 
     .combatant-image img {
         width: 50px;
         height: 50px;
+    }
+
+    .target-icon {
+        font-size: 36px;
     }
 
     .log-messages {
@@ -570,9 +655,15 @@
     }
 
     .turn-indicator,
-    .alive-players-count {
+    .alive-players-count,
+    .alive-enemies-count {
         font-size: 0.75em;
         padding: 4px 8px;
+    }
+
+    .targeting-indicator {
+        font-size: 0.85em;
+        padding: 8px;
     }
 
     .battle-field {
@@ -580,41 +671,29 @@
         gap: 12px;
     }
 
-    .player-combatants {
-        grid-template-columns: 1fr;
-        gap: 8px;
-    }
-
     .combatant {
-        min-width: auto;
-        padding: 10px;
+        padding: 6px;
     }
 
-    .combat-positions {
-        padding: 10px;
+    .combatant-info h3 {
+        font-size: 0.8em;
     }
 
-    .slots-row {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 4px;
+    .combatant-image img {
+        width: 45px;
+        height: 45px;
     }
 
-    .combat-slot {
-        min-height: 40px;
-        padding: 5px;
+    .target-icon {
+        font-size: 30px;
     }
 
-    .slot-content img {
-        width: 20px;
-        height: 20px;
+    .empty-slot {
+        min-height: 60px;
     }
 
-    .slot-name {
-        font-size: 0.55em;
-    }
-
-    .slot-hp {
-        font-size: 0.5em;
+    .enemy-slot {
+        min-height: 70px;
     }
 
     .vs-separator {
@@ -628,19 +707,15 @@
     }
 
     .attack-btn,
-    .position-btn {
-        padding: 7px 10px;
-        font-size: 0.75em;
+    .position-btn,
+    .cancel-btn {
+        padding: 8px 10px;
+        font-size: 0.8em;
     }
 
     .current-turn-indicator {
         font-size: 0.8em;
         padding: 6px 10px;
-    }
-
-    .combatant-image img {
-        width: 45px;
-        height: 45px;
     }
 
     .battle-log {
@@ -680,19 +755,13 @@
         padding: 8px;
     }
 
-    .combat-slot {
-        min-height: 35px;
-        padding: 4px;
-    }
-
-    .slot-content img {
-        width: 18px;
-        height: 18px;
-    }
-
     .combatant-image img {
         width: 40px;
         height: 40px;
+    }
+
+    .target-icon {
+        font-size: 24px;
     }
 
     .vs-separator {
@@ -723,149 +792,4 @@
 
 .log-messages::-webkit-scrollbar-thumb:hover {
     background: #555;
-}
-
-/* Player side with position columns */
-.player-side {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    width: 100%;
-}
-
-.position-column {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.position-label {
-    text-align: center;
-    color: #ffd700;
-    font-weight: bold;
-    font-size: 0.9em;
-    margin-bottom: 5px;
-    background: rgba(0, 0, 0, 0.3);
-    padding: 4px;
-    border-radius: 4px;
-}
-
-/* Position badges */
-.position-badge {
-    font-size: 0.7em;
-    padding: 2px 6px;
-    border-radius: 10px;
-    margin-top: 4px;
-    text-align: center;
-    font-weight: bold;
-}
-
-.front-badge {
-    background: #dc2626;
-    color: white;
-}
-
-.back-badge {
-    background: #3b82f6;
-    color: white;
-}
-
-/* Empty slots */
-.empty-slot {
-    background: rgba(42, 42, 42, 0.3);
-    border: 2px dashed #666;
-    border-radius: 8px;
-    min-height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #888;
-}
-
-.empty-slot-content {
-    text-align: center;
-    font-size: 0.8em;
-}
-
-/* Responsive battle field */
-@media (max-width: 768px) {
-    .battle-field {
-        grid-template-columns: 1fr auto;
-        gap: 10px;
-    }
-
-    .player-side {
-        grid-template-columns: 1fr;
-        gap: 8px;
-    }
-
-    .position-column {
-        gap: 6px;
-    }
-
-    /* Simplified mobile cards */
-    .combatant {
-        min-width: auto;
-        padding: 8px;
-    }
-
-    .combatant-info h3 {
-        font-size: 0.9em;
-        margin-bottom: 5px;
-    }
-
-    .hp-bar {
-        height: 12px;
-        margin: 4px 0;
-    }
-
-    .hp-text {
-        font-size: 0.6em;
-    }
-
-    .stats {
-        display: none;
-        /* Hide stats on mobile for simplicity */
-    }
-
-    .combatant-image img {
-        width: 40px;
-        height: 40px;
-    }
-
-    .position-label {
-        font-size: 0.8em;
-    }
-
-    .position-badge {
-        font-size: 0.6em;
-        padding: 1px 4px;
-    }
-}
-
-@media (max-width: 480px) {
-    .player-side {
-        gap: 5px;
-    }
-
-    .combatant {
-        padding: 6px;
-    }
-
-    .combatant-info h3 {
-        font-size: 0.8em;
-    }
-
-    .combatant-image img {
-        width: 35px;
-        height: 35px;
-    }
-
-    .empty-slot {
-        min-height: 60px;
-    }
-
-    .position-label {
-        font-size: 0.75em;
-    }
 }

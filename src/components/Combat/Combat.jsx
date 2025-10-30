@@ -11,7 +11,11 @@ import {
     executePlayerAttack,
     executePlayerPositionSwap,
     getBattleReward,
-    getBattlePenalty
+    getBattlePenalty,
+    areAllEnemiesDefeated,
+    canSelectAttackType,
+    isEnemyTargetable,
+    createTargetingMessage
 } from '../../utils/combatLogic'
 import CharacterDetail from '../CharacterDetail/CharacterDetail'
 
@@ -27,9 +31,22 @@ const Combat = ({
     onResetCharacterHp
 }) => {
     // ========== STATE MANAGEMENT ==========
-    const [combatState, setCombatState] = useState(() =>
-        initializeCombatState(activeCharacters, enemy, playerCharactersHp, playerMaxHp)
-    )
+    const [combatState, setCombatState] = useState(() => {
+        const enemiesArray = Array.isArray(enemy) ? enemy : [enemy]
+        const initialState = initializeCombatState(activeCharacters, enemiesArray, playerCharactersHp, playerMaxHp)
+
+        return {
+            ...initialState,
+            enemies: enemiesArray.map((e, index) => ({
+                ...e,
+                id: e.id || `enemy_${index}`,
+                currentHp: e.currentHp || e.maxHp,
+                position: e.position || 'front',
+                slot: e.slot !== undefined ? e.slot : index,
+                isAlive: true
+            }))
+        }
+    })
 
     const [combatPositions, setCombatPositions] = useState({
         front: [null, null, null],
@@ -37,6 +54,8 @@ const Combat = ({
     })
 
     const [selectedCharacter, setSelectedCharacter] = useState(null)
+    const [selectedAttackType, setSelectedAttackType] = useState(null)
+    const [targetingMode, setTargetingMode] = useState(false)
 
     // ========== INITIALIZE COMBAT POSITIONS ==========
     useEffect(() => {
@@ -57,7 +76,6 @@ const Combat = ({
             const timer = setTimeout(() => {
                 enemyTurn()
             }, 1000)
-
             return () => clearTimeout(timer)
         }
     }, [combatState.currentTurn, combatState.battleStatus])
@@ -71,9 +89,13 @@ const Combat = ({
         return getAlivePlayersCountLogic(combatState.playerCharacters)
     }
 
+    const getAliveEnemiesCount = () => {
+        return combatState.enemies.filter(enemy => enemy.currentHp > 0 && enemy.isAlive).length
+    }
+
     // ========== CHARACTER CLICK HANDLER ==========
     const handleCharacterClick = (character) => {
-        if (combatState.battleStatus === 'ongoing') {
+        if (combatState.battleStatus === 'ongoing' && !targetingMode) {
             setSelectedCharacter(character)
         }
     }
@@ -82,14 +104,57 @@ const Combat = ({
         setSelectedCharacter(null)
     }
 
+    // ========== ATTACK TYPE SELECTION ==========
+    const handleSelectAttackType = (attackType) => {
+        const currentPlayer = getCurrentPlayerTurn()
+
+        // Use combat logic to validate selection
+        if (!canSelectAttackType(combatState.currentTurn, combatState.battleStatus, currentPlayer)) {
+            return
+        }
+
+        setSelectedAttackType(attackType)
+        setTargetingMode(true)
+
+        // Use combat logic to create targeting message
+        addLog(createTargetingMessage(attackType))
+    }
+
+    // ========== ENEMY TARGET SELECTION ==========
+    const handleEnemyClick = (enemy) => {
+        // Only allow targeting if in targeting mode
+        if (!targetingMode || !selectedAttackType) return
+        if (combatState.currentTurn !== 'player' || combatState.battleStatus !== 'ongoing') return
+
+        // Use combat logic to validate target
+        if (!isEnemyTargetable(enemy)) return
+
+        // Execute the attack
+        executeAttack(selectedAttackType, enemy)
+
+        // Reset targeting mode
+        setTargetingMode(false)
+        setSelectedAttackType(null)
+    }
+
+    // ========== CANCEL TARGETING ==========
+    const handleCancelTargeting = () => {
+        setTargetingMode(false)
+        setSelectedAttackType(null)
+        addLog("❌ Selección de ataque cancelada")
+    }
+
     // ========== POSITION SWAP ACTION ==========
     const handlePositionSwap = () => {
         if (combatState.currentTurn !== 'player' || combatState.battleStatus !== 'ongoing') return
+        if (targetingMode) {
+            addLog("⚠️ Cancela primero la selección de ataque")
+            return
+        }
 
         const currentPlayer = getCurrentPlayerTurn()
         if (!currentPlayer || currentPlayer.currentHp <= 0) return
 
-        // Use combat logic for position swap
         const swapResult = executePlayerPositionSwap(combatPositions, currentPlayer)
 
         if (!swapResult.success) {
@@ -102,12 +167,13 @@ const Combat = ({
         endPlayerTurn()
     }
 
-    // ========== PLAYER ATTACK ACTION ==========
-    const playerAttack = (attackType) => {
-        if (combatState.currentTurn !== 'player' || combatState.battleStatus !== 'ongoing') return
+    // ========== PLAYER ATTACK EXECUTION ==========
+    const executeAttack = (attackType, targetEnemy) => {
+        const currentPlayer = getCurrentPlayerTurn()
+        if (!currentPlayer || currentPlayer.currentHp <= 0) return
 
         // Use combat logic for player attack
-        const attackResult = executePlayerAttack(combatState, attackType)
+        const attackResult = executePlayerAttack(combatState, attackType, targetEnemy)
 
         if (attackResult.shouldSkipTurn) {
             endPlayerTurn()
@@ -116,18 +182,28 @@ const Combat = ({
 
         addLog(attackResult.logMessage)
 
-        if (attackResult.shouldEndBattle) {
-            // Update enemy HP before ending battle
+        // Update ONLY the targeted enemy's HP
+        const updatedEnemies = combatState.enemies.map(enemy =>
+            enemy.id === targetEnemy.id
+                ? {
+                    ...enemy,
+                    currentHp: attackResult.updatedEnemyHp,
+                    isAlive: attackResult.updatedEnemyHp > 0
+                }
+                : enemy
+        )
+
+        // Check if all enemies are defeated
+        if (areAllEnemiesDefeated(updatedEnemies)) {
             setCombatState(prev => ({
                 ...prev,
-                enemy: { ...prev.enemy, currentHp: attackResult.updatedEnemyHp }
+                enemies: updatedEnemies
             }))
-            endBattle(attackResult.result)
+            endBattle('victory')
         } else {
-            // Update enemy HP and continue
             setCombatState(prev => ({
                 ...prev,
-                enemy: { ...prev.enemy, currentHp: attackResult.updatedEnemyHp }
+                enemies: updatedEnemies
             }))
             endPlayerTurn()
         }
@@ -135,7 +211,6 @@ const Combat = ({
 
     // ========== END PLAYER TURN ==========
     const endPlayerTurn = () => {
-        // Use combat logic for turn management
         const turnResult = handleEndPlayerTurn(combatState)
 
         if (turnResult.shouldEndBattle) {
@@ -143,7 +218,6 @@ const Combat = ({
             return
         }
 
-        // Update state based on turn result
         setCombatState(prev => ({
             ...prev,
             ...turnResult.newState
@@ -152,32 +226,48 @@ const Combat = ({
 
     // ========== ENEMY TURN ==========
     const enemyTurn = () => {
-        // Use combat logic for enemy turn
-        const enemyResult = executeEnemyTurn(combatState, combatState.enemy)
+        let allLogMessages = []
+        let updatedPlayers = [...combatState.playerCharacters]
 
-        if (enemyResult.error) return
+        combatState.enemies.forEach(enemy => {
+            if (enemy.currentHp <= 0 || !enemy.isAlive) return
 
-        // Update parent component HP
-        if (enemyResult.targetPlayerId && typeof onCharacterHpChange === 'function') {
-            onCharacterHpChange(enemyResult.targetPlayerId, enemyResult.updatedPlayerHp)
-        }
+            const enemyResult = executeEnemyTurn(
+                { ...combatState, playerCharacters: updatedPlayers },
+                enemy
+            )
 
-        addLog(enemyResult.logMessage)
+            if (enemyResult.error) return
 
-        if (enemyResult.shouldEndBattle) {
-            // Update players before ending
-            setCombatState(prev => ({
-                ...prev,
-                playerCharacters: enemyResult.updatedPlayers
-            }))
-            endBattle(enemyResult.result)
-            return
-        }
+            if (enemyResult.targetPlayerId && enemyResult.updatedPlayers) {
+                updatedPlayers = enemyResult.updatedPlayers
 
-        // Continue battle with updated state
+                if (typeof onCharacterHpChange === 'function') {
+                    onCharacterHpChange(enemyResult.targetPlayerId, enemyResult.updatedPlayerHp)
+                }
+            }
+
+            if (enemyResult.logMessage) {
+                allLogMessages.push(enemyResult.logMessage)
+            }
+
+            if (enemyResult.shouldEndBattle) {
+                setCombatState(prev => ({
+                    ...prev,
+                    playerCharacters: updatedPlayers
+                }))
+                endBattle(enemyResult.result)
+                return
+            }
+        })
+
+        allLogMessages.forEach(message => addLog(message))
+
         setCombatState(prev => ({
             ...prev,
-            ...enemyResult.newState
+            playerCharacters: updatedPlayers,
+            currentTurn: 'player',
+            currentPlayerTurnIndex: 0
         }))
     }
 
@@ -185,7 +275,6 @@ const Combat = ({
     const endBattle = (result) => {
         setCombatPositions(activeCharacters)
 
-        // Reset HP on defeat only
         if (result === 'defeat') {
             combatState.playerCharacters.forEach(char => {
                 if (typeof onResetCharacterHp === 'function') {
@@ -196,7 +285,6 @@ const Combat = ({
 
         setCombatState(prev => ({ ...prev, battleStatus: result }))
 
-        // Handle rewards/penalties
         if (result === 'victory') {
             const coinsWon = getBattleReward()
             addLog(`¡Victoria! Ganaste ${coinsWon} monedas`)
@@ -227,6 +315,16 @@ const Combat = ({
                     <div className="alive-players-count">
                         Jugadores vivos: {getAlivePlayersCount()}/{combatState.playerCharacters.length}
                     </div>
+                    <div className="alive-enemies-count">
+                        Enemigos vivos: {getAliveEnemiesCount()}/{combatState.enemies.length}
+                    </div>
+
+                    {/* TARGETING MODE INDICATOR */}
+                    {targetingMode && (
+                        <div className="targeting-indicator">
+                            🎯 SELECCIONA UN ENEMIGO PARA ATACAR
+                        </div>
+                    )}
                 </div>
 
                 {/* ========== BATTLE FIELD ========== */}
@@ -312,27 +410,99 @@ const Combat = ({
 
                     {/* ========== ENEMY SIDE ========== */}
                     <div className="enemy-side">
-                        <div className="combatant enemy-combatant">
-                            <div className="combatant-info">
-                                <h3>{enemy.name}</h3>
-                                <div className="hp-bar">
-                                    <div
-                                        className="hp-fill"
-                                        style={{ width: `${getHpPercentage(combatState.enemy.currentHp, enemy.maxHp)}%` }}
-                                    ></div>
-                                    <span className="hp-text">
-                                        PV: {combatState.enemy.currentHp}/{enemy.maxHp}
-                                    </span>
-                                </div>
-                                <div className="stats">
-                                    <span>Ataque Fís: {enemy.physicalAttack}</span>
-                                    <span>Ataque Psí: {enemy.psychicAttack}</span>
-                                    <span>Defensa Fís: {enemy.physicalDefense}</span>
-                                    <span>Defensa Psí: {enemy.psychicDefense}</span>
-                                </div>
+                        {/* Enemy Front Row - LEFT COLUMN (mirror of player back row) */}
+                        <div className="enemy-position-column enemy-front-column">
+                            <div className="position-label">Fila Delantera Enemiga</div>
+                            <div className="enemy-row-container">
+                                {[0, 1, 2].map(slot => {
+                                    const enemy = combatState.enemies?.find(
+                                        e => e.position === 'front' && e.slot === slot && e.isAlive
+                                    )
+                                    return (
+                                        <div key={`enemy-front-${slot}`} className="enemy-slot">
+                                            {enemy ? (
+                                                <div
+                                                    className={`combatant enemy-combatant ${enemy.currentHp <= 0 ? 'defeated' : ''} ${targetingMode && isEnemyTargetable(enemy) ? 'targetable' : ''}`}
+                                                    onClick={() => handleEnemyClick(enemy)}
+                                                >
+                                                    <div className="combatant-info">
+                                                        <h3>{enemy.name}</h3>
+                                                        <div className="hp-bar">
+                                                            <div
+                                                                className="hp-fill"
+                                                                style={{ width: `${getHpPercentage(enemy.currentHp, enemy.maxHp)}%` }}
+                                                            ></div>
+                                                            <span className="hp-text">
+                                                                PV: {enemy.currentHp}/{enemy.maxHp}
+                                                            </span>
+                                                        </div>
+                                                        <div className="stats">
+                                                            <span>ATK F: {enemy.physicalAttack}</span>
+                                                            <span>ATK P: {enemy.psychicAttack}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="combatant-image">
+                                                        <img src={enemy.image} alt={enemy.name} />
+                                                        {enemy.currentHp <= 0 && <div className="defeated-overlay">💀</div>}
+                                                        {targetingMode && isEnemyTargetable(enemy) && (
+                                                            <div className="target-icon">🎯</div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="empty-enemy-slot">Vacío</div>
+                                            )}
+                                        </div>
+                                    )
+                                })}
                             </div>
-                            <div className="combatant-image">
-                                <img src={enemy.image} alt={enemy.name} />
+                        </div>
+
+                        {/* Enemy Back Row - RIGHT COLUMN (mirror of player front row) */}
+                        <div className="enemy-position-column enemy-back-column">
+                            <div className="position-label">Fila Trasera Enemiga</div>
+                            <div className="enemy-row-container">
+                                {[0, 1, 2].map(slot => {
+                                    const enemy = combatState.enemies?.find(
+                                        e => e.position === 'back' && e.slot === slot && e.isAlive
+                                    )
+                                    return (
+                                        <div key={`enemy-back-${slot}`} className="enemy-slot">
+                                            {enemy ? (
+                                                <div
+                                                    className={`combatant enemy-combatant ${enemy.currentHp <= 0 ? 'defeated' : ''} ${targetingMode && isEnemyTargetable(enemy) ? 'targetable' : ''}`}
+                                                    onClick={() => handleEnemyClick(enemy)}
+                                                >
+                                                    <div className="combatant-info">
+                                                        <h3>{enemy.name}</h3>
+                                                        <div className="hp-bar">
+                                                            <div
+                                                                className="hp-fill"
+                                                                style={{ width: `${getHpPercentage(enemy.currentHp, enemy.maxHp)}%` }}
+                                                            ></div>
+                                                            <span className="hp-text">
+                                                                PV: {enemy.currentHp}/{enemy.maxHp}
+                                                            </span>
+                                                        </div>
+                                                        <div className="stats">
+                                                            <span>ATK F: {enemy.physicalAttack}</span>
+                                                            <span>ATK P: {enemy.psychicAttack}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="combatant-image">
+                                                        <img src={enemy.image} alt={enemy.name} />
+                                                        {enemy.currentHp <= 0 && <div className="defeated-overlay">💀</div>}
+                                                        {targetingMode && isEnemyTargetable(enemy) && (
+                                                            <div className="target-icon">🎯</div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="empty-enemy-slot">Vacío</div>
+                                            )}
+                                        </div>
+                                    )
+                                })}
                             </div>
                         </div>
                     </div>
@@ -344,24 +514,36 @@ const Combat = ({
                         <div className="current-turn-indicator">
                             Turno: {getCurrentPlayerTurn()?.name}
                         </div>
-                        <button
-                            className="attack-btn physical-attack"
-                            onClick={() => playerAttack('physical')}
-                        >
-                            🗡️ Ataque Físico
-                        </button>
-                        <button
-                            className="attack-btn psychic-attack"
-                            onClick={() => playerAttack('psychic')}
-                        >
-                            🔮 Ataque Psíquico
-                        </button>
-                        <button
-                            className="position-btn"
-                            onClick={handlePositionSwap}
-                        >
-                            🔄 Cambiar Posición
-                        </button>
+
+                        {!targetingMode ? (
+                            <>
+                                <button
+                                    className="attack-btn physical-attack"
+                                    onClick={() => handleSelectAttackType('physical')}
+                                >
+                                    🗡️ Ataque Físico
+                                </button>
+                                <button
+                                    className="attack-btn psychic-attack"
+                                    onClick={() => handleSelectAttackType('psychic')}
+                                >
+                                    🔮 Ataque Psíquico
+                                </button>
+                                <button
+                                    className="position-btn"
+                                    onClick={handlePositionSwap}
+                                >
+                                    🔄 Cambiar Posición
+                                </button>
+                            </>
+                        ) : (
+                            <button
+                                className="cancel-btn"
+                                onClick={handleCancelTargeting}
+                            >
+                                ❌ Cancelar Selección
+                            </button>
+                        )}
                     </div>
                 )}
 
@@ -385,8 +567,8 @@ const Combat = ({
                         </h2>
                         <p>
                             {combatState.battleStatus === 'victory'
-                                ? `Derrotaste a ${enemy.name}`
-                                : `Fuiste derrotado por ${enemy.name}`
+                                ? `Derrotaste a todos los enemigos`
+                                : `Fuiste derrotado`
                             }
                         </p>
                     </div>

@@ -57,13 +57,6 @@ export const shouldTriggerCombat = (encounterRate = 0.2) => {
     return Math.random() < encounterRate
 }
 
-// Get random enemy from enemy list
-export const getRandomEnemy = (enemies) => {
-    if (!enemies || enemies.length === 0) return null
-    const randomIndex = Math.floor(Math.random() * enemies.length)
-    return enemies[randomIndex]
-}
-
 // ========== ACTIVE CHARACTERS PROCESSING ==========
 
 // Get all active characters with their position data
@@ -170,7 +163,7 @@ export const isResetKey = (key) => {
 // ========== PLAYER MOVEMENT LOGIC ==========
 
 // Execute player movement with combat check
-export const executePlayerMovement = (currentPos, direction, map, enemies, encounterRate = 0.2) => {
+export const executePlayerMovement = (currentPos, direction, map, dungeonId, encounterRate = 0.2) => {
     // Calculate new position
     const newPosition = calculateNewPosition(currentPos, direction, map)
 
@@ -180,19 +173,18 @@ export const executePlayerMovement = (currentPos, direction, map, enemies, encou
             moved: false,
             newPosition: currentPos,
             combatTriggered: false,
-            enemy: null
+            enemyParty: null
         }
     }
 
     // Check for combat encounter
-    const combatTriggered = shouldTriggerCombat(encounterRate) && enemies && enemies.length > 0
-    const enemy = combatTriggered ? getRandomEnemy(enemies) : null
+    const combatTriggered = shouldTriggerCombat(encounterRate)
 
     return {
         moved: true,
         newPosition,
         combatTriggered,
-        enemy
+        dungeonId // Pass dungeon ID so we can generate appropriate formation
     }
 }
 
@@ -217,6 +209,61 @@ export const resetAllCharactersHP = (activeCharacters, maxHp) => {
         characterId: char.id,
         newHp: maxHp
     }))
+}
+
+// ========== ENEMY PARTY GENERATION ==========
+
+// Generate enemy party from formation configuration
+export const generateEnemyPartyFromFormation = (formation, enemiesData) => {
+    if (!formation || !formation.enemies || !enemiesData) {
+        return []
+    }
+
+    // Map formation config to actual enemy instances
+    return formation.enemies.map((config, index) => {
+        // Find enemy data by ID
+        const enemyData = enemiesData.find(e => e.id === config.enemyId)
+
+        if (!enemyData) {
+            console.warn(`Enemy with ID ${config.enemyId} not found in enemies.json`)
+            return null
+        }
+
+        // Create enemy instance with combat properties
+        return {
+            id: `enemy_${index}`, // Unique ID for this instance
+            ...enemyData, // Spread all enemy data (name, image, stats, etc.)
+            currentHp: enemyData.maxHp, // Initialize current HP
+            position: config.position, // front or back
+            slot: config.slot, // 0, 1, or 2
+            isAlive: true
+        }
+    }).filter(enemy => enemy !== null) // Remove any nulls from missing enemies
+}
+
+// Generate random enemy party for a specific dungeon
+export const generateRandomEnemyParty = (dungeonId, enemiesData, getRandomFormationForDungeon) => {
+    // Get random formation for this dungeon
+    const formation = getRandomFormationForDungeon(dungeonId)
+
+    if (!formation) {
+        console.warn(`No formations available for dungeon ${dungeonId}`)
+        // Fallback to single enemy
+        const fallbackEnemy = enemiesData[0]
+        return [{
+            ...fallbackEnemy,
+            id: 'enemy_0',
+            currentHp: fallbackEnemy.maxHp,
+            position: 'front',
+            slot: 1,
+            isAlive: true
+        }]
+    }
+
+    console.log(`Generated formation: ${formation.name} (${formation.difficulty}) with ${formation.enemies.length} enemies`)
+
+    // Generate party from formation
+    return generateEnemyPartyFromFormation(formation, enemiesData)
 }
 
 // ========== VALIDATION UTILITIES ==========
