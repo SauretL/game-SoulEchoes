@@ -378,6 +378,42 @@ const Dungeon = ({
         </div>
       </div>
 
+      {/* ===== FLOATING MOBILE CONTROLS ===== */}
+      <div className="floating-controls">
+        <div className="floating-controls-row">
+          <button
+            className="floating-button"
+            onClick={() => movePlayer('up')}
+            disabled={inCombat}
+          >
+            ↑
+          </button>
+        </div>
+        <div className="floating-controls-row">
+          <button
+            className="floating-button"
+            onClick={() => movePlayer('left')}
+            disabled={inCombat}
+          >
+            ←
+          </button>
+          <button
+            className="floating-button"
+            onClick={() => movePlayer('down')}
+            disabled={inCombat}
+          >
+            ↓
+          </button>
+          <button
+            className="floating-button"
+            onClick={() => movePlayer('right')}
+            disabled={inCombat}
+          >
+            →
+          </button>
+        </div>
+      </div>
+
       {/* ========== TOUCH CONTROLS ========== */}
       <div className="touch-controls">
         <div className="touch-row">
