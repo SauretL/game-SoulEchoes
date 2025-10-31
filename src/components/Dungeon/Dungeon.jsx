@@ -35,6 +35,17 @@ const Dungeon = ({
   const startPosition = currentDungeon.startPos
   const encounterRate = currentDungeon.encounterRate
 
+  console.log(`🔍 DUNGEON COMPONENT - Inicializando mazmorra: ${currentDungeon.name}`)
+  console.log(`🔍 DUNGEON CONFIG - ID: ${currentDungeon.id}, Dificultad: ${currentDungeon.difficulty}, Tasa encuentros: ${encounterRate}`)
+  console.log(`🔍 ENEMIES PROP RECEIVED - Enemigos disponibles: ${enemies?.length || 0} tipos`)
+
+  if (enemies && enemies.length > 0) {
+    console.log(`🔍 AVAILABLE ENEMY TYPES - Lista de enemigos cargados:`)
+    enemies.forEach((enemy, index) => {
+      console.log(`🔍 ENEMY TYPE [${index}] - ID: ${enemy.id}, Name: ${enemy.name}, HP: ${enemy.maxHp}, Stats: FIS_ATQ=${enemy.physicalAttack}, PSI_ATQ=${enemy.psychicAttack}`)
+    })
+  }
+
   // ========== STATE MANAGEMENT ==========
   // Use dungeon's start position
   const initialState = getInitialDungeonState(startPosition)
@@ -60,17 +71,22 @@ const Dungeon = ({
   // ========== COMBAT TRIGGER EFFECT ==========
   useEffect(() => {
     if (combatTriggered && enemies && enemies.length > 0) {
+      console.log(`🔍 COMBAT TRIGGERED EFFECT - Combate activado, procesando...`)
       setCombatTriggered(false)
     }
   }, [combatTriggered, enemies])
 
   // ========== PLAYER MOVEMENT LOGIC ==========
   const movePlayer = useCallback((direction) => {
+    console.log(`🔍 PLAYER MOVEMENT - Intento de movimiento: ${direction}`)
+
     // Check if movement is allowed
     if (!isMovementAllowed(inCombat)) {
-      console.log("Movimiento bloqueado - en combate")
+      console.log("🔍 MOVEMENT BLOCKED - Movimiento bloqueado - en combate")
       return
     }
+
+    console.log(`🔍 MOVEMENT ALLOWED - Movimiento permitido, ejecutando...`)
 
     // Execute movement (no longer needs enemies parameter)
     const movementResult = executePlayerMovement(
@@ -82,10 +98,14 @@ const Dungeon = ({
 
     // If movement was successful, update position
     if (movementResult.moved) {
+      console.log(`🔍 MOVEMENT SUCCESS - Jugador se movió a (${movementResult.newPosition.x}, ${movementResult.newPosition.y})`)
       setPlayerPos(movementResult.newPosition)
 
       // If combat was triggered, generate enemy party and start combat
       if (movementResult.combatTriggered) {
+        console.log(`🔍 COMBAT ENCOUNTER - ¡Encuentro de combate activado!`)
+        console.log(`🔍 GENERATING ENEMY PARTY - Generando grupo enemigo para dungeon: ${currentDungeon.id}`)
+
         // Generate random enemy party based on current dungeon
         const enemyParty = generateRandomEnemyParty(
           currentDungeon.id,
@@ -93,17 +113,25 @@ const Dungeon = ({
           getRandomFormationForDungeon
         )
 
-        console.log('Starting combat with enemy party:', enemyParty)
+        console.log(`🔍 ENEMY PARTY GENERATED - Grupo enemigo creado con ${enemyParty.length} enemigos:`)
+        enemyParty.forEach((enemy, index) => {
+          console.log(`🔍 PARTY ENEMY [${index}] - ${enemy.name} (ID: ${enemy.id}), Posición: ${enemy.position}, Slot: ${enemy.slot}, HP: ${enemy.currentHp}/${enemy.maxHp}`)
+        })
 
         // Start combat with the generated party
+        console.log(`🔍 STARTING COMBAT - Iniciando combate con grupo enemigo`)
         onStartCombat(enemyParty)
+      } else {
+        console.log(`🔍 NO COMBAT - Movimiento sin encuentro de combate`)
       }
+    } else {
+      console.log(`🔍 MOVEMENT FAILED - Movimiento bloqueado por pared o límite`)
     }
   }, [inCombat, enemies, playerPos, map, onStartCombat, encounterRate, currentDungeon.id])
 
   // ========== MANUAL COMBAT RESET ==========
   const manualCombatReset = useCallback(() => {
-    console.log("Reset manual de combate (solicitado desde la interfaz de Dungeon)")
+    console.log(`🔍 MANUAL COMBAT RESET - Reset manual activado`)
     if (typeof onResetDungeon === 'function') {
       onResetDungeon()
     }
@@ -114,19 +142,21 @@ const Dungeon = ({
     const handleKeyPress = (e) => {
       // Check for reset key
       if (isResetKey(e.key)) {
+        console.log(`🔍 KEYBOARD RESET - Tecla R presionada para reset`)
         manualCombatReset()
         return
       }
 
       // Check if movement is allowed
       if (!isMovementAllowed(inCombat)) {
-        console.log("Teclado bloqueado - en combate")
+        console.log("🔍 KEYBOARD BLOCKED - Teclado bloqueado - en combate")
         return
       }
 
       // Get direction from key
       const direction = getDirectionFromKey(e.key)
       if (direction) {
+        console.log(`🔍 KEYBOARD MOVEMENT - Tecla detectada: ${e.key} -> Dirección: ${direction}`)
         movePlayer(direction)
       }
     }
@@ -139,6 +169,8 @@ const Dungeon = ({
   const renderActiveCharacters = () => {
     const activeCount = getActiveCharactersCount(activeCharacters)
     const allActiveChars = getAllActiveCharacters(activeCharacters)
+
+    console.log(`🔍 RENDER ACTIVE CHARACTERS - ${activeCount} personajes activos`)
 
     // If no active characters, show empty state
     if (!hasActiveCharacters(activeCharacters)) {
@@ -214,6 +246,8 @@ const Dungeon = ({
 
   // ========== DUNGEON RESET FUNCTION ==========
   const resetDungeon = () => {
+    console.log(`🔍 DUNGEON RESET - Reiniciando mazmorra completa`)
+
     // MODIFIED: Use dungeon's start position for reset
     const newState = resetDungeonState(startPosition)
     setPlayerPos(newState.playerPos)
@@ -221,8 +255,11 @@ const Dungeon = ({
     setPendingCoins(newState.pendingCoins)
     setCombatTriggered(newState.combatTriggered)
 
+    console.log(`🔍 PLAYER POSITION RESET - Nueva posición: (${newState.playerPos.x}, ${newState.playerPos.y})`)
+
     // Reset all character HP using logic function
     if (activeCharacters) {
+      console.log(`🔍 CHARACTER HP RESET - Reiniciando HP de ${getActiveCharactersCount(activeCharacters)} personajes`)
       const hpResets = resetAllCharactersHP(activeCharacters, playerMaxHp)
 
       hpResets.forEach(({ characterId, newHp }) => {
@@ -252,7 +289,7 @@ const Dungeon = ({
         </div>
       </div>
 
-      {/* ADDED: Dungeon difficulty badge */}
+      {/* Dungeon difficulty badge */}
       <div style={{
         textAlign: 'center',
         padding: '5px',

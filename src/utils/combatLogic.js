@@ -1,3 +1,10 @@
+// ========== UNIQUE ID GENERATION ==========
+
+// Generate unique ID for enemy instances
+export const generateUniqueEnemyId = (baseId, index) => {
+    return `enemy_${baseId}_${index}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+}
+
 // ========== DAMAGE CALCULATION ==========
 
 export const calculateDamage = (attack, defense) => {
@@ -229,12 +236,22 @@ export const initializeCombatState = (activeCharacters, enemies, playerCharacter
     // enemies is an array
     const enemiesArray = Array.isArray(enemies) ? enemies : [enemies]
 
+    // Generate unique IDs for each enemy instance
+    const initializedEnemies = enemiesArray.map((enemy, index) => {
+        const uniqueId = generateUniqueEnemyId(enemy.id, index)
+
+        return {
+            ...enemy,
+            id: uniqueId, // Override with unique instance ID
+            originalClassId: enemy.id, // Store original class ID for reference
+            currentHp: enemy.currentHp || enemy.maxHp,
+            isAlive: true
+        }
+    })
+
     return {
         playerCharacters,
-        enemies: enemiesArray.map(enemy => ({
-            ...enemy,
-            currentHp: enemy.currentHp || enemy.maxHp
-        })),
+        enemies: initializedEnemies,
         currentTurn: 'player',
         currentPlayerTurnIndex: 0,
         battleLog: [],
@@ -258,7 +275,7 @@ export const getLastBattleLogs = (battleLog, count = 6) => {
 
 // Get position text for battle log
 export const getPositionText = (position) => {
-    return position === 'front' ? 'delantera' : 'trasera'
+    return position === 'front' ? 'fila delantera' : 'fila trasera'
 }
 
 // Get attack type text for battle log
@@ -269,9 +286,9 @@ export const getAttackTypeText = (attackType) => {
 // Get battle result text
 export const getBattleResultText = (result, enemyName) => {
     if (result === 'victory') {
-        return `¡Victoria! Derrotaste a ${enemyName}`
+        return `¡Victoria! Has derrotado a ${enemyName}`
     } else {
-        return `¡Derrota! Fuiste derrotado por ${enemyName}`
+        return `¡Derrota! Has sido derrotado por ${enemyName}`
     }
 }
 
@@ -336,7 +353,7 @@ export const handleEndPlayerTurn = (combatState) => {
 export const executeEnemyTurn = (combatState, enemy) => {
     // Validate if enemy can attack
     if (combatState.battleStatus !== 'ongoing') {
-        return { shouldEndBattle: false, error: 'Battle already ended' }
+        return { shouldEndBattle: false, error: 'La batalla ya terminó' }
     }
 
     // Check for alive players
@@ -367,8 +384,8 @@ export const executeEnemyTurn = (combatState, enemy) => {
 
     // Create battle log message
     const attackName = result.attackType === 'physical' ? 'Ataque Físico' : 'Ataque Psíquico'
-    const criticalText = result.isCritical ? ' ¡CRÍTICO!' : ''
-    const logMessage = `${enemy.name} usa ${attackName} contra ${targetPlayer.name} - ${actualDamage} daño${criticalText}`
+    const criticalText = result.isCritical ? ' ¡GOLPE CRÍTICO!' : ''
+    const logMessage = `${enemy.name} usa ${attackName} en ${targetPlayer.name} - ${actualDamage} de daño${criticalText}`
 
     // Check if battle ends with this attack
     const battleResult = checkBattleEnd(updatedPlayers, enemy)
@@ -416,8 +433,8 @@ export const executePlayerAttack = (combatState, attackType, targetEnemy) => {
 
     // Create battle log message
     const attackName = attackType === 'physical' ? 'Ataque Físico' : 'Ataque Psíquico'
-    const criticalText = result.isCritical ? ' ¡CRÍTICO!' : ''
-    const logMessage = `${currentPlayer.name} usa ${attackName} contra ${targetEnemy.name} - ${actualDamage} daño${criticalText}`
+    const criticalText = result.isCritical ? ' ¡GOLPE CRÍTICO!' : ''
+    const logMessage = `${currentPlayer.name} usa ${attackName} en ${targetEnemy.name} - ${actualDamage} de daño${criticalText}`
 
     // Calculate enemy HP after attack
     const updatedEnemyHp = Math.max(0, targetEnemy.currentHp - actualDamage)
@@ -442,7 +459,7 @@ export const executePlayerPositionSwap = (combatPositions, currentPlayer) => {
     if (!swapData) {
         return {
             success: false,
-            message: `No hay espacio disponible en la fila ${swapData?.targetPosition === 'front' ? 'delantera' : 'trasera'}`
+            message: `No hay espacio disponible en la ${swapData?.targetPosition === 'front' ? 'fila delantera' : 'fila trasera'}`
         }
     }
 
@@ -463,7 +480,8 @@ export const executePlayerPositionSwap = (combatPositions, currentPlayer) => {
 
 // Check if all enemies are defeated
 export const areAllEnemiesDefeated = (enemies) => {
-    return enemies.every(enemy => enemy.currentHp <= 0 || !enemy.isAlive)
+    const allDefeated = enemies.every(enemy => enemy.currentHp <= 0 || !enemy.isAlive)
+    return allDefeated
 }
 
 // Get random alive enemy for player targeting
@@ -472,17 +490,21 @@ export const getRandomAliveEnemy = (enemies) => {
     if (aliveEnemies.length === 0) return null
 
     const randomIndex = Math.floor(Math.random() * aliveEnemies.length)
-    return aliveEnemies[randomIndex]
+    const selectedEnemy = aliveEnemies[randomIndex]
+
+    return selectedEnemy
 }
 
 // Get all alive enemies for targeting
 export const getAliveEnemies = (enemies) => {
-    return enemies.filter(e => e.currentHp > 0 && e.isAlive)
+    const aliveEnemies = enemies.filter(e => e.currentHp > 0 && e.isAlive)
+    return aliveEnemies
 }
 
 // Check if enemy is targetable
 export const isEnemyTargetable = (enemy) => {
-    return enemy && enemy.currentHp > 0 && enemy.isAlive
+    const targetable = enemy && enemy.currentHp > 0 && enemy.isAlive
+    return targetable
 }
 
 // ========== TARGETING MODE MANAGEMENT ==========

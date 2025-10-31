@@ -66,6 +66,17 @@
   font-weight: 500;
 }
 
+/* Footer */
+
+footer {
+  padding: 10px;
+  border-style: double;
+  border-color: #333;
+  color: white;
+  text-align: center;
+  margin-top: 10px;
+}
+
 /* Buttons */
 button {
   background: linear-gradient(135deg, #296ab4 0%, #6a5acd 100%);

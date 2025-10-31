@@ -9,12 +9,12 @@ async function loadArray(arrayURL) {
         }
         currentArray = await response.json()
 
-        console.log(`${arrayURL} data load succefully: `, currentArray)
+        console.log(`${arrayURL} cargado: `, currentArray)
 
         return currentArray
     }
     catch (error) {
-        console.error("Error loading characters", error)
+        console.error("Error cargando personajes", error)
         return []
     }
 }

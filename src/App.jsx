@@ -185,7 +185,7 @@ function App() {
     setShowCombat(false)
     setCurrentEnemy(null)
     setIsInCombat(false)
-    console.log(`Combat ended with result: ${result}`)
+    console.log(`Combate termino con el resultado: ${result}`)
   }, [])
 
   /* Resets dungeon state */
@@ -327,7 +327,9 @@ function App() {
           onResetCharacterHp={resetCharacterHp}
         />
       )}
+      <footer>Realizado por Salvatore</footer>
     </div>
+
   )
 }
 

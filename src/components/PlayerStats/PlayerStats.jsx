@@ -11,20 +11,6 @@ function PlayerStats({ playerCharacters, allCharacters, playerCoins, onBack }) {
     const genderStats = calculateGenderStats(playerCharacters, allCharacters)
     const fragmentDetailedStats = calculateFragmentDetailedStats(playerCharacters, allCharacters)
 
-    // ========== DEBUG LOGGING ==========
-    console.log("=== DEBUG GENDER STATS ===")
-    console.log("All characters genders:", allCharacters.map(char => ({
-        id: char.id,
-        name: char.name,
-        gender: char.gender
-    })))
-    console.log("Player characters genders:", playerCharacters.map(char => ({
-        id: char.id,
-        name: char.name,
-        gender: char.gender
-    })))
-    console.log("Gender stats result:", genderStats)
-
     // ========== RENDER COMPONENT ==========
     return (
         <div className="stats-container">

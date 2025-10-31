@@ -1,4 +1,4 @@
-// ========== POSITION MANAGEMENT ==========
+// ========== POSITION MANAGEMENT ========== //
 
 // Calculate new position based on direction
 export const calculateNewPosition = (currentPos, direction, map) => {
@@ -215,23 +215,47 @@ export const resetAllCharactersHP = (activeCharacters, maxHp) => {
 
 // Generate enemy party from formation configuration
 export const generateEnemyPartyFromFormation = (formation, enemiesData) => {
+    console.log(`🔍 DUNGEON ENEMY GENERATION - Iniciando generación de grupo enemigo desde formación`)
+    console.log(`🔍 FORMATION DATA - Formación recibida:`, formation)
+    console.log(`🔍 ENEMIES DATA SOURCE - Total enemigos disponibles: ${enemiesData?.length || 0}`)
+
     if (!formation || !formation.enemies || !enemiesData) {
+        console.warn(`🔍 ENEMY GENERATION FAILED - Datos de formación o enemigos faltantes`)
         return []
     }
 
+    console.log(`🔍 FORMATION ENEMIES - Configuración de enemigos en formación:`, formation.enemies)
+
     // Map formation config to actual enemy instances
-    return formation.enemies.map((config, index) => {
+    const enemyParty = formation.enemies.map((config, index) => {
+        console.log(`🔍 PROCESSING ENEMY CONFIG [${index}] - Buscando enemigo ID: ${config.enemyId}, Posición: ${config.position}, Slot: ${config.slot}`)
+
         // Find enemy data by ID
         const enemyData = enemiesData.find(e => e.id === config.enemyId)
 
         if (!enemyData) {
-            console.warn(`Enemy with ID ${config.enemyId} not found in enemies.json`)
+            console.warn(`🔍 ENEMY NOT FOUND - Enemigo con ID ${config.enemyId} no encontrado en enemies.json`)
             return null
         }
 
+        console.log(`🔍 ENEMY DATA FOUND - ${enemyData.name} encontrado:`, {
+            id: enemyData.id,
+            maxHp: enemyData.maxHp,
+            physicalAttack: enemyData.physicalAttack,
+            psychicAttack: enemyData.psychicAttack,
+            physicalDefense: enemyData.physicalDefense,
+            psychicDefense: enemyData.psychicDefense
+        })
+
+        // Create truly unique ID combining enemyId, position, slot, and timestamp
+        const uniqueId = `enemy_${config.enemyId}_${config.position}_${config.slot}_${index}_${Date.now()}`
+
+        console.log(`🔍 ENEMY INSTANCE CREATED - ID único: ${uniqueId}`)
+
         // Create enemy instance with combat properties
         return {
-            id: `enemy_${index}`, // Unique ID for this instance
+            id: uniqueId, // Truly unique ID for this instance
+            enemyTypeId: config.enemyId, // Store original enemy type ID for reference
             ...enemyData, // Spread all enemy data (name, image, stats, etc.)
             currentHp: enemyData.maxHp, // Initialize current HP
             position: config.position, // front or back
@@ -239,31 +263,72 @@ export const generateEnemyPartyFromFormation = (formation, enemiesData) => {
             isAlive: true
         }
     }).filter(enemy => enemy !== null) // Remove any nulls from missing enemies
+
+    console.log(`🔍 ENEMY PARTY COMPLETE - Grupo generado con ${enemyParty.length} enemigos:`,
+        enemyParty.map(e => `${e.name} (ID: ${e.id}, HP: ${e.currentHp}/${e.maxHp})`))
+
+    return enemyParty
 }
 
 // Generate random enemy party for a specific dungeon
 export const generateRandomEnemyParty = (dungeonId, enemiesData, getRandomFormationForDungeon) => {
-    // Get random formation for this dungeon
-    const formation = getRandomFormationForDungeon(dungeonId)
+    console.log(`🔍 RANDOM ENEMY PARTY GENERATION - Iniciando para dungeon: ${dungeonId}`)
+    console.log(`🔍 AVAILABLE ENEMIES DATA - Total tipos de enemigos: ${enemiesData?.length || 0}`)
 
-    if (!formation) {
-        console.warn(`No formations available for dungeon ${dungeonId}`)
-        // Fallback to single enemy
-        const fallbackEnemy = enemiesData[0]
-        return [{
-            ...fallbackEnemy,
-            id: 'enemy_0',
-            currentHp: fallbackEnemy.maxHp,
-            position: 'front',
-            slot: 1,
-            isAlive: true
-        }]
+    if (enemiesData && enemiesData.length > 0) {
+        console.log(`🔍 ENEMY TYPES AVAILABLE - Lista de enemigos disponibles:`,
+            enemiesData.map(e => `${e.name} (ID: ${e.id}, HP: ${e.maxHp})`))
     }
 
-    console.log(`Generated formation: ${formation.name} (${formation.difficulty}) with ${formation.enemies.length} enemies`)
+    // Get random formation for this dungeon
+    const formation = getRandomFormationForDungeon(dungeonId)
+    console.log(`🔍 SELECTED FORMATION - Formación aleatoria para dungeon ${dungeonId}:`, formation)
+
+    if (!formation) {
+        console.warn(`🔍 NO FORMATION FOUND - Sin formaciones disponibles para dungeon ${dungeonId}`)
+
+        // Fallback to single enemy with unique ID
+        const fallbackEnemy = enemiesData?.[0]
+        if (fallbackEnemy) {
+            console.log(`🔍 FALLBACK ENEMY CREATED - Usando enemigo por defecto: ${fallbackEnemy.name}`)
+            const fallbackParty = [{
+                ...fallbackEnemy,
+                id: `enemy_fallback_${Date.now()}`, // Unique fallback ID
+                enemyTypeId: fallbackEnemy.id,
+                currentHp: fallbackEnemy.maxHp,
+                position: 'front',
+                slot: 1,
+                isAlive: true
+            }]
+            console.log(`🔍 FALLBACK PARTY - Grupo de respaldo creado:`, fallbackParty)
+            return fallbackParty
+        } else {
+            console.error(`🔍 CRITICAL ERROR - No hay enemigos disponibles para crear grupo de respaldo`)
+            return []
+        }
+    }
 
     // Generate party from formation
-    return generateEnemyPartyFromFormation(formation, enemiesData)
+    console.log(`🔍 GENERATING PARTY FROM FORMATION - Usando formación con ${formation.enemies?.length || 0} enemigos`)
+    const enemyParty = generateEnemyPartyFromFormation(formation, enemiesData)
+
+    console.log(`🔍 RANDOM ENEMY PARTY FINAL - Grupo enemigo completo para dungeon ${dungeonId}:`,
+        enemyParty.map(e => ({
+            name: e.name,
+            id: e.id,
+            typeId: e.enemyTypeId,
+            hp: `${e.currentHp}/${e.maxHp}`,
+            position: e.position,
+            slot: e.slot,
+            stats: {
+                physAtk: e.physicalAttack,
+                psyAtk: e.psychicAttack,
+                physDef: e.physicalDefense,
+                psyDef: e.psychicDefense
+            }
+        })))
+
+    return enemyParty
 }
 
 // ========== VALIDATION UTILITIES ==========

@@ -30,22 +30,11 @@ const Combat = ({
     onCharacterHpChange,
     onResetCharacterHp
 }) => {
+
     // ========== STATE MANAGEMENT ==========
     const [combatState, setCombatState] = useState(() => {
         const enemiesArray = Array.isArray(enemy) ? enemy : [enemy]
-        const initialState = initializeCombatState(activeCharacters, enemiesArray, playerCharactersHp, playerMaxHp)
-
-        return {
-            ...initialState,
-            enemies: enemiesArray.map((e, index) => ({
-                ...e,
-                id: e.id || `enemy_${index}`,
-                currentHp: e.currentHp || e.maxHp,
-                position: e.position || 'front',
-                slot: e.slot !== undefined ? e.slot : index,
-                isAlive: true
-            }))
-        }
+        return initializeCombatState(activeCharacters, enemiesArray, playerCharactersHp, playerMaxHp)
     })
 
     const [combatPositions, setCombatPositions] = useState({
@@ -108,7 +97,6 @@ const Combat = ({
     const handleSelectAttackType = (attackType) => {
         const currentPlayer = getCurrentPlayerTurn()
 
-        // Use combat logic to validate selection
         if (!canSelectAttackType(combatState.currentTurn, combatState.battleStatus, currentPlayer)) {
             return
         }
@@ -116,23 +104,24 @@ const Combat = ({
         setSelectedAttackType(attackType)
         setTargetingMode(true)
 
-        // Use combat logic to create targeting message
         addLog(createTargetingMessage(attackType))
     }
 
     // ========== ENEMY TARGET SELECTION ==========
     const handleEnemyClick = (enemy) => {
-        // Only allow targeting if in targeting mode
-        if (!targetingMode || !selectedAttackType) return
-        if (combatState.currentTurn !== 'player' || combatState.battleStatus !== 'ongoing') return
+        if (!targetingMode || !selectedAttackType) {
+            return
+        }
+        if (combatState.currentTurn !== 'player' || combatState.battleStatus !== 'ongoing') {
+            return
+        }
 
-        // Use combat logic to validate target
-        if (!isEnemyTargetable(enemy)) return
+        if (!isEnemyTargetable(enemy)) {
+            return
+        }
 
-        // Execute the attack
         executeAttack(selectedAttackType, enemy)
 
-        // Reset targeting mode
         setTargetingMode(false)
         setSelectedAttackType(null)
     }
@@ -148,7 +137,7 @@ const Combat = ({
     const handlePositionSwap = () => {
         if (combatState.currentTurn !== 'player' || combatState.battleStatus !== 'ongoing') return
         if (targetingMode) {
-            addLog("⚠️ Cancela primero la selección de ataque")
+            addLog("⚠️ Cancela la selección de ataque primero")
             return
         }
 
@@ -172,7 +161,6 @@ const Combat = ({
         const currentPlayer = getCurrentPlayerTurn()
         if (!currentPlayer || currentPlayer.currentHp <= 0) return
 
-        // Use combat logic for player attack
         const attackResult = executePlayerAttack(combatState, attackType, targetEnemy)
 
         if (attackResult.shouldSkipTurn) {
@@ -182,18 +170,17 @@ const Combat = ({
 
         addLog(attackResult.logMessage)
 
-        // Update ONLY the targeted enemy's HP
-        const updatedEnemies = combatState.enemies.map(enemy =>
-            enemy.id === targetEnemy.id
-                ? {
+        const updatedEnemies = combatState.enemies.map(enemy => {
+            if (enemy.id === targetEnemy.id) {
+                return {
                     ...enemy,
                     currentHp: attackResult.updatedEnemyHp,
                     isAlive: attackResult.updatedEnemyHp > 0
                 }
-                : enemy
-        )
+            }
+            return enemy
+        })
 
-        // Check if all enemies are defeated
         if (areAllEnemiesDefeated(updatedEnemies)) {
             setCombatState(prev => ({
                 ...prev,
@@ -229,15 +216,19 @@ const Combat = ({
         let allLogMessages = []
         let updatedPlayers = [...combatState.playerCharacters]
 
-        combatState.enemies.forEach(enemy => {
-            if (enemy.currentHp <= 0 || !enemy.isAlive) return
+        combatState.enemies.forEach((enemy, enemyIndex) => {
+            if (enemy.currentHp <= 0 || !enemy.isAlive) {
+                return
+            }
 
             const enemyResult = executeEnemyTurn(
                 { ...combatState, playerCharacters: updatedPlayers },
                 enemy
             )
 
-            if (enemyResult.error) return
+            if (enemyResult.error) {
+                return
+            }
 
             if (enemyResult.targetPlayerId && enemyResult.updatedPlayers) {
                 updatedPlayers = enemyResult.updatedPlayers
@@ -332,77 +323,73 @@ const Combat = ({
 
                     {/* ========== PLAYER SIDE ========== */}
                     <div className="player-side">
-                        {/* Back Row */}
-                        <div className="position-column back-row-column">
-                            <div className="position-label">Fila Trasera</div>
-                            {combatPositions.back.map((char, index) => (
-                                char ? (
-                                    <div
-                                        key={`back-${char.id}-${index}`}
-                                        className={`combatant player-combatant ${getCurrentPlayerTurn()?.id === char.id ? 'active-turn' : ''} ${combatState.playerCharacters.find(p => p.id === char.id)?.currentHp <= 0 ? 'defeated' : ''}`}
-                                        onClick={() => handleCharacterClick(char)}
-                                    >
-                                        <div className="combatant-info">
-                                            <h3>{char.name}</h3>
-                                            <div className="hp-bar">
-                                                <div
-                                                    className="hp-fill"
-                                                    style={{ width: `${getHpPercentage(combatState.playerCharacters.find(p => p.id === char.id)?.currentHp || 0, playerMaxHp)}%` }}
-                                                ></div>
-                                                <span className="hp-text">
-                                                    PV: {combatState.playerCharacters.find(p => p.id === char.id)?.currentHp || 0}/{playerMaxHp}
-                                                </span>
+                        {/* Back Row - Only render if there are characters */}
+                        {combatPositions.back.some(char => char !== null) && (
+                            <div className="position-column back-row-column">
+                                <div className="position-label">Fila Trasera</div>
+                                {combatPositions.back.map((char, index) => (
+                                    char ? (
+                                        <div
+                                            key={`back-${char.id}-${index}`}
+                                            className={`combatant player-combatant ${getCurrentPlayerTurn()?.id === char.id ? 'active-turn' : ''} ${combatState.playerCharacters.find(p => p.id === char.id)?.currentHp <= 0 ? 'defeated' : ''}`}
+                                            onClick={() => handleCharacterClick(char)}
+                                        >
+                                            <div className="combatant-info">
+                                                <h3>{char.name}</h3>
+                                                <div className="hp-bar">
+                                                    <div
+                                                        className="hp-fill"
+                                                        style={{ width: `${getHpPercentage(combatState.playerCharacters.find(p => p.id === char.id)?.currentHp || 0, playerMaxHp)}%` }}
+                                                    ></div>
+                                                    <span className="hp-text">
+                                                        PV: {combatState.playerCharacters.find(p => p.id === char.id)?.currentHp || 0}/{playerMaxHp}
+                                                    </span>
+                                                </div>
+                                                <div className="position-badge back-badge">Trasero</div>
                                             </div>
-                                            <div className="position-badge back-badge">Trasero</div>
+                                            <div className="combatant-image">
+                                                <img src={char.images?.[0]} alt={char.name} />
+                                                {combatState.playerCharacters.find(p => p.id === char.id)?.currentHp <= 0 && <div className="defeated-overlay">💀</div>}
+                                            </div>
                                         </div>
-                                        <div className="combatant-image">
-                                            <img src={char.images?.[0]} alt={char.name} />
-                                            {combatState.playerCharacters.find(p => p.id === char.id)?.currentHp <= 0 && <div className="defeated-overlay">💀</div>}
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div key={`back-empty-${index}`} className="combatant empty-slot">
-                                        <div className="empty-slot-content">Vacío</div>
-                                    </div>
-                                )
-                            ))}
-                        </div>
+                                    ) : null
+                                ))}
+                            </div>
+                        )}
 
-                        {/* Front Row */}
-                        <div className="position-column front-row-column">
-                            <div className="position-label">Fila Delantera</div>
-                            {combatPositions.front.map((char, index) => (
-                                char ? (
-                                    <div
-                                        key={`front-${char.id}-${index}`}
-                                        className={`combatant player-combatant ${getCurrentPlayerTurn()?.id === char.id ? 'active-turn' : ''} ${combatState.playerCharacters.find(p => p.id === char.id)?.currentHp <= 0 ? 'defeated' : ''}`}
-                                        onClick={() => handleCharacterClick(char)}
-                                    >
-                                        <div className="combatant-info">
-                                            <h3>{char.name}</h3>
-                                            <div className="hp-bar">
-                                                <div
-                                                    className="hp-fill"
-                                                    style={{ width: `${getHpPercentage(combatState.playerCharacters.find(p => p.id === char.id)?.currentHp || 0, playerMaxHp)}%` }}
-                                                ></div>
-                                                <span className="hp-text">
-                                                    PV: {combatState.playerCharacters.find(p => p.id === char.id)?.currentHp || 0}/{playerMaxHp}
-                                                </span>
+                        {/* Front Row - Only render if there are characters */}
+                        {combatPositions.front.some(char => char !== null) && (
+                            <div className="position-column front-row-column">
+                                <div className="position-label">Fila Delantera</div>
+                                {combatPositions.front.map((char, index) => (
+                                    char ? (
+                                        <div
+                                            key={`front-${char.id}-${index}`}
+                                            className={`combatant player-combatant ${getCurrentPlayerTurn()?.id === char.id ? 'active-turn' : ''} ${combatState.playerCharacters.find(p => p.id === char.id)?.currentHp <= 0 ? 'defeated' : ''}`}
+                                            onClick={() => handleCharacterClick(char)}
+                                        >
+                                            <div className="combatant-info">
+                                                <h3>{char.name}</h3>
+                                                <div className="hp-bar">
+                                                    <div
+                                                        className="hp-fill"
+                                                        style={{ width: `${getHpPercentage(combatState.playerCharacters.find(p => p.id === char.id)?.currentHp || 0, playerMaxHp)}%` }}
+                                                    ></div>
+                                                    <span className="hp-text">
+                                                        PV: {combatState.playerCharacters.find(p => p.id === char.id)?.currentHp || 0}/{playerMaxHp}
+                                                    </span>
+                                                </div>
+                                                <div className="position-badge front-badge">Delantero</div>
                                             </div>
-                                            <div className="position-badge front-badge">Delantero</div>
+                                            <div className="combatant-image">
+                                                <img src={char.images?.[0]} alt={char.name} />
+                                                {combatState.playerCharacters.find(p => p.id === char.id)?.currentHp <= 0 && <div className="defeated-overlay">💀</div>}
+                                            </div>
                                         </div>
-                                        <div className="combatant-image">
-                                            <img src={char.images?.[0]} alt={char.name} />
-                                            {combatState.playerCharacters.find(p => p.id === char.id)?.currentHp <= 0 && <div className="defeated-overlay">💀</div>}
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div key={`front-empty-${index}`} className="combatant empty-slot">
-                                        <div className="empty-slot-content">Vacío</div>
-                                    </div>
-                                )
-                            ))}
-                        </div>
+                                    ) : null
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* ========== VS SEPARATOR ========== */}
@@ -410,17 +397,17 @@ const Combat = ({
 
                     {/* ========== ENEMY SIDE ========== */}
                     <div className="enemy-side">
-                        {/* Enemy Front Row - LEFT COLUMN (mirror of player back row) */}
-                        <div className="enemy-position-column enemy-front-column">
-                            <div className="position-label">Fila Delantera Enemiga</div>
-                            <div className="enemy-row-container">
-                                {[0, 1, 2].map(slot => {
-                                    const enemy = combatState.enemies?.find(
-                                        e => e.position === 'front' && e.slot === slot && e.isAlive
-                                    )
-                                    return (
-                                        <div key={`enemy-front-${slot}`} className="enemy-slot">
-                                            {enemy ? (
+                        {/* Enemy Front Row - Only render if there are enemies */}
+                        {combatState.enemies.some(enemy => enemy.position === 'front' && enemy.isAlive) && (
+                            <div className="enemy-position-column enemy-front-column">
+                                <div className="position-label">Fila Delantera Enemiga</div>
+                                <div className="enemy-row-container">
+                                    {[0, 1, 2].map(slot => {
+                                        const enemy = combatState.enemies?.find(
+                                            e => e.position === 'front' && e.slot === slot && e.isAlive
+                                        )
+                                        return enemy ? (
+                                            <div key={`enemy-front-${slot}`} className="enemy-slot">
                                                 <div
                                                     className={`combatant enemy-combatant ${enemy.currentHp <= 0 ? 'defeated' : ''} ${targetingMode && isEnemyTargetable(enemy) ? 'targetable' : ''}`}
                                                     onClick={() => handleEnemyClick(enemy)}
@@ -437,8 +424,8 @@ const Combat = ({
                                                             </span>
                                                         </div>
                                                         <div className="stats">
-                                                            <span>ATK F: {enemy.physicalAttack}</span>
-                                                            <span>ATK P: {enemy.psychicAttack}</span>
+                                                            <span>ATAQ FÍS: {enemy.physicalAttack}</span>
+                                                            <span>ATAQ PSÍ: {enemy.psychicAttack}</span>
                                                         </div>
                                                     </div>
                                                     <div className="combatant-image">
@@ -449,26 +436,24 @@ const Combat = ({
                                                         )}
                                                     </div>
                                                 </div>
-                                            ) : (
-                                                <div className="empty-enemy-slot">Vacío</div>
-                                            )}
-                                        </div>
-                                    )
-                                })}
+                                            </div>
+                                        ) : null
+                                    })}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
-                        {/* Enemy Back Row - RIGHT COLUMN (mirror of player front row) */}
-                        <div className="enemy-position-column enemy-back-column">
-                            <div className="position-label">Fila Trasera Enemiga</div>
-                            <div className="enemy-row-container">
-                                {[0, 1, 2].map(slot => {
-                                    const enemy = combatState.enemies?.find(
-                                        e => e.position === 'back' && e.slot === slot && e.isAlive
-                                    )
-                                    return (
-                                        <div key={`enemy-back-${slot}`} className="enemy-slot">
-                                            {enemy ? (
+                        {/* Enemy Back Row - Only render if there are enemies */}
+                        {combatState.enemies.some(enemy => enemy.position === 'back' && enemy.isAlive) && (
+                            <div className="enemy-position-column enemy-back-column">
+                                <div className="position-label">Fila Trasera Enemiga</div>
+                                <div className="enemy-row-container">
+                                    {[0, 1, 2].map(slot => {
+                                        const enemy = combatState.enemies?.find(
+                                            e => e.position === 'back' && e.slot === slot && e.isAlive
+                                        )
+                                        return enemy ? (
+                                            <div key={`enemy-back-${slot}`} className="enemy-slot">
                                                 <div
                                                     className={`combatant enemy-combatant ${enemy.currentHp <= 0 ? 'defeated' : ''} ${targetingMode && isEnemyTargetable(enemy) ? 'targetable' : ''}`}
                                                     onClick={() => handleEnemyClick(enemy)}
@@ -485,8 +470,8 @@ const Combat = ({
                                                             </span>
                                                         </div>
                                                         <div className="stats">
-                                                            <span>ATK F: {enemy.physicalAttack}</span>
-                                                            <span>ATK P: {enemy.psychicAttack}</span>
+                                                            <span>ATAQ FÍS: {enemy.physicalAttack}</span>
+                                                            <span>ATAQ PSÍ: {enemy.psychicAttack}</span>
                                                         </div>
                                                     </div>
                                                     <div className="combatant-image">
@@ -497,14 +482,12 @@ const Combat = ({
                                                         )}
                                                     </div>
                                                 </div>
-                                            ) : (
-                                                <div className="empty-enemy-slot">Vacío</div>
-                                            )}
-                                        </div>
-                                    )
-                                })}
+                                            </div>
+                                        ) : null
+                                    })}
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </div>
 
@@ -549,7 +532,7 @@ const Combat = ({
 
                 {/* ========== BATTLE LOG ========== */}
                 <div className="battle-log">
-                    <h4>Registro de Combate:</h4>
+                    <h4>Registro de Batalla:</h4>
                     <div className="log-messages">
                         {getLastBattleLogs(combatState.battleLog).map((log, index) => (
                             <div key={index} className="log-message">
@@ -567,8 +550,8 @@ const Combat = ({
                         </h2>
                         <p>
                             {combatState.battleStatus === 'victory'
-                                ? `Derrotaste a todos los enemigos`
-                                : `Fuiste derrotado`
+                                ? `Has derrotado a todos los enemigos`
+                                : `Has sido derrotado`
                             }
                         </p>
                     </div>
