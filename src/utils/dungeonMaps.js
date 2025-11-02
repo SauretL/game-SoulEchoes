@@ -1,7 +1,62 @@
-// ========== ENEMY FORMATIONS ==========
+// dungeonMaps.js
 
-// Enemy formation configurations
-// Each formation defines enemies with their type, position (front/back), and slot (0-2)
+// ========== DUNGEON MAP LAYOUTS ==========
+// Map legend: 1 = wall, 0 = floor, 2 = stairs to next level
+
+// Dungeon 1: Beginner
+export const DUNGEON_1_MAP = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1],
+    [1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1],
+    [1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
+    [1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1],
+    [1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1],
+    [1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1],
+    [1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 2, 1], // Stairs at (11,10)
+    [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+]
+
+// Dungeon 2: Intermediate
+export const DUNGEON_2_MAP = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1],
+    [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1],
+    [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1], // Stairs at (11,11)
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+]
+
+// Dungeon 3: Advanced
+export const DUNGEON_3_MAP = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+    [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
+    [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+]
+
+// ========== ENEMY FORMATIONS CONFIGURATION ==========
+// Each formation defines enemies with type, position (front/back), and slot (0-2)
+
 export const ENEMY_FORMATIONS = {
     // ===== BEGINNER FORMATIONS =====
     SINGLE_SEED: {
@@ -107,62 +162,8 @@ export const ENEMY_FORMATIONS = {
     }
 }
 
-// dungeon map layout (1 = wall, 0 = floor)
+// ========== DUNGEON CONFIGURATIONS ==========
 
-// Dungeon 1: Beginner
-export const DUNGEON_1_MAP = [
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1],
-    [1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1],
-    [1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
-    [1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1],
-    [1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1],
-    [1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1],
-    [1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1],
-    [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-]
-
-// Dungeon 2: Intermediate
-export const DUNGEON_2_MAP = [
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1],
-    [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-    [1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1],
-    [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
-    [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-]
-
-// Dungeon 3: Advanced
-export const DUNGEON_3_MAP = [
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
-    [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
-    [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-]
-
-// ========== DUNGEON METADATA ==========
-
-// Dungeon configurations with metadata
 export const DUNGEONS = [
     {
         id: 1,
@@ -170,10 +171,10 @@ export const DUNGEONS = [
         difficulty: 'Principiante',
         map: DUNGEON_1_MAP,
         startPos: { x: 1, y: 1 },
-        encounterRate: 0.2, // 20% chance per step
+        stairsPos: { x: 11, y: 10 },
+        nextDungeonId: 2,
+        encounterRate: 0.2,
         description: 'Una mazmorra simple para comenzar tu aventura',
-        minLevel: 1,
-        maxLevel: 5,
         // Available enemy formations for this dungeon (beginner only)
         availableFormations: [
             'SINGLE_SEED',
@@ -187,10 +188,10 @@ export const DUNGEONS = [
         difficulty: 'Intermedio',
         map: DUNGEON_2_MAP,
         startPos: { x: 1, y: 1 },
-        encounterRate: 0.3, // 30% chance per step
+        stairsPos: { x: 11, y: 11 },
+        nextDungeonId: 3,
+        encounterRate: 0.25,
         description: 'Un laberinto complejo con más enemigos',
-        minLevel: 6,
-        maxLevel: 10,
         // Available enemy formations for this dungeon (beginner + intermediate)
         availableFormations: [
             'SINGLE_SEED',
@@ -207,10 +208,10 @@ export const DUNGEONS = [
         difficulty: 'Avanzado',
         map: DUNGEON_3_MAP,
         startPos: { x: 6, y: 6 }, // Center of arena
+        stairsPos: null,
+        nextDungeonId: null,
         encounterRate: 0.4, // 40% chance per step
-        description: 'Una arena abierta con combates intensos',
-        minLevel: 11,
-        maxLevel: 20,
+        description: 'Una arena abierta con combates intensos - ¡Nivel Final!',
         // Available enemy formations for this dungeon (all formations)
         availableFormations: [
             'SEED_TRIO',
@@ -224,7 +225,7 @@ export const DUNGEONS = [
     }
 ]
 
-// ========== HELPER FUNCTIONS ==========
+// ========== DUNGEON MANAGEMENT FUNCTIONS ==========
 
 // Get dungeon by ID
 export const getDungeonById = (dungeonId) => {
@@ -240,6 +241,8 @@ export const getAllDungeons = () => {
 export const getDefaultDungeon = () => {
     return DUNGEONS[0]
 }
+
+// ========== FORMATION MANAGEMENT FUNCTIONS ==========
 
 // Get random formation for a specific dungeon
 export const getRandomFormationForDungeon = (dungeonId) => {
@@ -258,4 +261,34 @@ export const getRandomFormationForDungeon = (dungeonId) => {
 // Get formation by key
 export const getFormationByKey = (formationKey) => {
     return ENEMY_FORMATIONS[formationKey] || null
+}
+
+// ========== STAIRS MANAGEMENT FUNCTIONS ==========
+
+// Check if position has stairs
+export const isStairsPosition = (dungeonId, position) => {
+    const dungeon = getDungeonById(dungeonId)
+    if (!dungeon || !dungeon.stairsPos) return false
+
+    return position.x === dungeon.stairsPos.x && position.y === dungeon.stairsPos.y
+}
+
+// Get next dungeon ID
+export const getNextDungeonId = (currentDungeonId) => {
+    const dungeon = getDungeonById(currentDungeonId)
+    return dungeon?.nextDungeonId || null
+}
+
+// Check if player can advance to next dungeon (always true - no level restrictions)
+export const canAdvanceToNextDungeon = () => {
+    return true
+}
+
+// Get stairs message
+export const getStairsMessage = (currentDungeonId) => {
+    const nextDungeonId = getNextDungeonId(currentDungeonId)
+    if (!nextDungeonId) return '¡Has llegado a la cima de la torre! Esta es la mazmorra final.'
+
+    const nextDungeon = getDungeonById(nextDungeonId)
+    return `¡Has encontrado las escaleras a ${nextDungeon.name}!`
 }

@@ -14,7 +14,12 @@ import {
   resetAllCharactersHP,
   generateRandomEnemyParty
 } from '../../utils/dungeonLogic'
-import { getDefaultDungeon, getRandomFormationForDungeon } from '../../utils/dungeonMaps'
+import {
+  getDefaultDungeon,
+  getRandomFormationForDungeon,
+  getDungeonById,
+  getNextDungeonId
+} from '../../utils/dungeonMaps'
 
 const Dungeon = ({
   onBack,
@@ -30,30 +35,19 @@ const Dungeon = ({
   playerMaxHp
 }) => {
   // ========== DUNGEON CONFIGURATION ==========
-  const currentDungeon = getDefaultDungeon()
+  const [currentDungeon, setCurrentDungeon] = useState(getDefaultDungeon())
   const map = currentDungeon.map
   const startPosition = currentDungeon.startPos
   const encounterRate = currentDungeon.encounterRate
 
-  console.log(`🔍 DUNGEON COMPONENT - Inicializando mazmorra: ${currentDungeon.name}`)
-  console.log(`🔍 DUNGEON CONFIG - ID: ${currentDungeon.id}, Dificultad: ${currentDungeon.difficulty}, Tasa encuentros: ${encounterRate}`)
-  console.log(`🔍 ENEMIES PROP RECEIVED - Enemigos disponibles: ${enemies?.length || 0} tipos`)
-
-  if (enemies && enemies.length > 0) {
-    console.log(`🔍 AVAILABLE ENEMY TYPES - Lista de enemigos cargados:`)
-    enemies.forEach((enemy, index) => {
-      console.log(`🔍 ENEMY TYPE [${index}] - ID: ${enemy.id}, Name: ${enemy.name}, HP: ${enemy.maxHp}, Stats: FIS_ATQ=${enemy.physicalAttack}, PSI_ATQ=${enemy.psychicAttack}`)
-    })
-  }
-
   // ========== STATE MANAGEMENT ==========
-  // Use dungeon's start position
-  const initialState = getInitialDungeonState(startPosition)
-
-  const [playerPos, setPlayerPos] = useState(initialState.playerPos)
-  const [coinsCollected, setCoinsCollected] = useState(initialState.coinsCollected)
-  const [pendingCoins, setPendingCoins] = useState(initialState.pendingCoins)
-  const [combatTriggered, setCombatTriggered] = useState(initialState.combatTriggered)
+  const [playerPos, setPlayerPos] = useState(startPosition)
+  const [coinsCollected, setCoinsCollected] = useState(0)
+  const [pendingCoins, setPendingCoins] = useState(0)
+  const [combatTriggered, setCombatTriggered] = useState(false)
+  const [showStairsModal, setShowStairsModal] = useState(false)
+  const [stairsMessage, setStairsMessage] = useState('')
+  const [isOnStairs, setIsOnStairs] = useState(false)
 
   // ========== COIN PROCESSING EFFECT ==========
   useEffect(() => {
@@ -71,67 +65,84 @@ const Dungeon = ({
   // ========== COMBAT TRIGGER EFFECT ==========
   useEffect(() => {
     if (combatTriggered && enemies && enemies.length > 0) {
-      console.log(`🔍 COMBAT TRIGGERED EFFECT - Combate activado, procesando...`)
       setCombatTriggered(false)
     }
   }, [combatTriggered, enemies])
 
   // ========== PLAYER MOVEMENT LOGIC ==========
   const movePlayer = useCallback((direction) => {
-    console.log(`🔍 PLAYER MOVEMENT - Intento de movimiento: ${direction}`)
-
     // Check if movement is allowed
     if (!isMovementAllowed(inCombat)) {
-      console.log("🔍 MOVEMENT BLOCKED - Movimiento bloqueado - en combate")
       return
     }
 
-    console.log(`🔍 MOVEMENT ALLOWED - Movimiento permitido, ejecutando...`)
-
-    // Execute movement (no longer needs enemies parameter)
+    // Execute movement with dungeon ID parameter
     const movementResult = executePlayerMovement(
       playerPos,
       direction,
       map,
+      currentDungeon.id,
       encounterRate
     )
 
     // If movement was successful, update position
     if (movementResult.moved) {
-      console.log(`🔍 MOVEMENT SUCCESS - Jugador se movió a (${movementResult.newPosition.x}, ${movementResult.newPosition.y})`)
       setPlayerPos(movementResult.newPosition)
 
-      // If combat was triggered, generate enemy party and start combat
-      if (movementResult.combatTriggered) {
-        console.log(`🔍 COMBAT ENCOUNTER - ¡Encuentro de combate activado!`)
-        console.log(`🔍 GENERATING ENEMY PARTY - Generando grupo enemigo para dungeon: ${currentDungeon.id}`)
+      // Check if player stepped on stairs
+      if (movementResult.levelUp) {
+        setIsOnStairs(true)
+        return
+      } else {
+        setIsOnStairs(false)
+      }
 
+      // Si combat fue triggered, generar enemigos y empezar combate
+      if (movementResult.combatTriggered) {
         // Generate random enemy party based on current dungeon
         const enemyParty = generateRandomEnemyParty(
           currentDungeon.id,
           enemies,
           getRandomFormationForDungeon
         )
-
-        console.log(`🔍 ENEMY PARTY GENERATED - Grupo enemigo creado con ${enemyParty.length} enemigos:`)
-        enemyParty.forEach((enemy, index) => {
-          console.log(`🔍 PARTY ENEMY [${index}] - ${enemy.name} (ID: ${enemy.id}), Posición: ${enemy.position}, Slot: ${enemy.slot}, HP: ${enemy.currentHp}/${enemy.maxHp}`)
-        })
-
         // Start combat with the generated party
-        console.log(`🔍 STARTING COMBAT - Iniciando combate con grupo enemigo`)
         onStartCombat(enemyParty)
-      } else {
-        console.log(`🔍 NO COMBAT - Movimiento sin encuentro de combate`)
       }
-    } else {
-      console.log(`🔍 MOVEMENT FAILED - Movimiento bloqueado por pared o límite`)
     }
   }, [inCombat, enemies, playerPos, map, onStartCombat, encounterRate, currentDungeon.id])
 
+  // ========== STAIRS INTERACTION LOGIC ==========
+  const handleStairsInteraction = useCallback(() => {
+    const nextDungeonId = getNextDungeonId(currentDungeon.id)
+
+    if (!nextDungeonId) {
+      setStairsMessage('¡Has llegado a la cima de la torre! Esta es la mazmorra final.')
+      setShowStairsModal(true)
+      return
+    }
+
+    // Player can always use stairs - no level restrictions
+    const nextDungeon = getDungeonById(nextDungeonId)
+    setCurrentDungeon(nextDungeon)
+    setPlayerPos(nextDungeon.startPos)
+    setIsOnStairs(false)
+
+    // Reset dungeon state for new level
+    const newState = getInitialDungeonState(nextDungeon.startPos)
+    setCoinsCollected(newState.coinsCollected)
+    setPendingCoins(newState.pendingCoins)
+    setCombatTriggered(newState.combatTriggered)
+
+    console.log(`🏰 Cambiado a mazmorra: ${nextDungeon.name}`)
+  }, [currentDungeon.id])
+
+  // ========== STAIRS CONFIRMATION ==========
+  const handleStairsConfirm = () => {
+    setShowStairsModal(false)
+  }
+
   // ========== MANUAL COMBAT RESET ==========
   const manualCombatReset = useCallback(() => {
-    console.log(`🔍 MANUAL COMBAT RESET - Reset manual activado`)
     if (typeof onResetDungeon === 'function') {
       onResetDungeon()
     }
@@ -142,35 +153,36 @@ const Dungeon = ({
     const handleKeyPress = (e) => {
       // Check for reset key
       if (isResetKey(e.key)) {
-        console.log(`🔍 KEYBOARD RESET - Tecla R presionada para reset`)
         manualCombatReset()
+        return
+      }
+
+      // Check for Enter key when on stairs
+      if ((e.key === 'Enter' || e.key === ' ') && isOnStairs && !inCombat) {
+        handleStairsInteraction()
         return
       }
 
       // Check if movement is allowed
       if (!isMovementAllowed(inCombat)) {
-        console.log("🔍 KEYBOARD BLOCKED - Teclado bloqueado - en combate")
         return
       }
 
       // Get direction from key
       const direction = getDirectionFromKey(e.key)
       if (direction) {
-        console.log(`🔍 KEYBOARD MOVEMENT - Tecla detectada: ${e.key} -> Dirección: ${direction}`)
         movePlayer(direction)
       }
     }
 
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [movePlayer, inCombat, manualCombatReset])
+  }, [movePlayer, inCombat, manualCombatReset, isOnStairs, handleStairsInteraction])
 
   // ========== RENDER ACTIVE CHARACTERS ==========
   const renderActiveCharacters = () => {
     const activeCount = getActiveCharactersCount(activeCharacters)
     const allActiveChars = getAllActiveCharacters(activeCharacters)
-
-    console.log(`🔍 RENDER ACTIVE CHARACTERS - ${activeCount} personajes activos`)
 
     // If no active characters, show empty state
     if (!hasActiveCharacters(activeCharacters)) {
@@ -244,22 +256,77 @@ const Dungeon = ({
     )
   }
 
+  // ========== RENDER STAIRS MODAL ==========
+  const renderStairsModal = () => {
+    if (!showStairsModal) return null
+
+    const nextDungeonId = getNextDungeonId(currentDungeon.id)
+    const canAdvance = !!nextDungeonId
+
+    return (
+      <div className="stairs-modal-overlay">
+        <div className="stairs-modal">
+          <h3>¡Escaleras Encontradas! 🏰</h3>
+          <p>{stairsMessage}</p>
+
+          {nextDungeonId && (
+            <div className="next-dungeon-info">
+              <h4>Próxima Mazmorra:</h4>
+              <p><strong>Nombre:</strong> {getDungeonById(nextDungeonId).name}</p>
+              <p><strong>Dificultad:</strong> {getDungeonById(nextDungeonId).difficulty}</p>
+            </div>
+          )}
+
+          <div className="modal-actions">
+            {canAdvance ? (
+              <>
+                <button
+                  className="confirm-button"
+                  onClick={handleStairsConfirm}
+                >
+                  🏰 Avanzar al Siguiente Nivel
+                </button>
+                <button
+                  className="cancel-button"
+                  onClick={() => setShowStairsModal(false)}
+                >
+                  ↩️ Seguir Explorando
+                </button>
+              </>
+            ) : (
+              <button
+                className="confirm-button"
+                onClick={() => setShowStairsModal(false)}
+              >
+                Entendido
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // ========== DUNGEON RESET FUNCTION ==========
   const resetDungeon = () => {
-    console.log(`🔍 DUNGEON RESET - Reiniciando mazmorra completa`)
+    console.log(`🔄 DUNGEON RESET - Reiniciando mazmorra completa`)
 
-    // MODIFIED: Use dungeon's start position for reset
-    const newState = resetDungeonState(startPosition)
+    // Reset to first dungeon
+    const firstDungeon = getDefaultDungeon()
+    setCurrentDungeon(firstDungeon)
+
+    const newState = resetDungeonState(firstDungeon.startPos)
     setPlayerPos(newState.playerPos)
     setCoinsCollected(newState.coinsCollected)
     setPendingCoins(newState.pendingCoins)
     setCombatTriggered(newState.combatTriggered)
+    setIsOnStairs(false)
 
-    console.log(`🔍 PLAYER POSITION RESET - Nueva posición: (${newState.playerPos.x}, ${newState.playerPos.y})`)
+    console.log(`🔄 PLAYER POSITION RESET - Nueva posición: (${newState.playerPos.x}, ${newState.playerPos.y})`)
 
     // Reset all character HP using logic function
     if (activeCharacters) {
-      console.log(`🔍 CHARACTER HP RESET - Reiniciando HP de ${getActiveCharactersCount(activeCharacters)} personajes`)
+      console.log(`🔄 CHARACTER HP RESET - Reiniciando HP de ${getActiveCharactersCount(activeCharacters)} personajes`)
       const hpResets = resetAllCharactersHP(activeCharacters, playerMaxHp)
 
       hpResets.forEach(({ characterId, newHp }) => {
@@ -274,9 +341,11 @@ const Dungeon = ({
   return (
     <div className="dungeon-container">
 
+      {/* ========== STAIRS MODAL ========== */}
+      {renderStairsModal()}
+
       {/* ========== DUNGEON HEADER ========== */}
       <div className="dungeon-header">
-        {/* Show dungeon name */}
         <h2>{currentDungeon.name}</h2>
         <div className="dungeon-info">
           <div className="coins-display">
@@ -316,6 +385,25 @@ const Dungeon = ({
         </div>
       )}
 
+      {/* ========== STAIRS INDICATOR ========== */}
+      {isOnStairs && !inCombat && (
+        <div className="stairs-status" style={{
+          backgroundColor: '#4CAF50',
+          color: 'white',
+          padding: '15px',
+          borderRadius: '5px',
+          margin: '10px 0',
+          textAlign: 'center',
+          fontSize: '1.1em',
+          fontWeight: 'bold',
+          animation: 'pulse 2s infinite'
+        }}>
+          🏰 ¡Escaleras encontradas!
+          <br />
+          <small style={{ fontSize: '0.9em' }}>Presiona ENTER o el botón 🏰 para subir de nivel</small>
+        </div>
+      )}
+
       {/* ========== NAVIGATION BUTTONS ========== */}
       <div className="dungeon-navigation">
         <button onClick={onBack} className="nav-button back-button">
@@ -334,11 +422,17 @@ const Dungeon = ({
         <p>⚔️ {currentDungeon.description}</p>
         <p>🎯 Usa las flechas del teclado o los botones táctiles</p>
         <p>👹 Tasa de encuentros: {(encounterRate * 100).toFixed(0)}%</p>
+        <p>🏰 Busca las escaleras ⇧ y presiona ENTER o el botón para subir</p>
         <p>💰 Gana monedas al derrotar enemigos</p>
         <p>¡Cuidado! Pierdes monedas si eres derrotado</p>
         {inCombat && (
           <p style={{ color: '#ff4444', fontWeight: 'bold' }}>
             ⚠️ Combate en curso - Movimiento bloqueado
+          </p>
+        )}
+        {isOnStairs && !inCombat && (
+          <p style={{ color: '#4CAF50', fontWeight: 'bold' }}>
+            🏰 ¡Estás en las escaleras! Presiona ENTER o el botón 🏰 para avanzar
           </p>
         )}
       </div>
@@ -351,7 +445,8 @@ const Dungeon = ({
               {row.map((cell, x) => (
                 <div
                   key={x}
-                  className={`map-cell ${cell === 1 ? 'wall' : 'floor'}
+                  className={`map-cell ${cell === 1 ? 'wall' : 'floor'} 
+                                        ${cell === 2 ? 'stairs' : ''}
                                         ${x === playerPos.x && y === playerPos.y ? 'player' : ''}`}
                 >
                   {getCellDisplay(cell, x, y, playerPos)}
@@ -375,6 +470,10 @@ const Dungeon = ({
         <div className="legend-item">
           <span className="legend-symbol">·</span>
           <span className="legend-text">Suelo</span>
+        </div>
+        <div className="legend-item">
+          <span className="legend-symbol">⇧</span>
+          <span className="legend-text">Escaleras</span>
         </div>
       </div>
 
@@ -412,6 +511,22 @@ const Dungeon = ({
             →
           </button>
         </div>
+        {isOnStairs && !inCombat && (
+          <div className="floating-controls-row" style={{ marginTop: '10px' }}>
+            <button
+              className="floating-button stairs-button"
+              onClick={handleStairsInteraction}
+              style={{
+                backgroundColor: '#4CAF50',
+                fontSize: '1.5em',
+                padding: '15px 25px',
+                animation: 'pulse 2s infinite'
+              }}
+            >
+              🏰 SUBIR
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ========== TOUCH CONTROLS ========== */}
@@ -448,6 +563,23 @@ const Dungeon = ({
             →
           </button>
         </div>
+        {isOnStairs && !inCombat && (
+          <div className="touch-row" style={{ marginTop: '10px' }}>
+            <button
+              className="touch-button stairs-button"
+              onClick={handleStairsInteraction}
+              style={{
+                backgroundColor: '#4CAF50',
+                fontSize: '1.2em',
+                padding: '15px 30px',
+                gridColumn: '1 / -1',
+                animation: 'pulse 2s infinite'
+              }}
+            >
+              🏰 SUBIR ESCALERAS
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ========== DUNGEON STATISTICS ========== */}
@@ -465,6 +597,10 @@ const Dungeon = ({
           <span className="stat-value" style={{ color: inCombat ? '#ff4444' : '#4CAF50' }}>
             {inCombat ? '⚔️ En Combate' : '🌍 Explorando'}
           </span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-label">Mazmorra:</span>
+          <span className="stat-value">{currentDungeon.name}</span>
         </div>
       </div>
     </div>

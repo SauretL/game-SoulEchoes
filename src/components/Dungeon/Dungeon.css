@@ -1,4 +1,31 @@
-/* ===== DUNGEON CONTAINER ===== */
+/* ==================== ANIMATIONS ==================== */
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    }
+
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==================== MAIN CONTAINER ==================== */
 .dungeon-container {
     padding: 20px;
     max-width: 1200px;
@@ -12,7 +39,7 @@
     color: #e0e0e0;
 }
 
-/* ===== DUNGEON HEADER SECTION ===== */
+/* ==================== HEADER SECTION ==================== */
 .dungeon-header {
     text-align: center;
     margin-bottom: 25px;
@@ -25,7 +52,6 @@
     font-size: 2em;
     margin-bottom: 15px;
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-    font-family: 'Courier New', monospace;
     font-weight: bold;
 }
 
@@ -41,7 +67,6 @@
     padding: 8px 16px;
     border-radius: 4px;
     border: 1px solid #555;
-    font-family: 'Courier New', monospace;
 }
 
 .coins-label {
@@ -63,10 +88,9 @@
     border: 1px solid #296ab4;
     color: #87ceeb;
     font-weight: 600;
-    font-family: 'Courier New', monospace;
 }
 
-/* ===== NAVIGATION BUTTONS ===== */
+/* ==================== NAVIGATION BUTTONS ==================== */
 .dungeon-navigation {
     display: flex;
     justify-content: center;
@@ -89,10 +113,19 @@
     min-width: 160px;
 }
 
+.nav-button:hover {
+    background: #3a3a3a;
+    transform: translateY(-1px);
+}
+
 .back-button {
     background: #5a2a2a;
     border-color: #8b4513;
     color: #ffa07a;
+}
+
+.back-button:hover {
+    background: #6a3a3a;
 }
 
 .refresh-button {
@@ -101,20 +134,39 @@
     color: #98fb98;
 }
 
-.nav-button:hover {
-    background: #3a3a3a;
-    transform: translateY(-1px);
-}
-
-.back-button:hover {
-    background: #6a3a3a;
-}
-
 .refresh-button:hover {
     background: #3a6a3a;
 }
 
-/* ===== ACTIVE CHARACTERS SECTION ===== */
+/* ==================== STATUS INDICATORS ==================== */
+.combat-status,
+.stairs-status {
+    padding: 15px;
+    border-radius: 5px;
+    margin: 10px 0;
+    text-align: center;
+    font-weight: bold;
+    animation: fadeIn 0.3s ease;
+}
+
+.combat-status {
+    background-color: #ff4444;
+    color: white;
+}
+
+.stairs-status {
+    background-color: #4CAF50;
+    color: white;
+    font-size: 1.1em;
+    animation: pulse 2s infinite;
+}
+
+.stairs-status small {
+    font-size: 0.9em;
+    font-weight: normal;
+}
+
+/* ==================== ACTIVE CHARACTERS SECTION ==================== */
 .dungeon-active-characters {
     width: 100%;
     margin-bottom: 30px;
@@ -138,10 +190,10 @@
     justify-content: center;
     gap: 20px;
     flex-wrap: wrap;
-    max-width: 100%;
     padding: 10px 0;
 }
 
+/* Character Card */
 .dungeon-character-card {
     width: 200px;
     min-height: 280px;
@@ -152,7 +204,6 @@
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    font-family: 'Courier New', monospace;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -191,17 +242,15 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin: 8px 0 12px 0;
     padding-bottom: 8px;
     border-bottom: 1px solid #444;
-    margin-top: 8px;
 }
 
 .dungeon-character-header h4 {
     color: #ffd700;
     margin: 0;
     font-size: 1.1em;
-    text-align: left;
 }
 
 .dungeon-duplicates {
@@ -231,7 +280,6 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    background: #1a1a2a;
 }
 
 /* HP Bar */
@@ -345,7 +393,7 @@
     color: #777;
 }
 
-/* ===== GAME INSTRUCTIONS ===== */
+/* ==================== GAME INSTRUCTIONS ==================== */
 .dungeon-instructions {
     background: #1a1a2a;
     padding: 15px;
@@ -353,7 +401,6 @@
     margin-bottom: 25px;
     border: 1px solid #444;
     text-align: center;
-    font-family: 'Courier New', monospace;
 }
 
 .dungeon-instructions p {
@@ -362,13 +409,11 @@
     font-size: 0.95em;
 }
 
-/* ===== MAP CONTAINER ===== */
+/* ==================== MAP DISPLAY ==================== */
 .dungeon-map-container {
     display: flex;
     justify-content: center;
     margin-bottom: 25px;
-    position: relative;
-    /* For floating controls positioning */
 }
 
 .dungeon-map {
@@ -393,7 +438,6 @@
     margin: 1px;
     border-radius: 2px;
     font-size: 1.8em;
-    font-family: 'Courier New', monospace;
     font-weight: bold;
     transition: all 0.2s ease;
 }
@@ -412,6 +456,14 @@
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
+.stairs {
+    background: #2a4a2a;
+    color: #90EE90;
+    border: 1px solid #4CAF50;
+    text-shadow: 0 0 8px rgba(144, 238, 144, 0.5);
+    animation: pulse 2s infinite;
+}
+
 .player {
     background: #2a4a6a;
     color: #ffd700;
@@ -420,7 +472,7 @@
     box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
 }
 
-/* ===== MAP LEGEND ===== */
+/* ==================== MAP LEGEND ==================== */
 .dungeon-legend {
     display: flex;
     justify-content: center;
@@ -442,7 +494,6 @@
 .legend-symbol {
     font-size: 1.5em;
     font-weight: bold;
-    font-family: 'Courier New', monospace;
 }
 
 .legend-text {
@@ -450,14 +501,8 @@
     font-size: 0.9em;
 }
 
-/* ===== TOUCH CONTROLS ===== */
-/* Default desktop - hidden */
-.touch-controls {
-    display: none;
-}
-
-/* ===== FLOATING MOBILE CONTROLS ===== */
-/* Floating transparent controls for mobile */
+/* ==================== MOBILE CONTROLS ==================== */
+/* Floating Controls - Hidden by default */
 .floating-controls {
     display: none;
     position: fixed;
@@ -484,7 +529,6 @@
     transition: all 0.2s ease;
     background: rgba(42, 42, 42, 0.7);
     color: #e0e0e0;
-    font-family: 'Courier New', monospace;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -505,7 +549,21 @@
     background: rgba(42, 42, 42, 0.4);
 }
 
-/* ===== DUNGEON STATISTICS ===== */
+.floating-button.stairs-button {
+    background: rgba(76, 175, 80, 0.8);
+    width: auto;
+    border-radius: 8px;
+    padding: 15px 25px;
+    font-size: 1.5em;
+    animation: pulse 2s infinite;
+}
+
+/* Touch Controls - Hidden by default */
+.touch-controls {
+    display: none;
+}
+
+/* ==================== DUNGEON STATISTICS ==================== */
 .dungeon-stats {
     display: flex;
     justify-content: center;
@@ -515,7 +573,6 @@
     padding: 15px;
     border-radius: 4px;
     border: 1px solid #444;
-    font-family: 'Courier New', monospace;
 }
 
 .stat-item {
@@ -537,18 +594,105 @@
     font-size: 1.1em;
 }
 
-/* ===== COMBAT STATUS ===== */
-.combat-status {
-    background-color: #ff4444;
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-    margin: 10px 0;
-    text-align: center;
-    font-weight: bold;
+/* ==================== LEVEL UP MODAL ==================== */
+.level-up-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    animation: fadeIn 0.3s ease;
 }
 
-/* ===== RESPONSIVE DESIGN ===== */
+.level-up-modal {
+    background: #1a1a2a;
+    border: 2px solid #ffd700;
+    border-radius: 8px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    animation: fadeIn 0.3s ease;
+}
+
+.level-up-modal h3 {
+    color: #ffd700;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+
+.level-up-modal p {
+    color: #e0e0e0;
+    text-align: center;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.next-dungeon-info {
+    background: rgba(26, 26, 42, 0.8);
+    padding: 15px;
+    border-radius: 4px;
+    border: 1px solid #444;
+    margin-bottom: 20px;
+}
+
+.next-dungeon-info h4 {
+    color: #b0b0ff;
+    margin-bottom: 10px;
+}
+
+.next-dungeon-info p {
+    color: #e0e0e0;
+    margin: 5px 0;
+    text-align: left;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.confirm-button,
+.cancel-button {
+    padding: 12px 25px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    font-family: 'Courier New', monospace;
+}
+
+.confirm-button {
+    background: #4CAF50;
+    color: white;
+}
+
+.confirm-button:hover {
+    background: #45a049;
+    transform: translateY(-2px);
+}
+
+.cancel-button {
+    background: #666;
+    color: white;
+}
+
+.cancel-button:hover {
+    background: #777;
+    transform: translateY(-2px);
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+/* Tablets */
 @media (max-width: 1024px) {
     .dungeon-container {
         max-width: 95%;
@@ -564,13 +708,13 @@
     }
 }
 
+/* Mobile Devices */
 @media (max-width: 768px) {
     .dungeon-container {
         padding: 15px;
         margin: 10px;
         max-width: 100%;
         overflow-x: hidden;
-        /* Prevent horizontal scroll */
     }
 
     .dungeon-header h2 {
@@ -598,7 +742,6 @@
     }
 
     .active-characters-grid {
-        flex-wrap: wrap;
         justify-content: center;
     }
 
@@ -643,6 +786,7 @@
     }
 }
 
+/* Small Mobile Devices */
 @media (max-width: 480px) {
     .dungeon-container {
         padding: 10px;
@@ -665,7 +809,7 @@
         min-width: 110px;
     }
 
-    /* Even smaller map for very small screens */
+    /* Even smaller map */
     .map-cell {
         width: 25px;
         height: 25px;
@@ -676,10 +820,15 @@
         padding: 10px;
     }
 
-    /* Smaller floating buttons for very small screens */
+    /* Smaller floating buttons */
     .floating-button {
         width: 45px;
         height: 45px;
+        font-size: 1.3em;
+    }
+
+    .floating-button.stairs-button {
+        padding: 12px 20px;
         font-size: 1.3em;
     }
 
@@ -696,9 +845,17 @@
         padding: 10px 20px;
         font-size: 0.9em;
     }
+
+    .level-up-modal {
+        padding: 20px;
+    }
+
+    .level-up-modal h3 {
+        font-size: 1.3em;
+    }
 }
 
-/* Extra small screens */
+/* Extra Small Screens */
 @media (max-width: 360px) {
     .map-cell {
         width: 22px;
@@ -709,6 +866,11 @@
     .floating-button {
         width: 40px;
         height: 40px;
+        font-size: 1.2em;
+    }
+
+    .floating-button.stairs-button {
+        padding: 10px 18px;
         font-size: 1.2em;
     }
 }

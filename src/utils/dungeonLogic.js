@@ -24,7 +24,8 @@ export const calculateNewPosition = (currentPos, direction, map) => {
     }
 
     // Check if new position is valid (within bounds and not a wall)
-    if (map[newY]?.[newX] === 0) {
+    // Allow stairs (value 2) as valid movement
+    if (map[newY]?.[newX] === 0 || map[newY]?.[newX] === 2) {
         return { x: newX, y: newY }
     }
 
@@ -112,6 +113,11 @@ export const getCellDisplay = (cell, x, y, playerPos) => {
         return '█' // Wall
     }
 
+    // Stairs
+    if (cell === 2) {
+        return '⇧' // Stairs to next level
+    }
+
     // Floor
     return '·' // Floor
 }
@@ -119,9 +125,9 @@ export const getCellDisplay = (cell, x, y, playerPos) => {
 // ========== DUNGEON STATE UTILITIES ==========
 
 // Get initial dungeon state
-export const getInitialDungeonState = () => {
+export const getInitialDungeonState = (startPosition = { x: 1, y: 1 }) => {
     return {
-        playerPos: { x: 1, y: 1 },
+        playerPos: startPosition,
         coinsCollected: 0,
         pendingCoins: 0,
         combatTriggered: false
@@ -129,8 +135,8 @@ export const getInitialDungeonState = () => {
 }
 
 // Reset dungeon state to initial values
-export const resetDungeonState = () => {
-    return getInitialDungeonState()
+export const resetDungeonState = (startPosition = { x: 1, y: 1 }) => {
+    return getInitialDungeonState(startPosition)
 }
 
 // ========== KEYBOARD INPUT HANDLING ==========
@@ -173,21 +179,24 @@ export const executePlayerMovement = (currentPos, direction, map, dungeonId, enc
             moved: false,
             newPosition: currentPos,
             combatTriggered: false,
-            enemyParty: null
+            levelUp: false
         }
     }
 
-    // Check for combat encounter
-    const combatTriggered = shouldTriggerCombat(encounterRate)
+    // Check if player stepped on stairs
+    const isOnStairs = map[newPosition.y]?.[newPosition.x] === 2
+
+    // Check for combat encounter (only if not on stairs)
+    const combatTriggered = !isOnStairs && shouldTriggerCombat(encounterRate)
 
     return {
         moved: true,
         newPosition,
         combatTriggered,
+        levelUp: isOnStairs, // Signal level up if on stairs
         dungeonId // Pass dungeon ID so we can generate appropriate formation
     }
 }
-
 // ========== COIN MANAGEMENT ==========
 
 // Process pending coins to collected coins
@@ -342,4 +351,20 @@ export const isMovementAllowed = (inCombat) => {
 export const hasActiveCharacters = (activeCharacters) => {
     const count = getActiveCharactersCount(activeCharacters)
     return count > 0
+}
+
+// ========== STAIRS MANAGEMENT ==========
+
+// Check if position has stairs
+export const isStairsPosition = (dungeonId, position, getDungeonById) => {
+    const dungeon = getDungeonById(dungeonId)
+    if (!dungeon || !dungeon.stairsPos) return false
+
+    return position.x === dungeon.stairsPos.x && position.y === dungeon.stairsPos.y
+}
+
+// Get next dungeon ID
+export const getNextDungeonId = (currentDungeonId, getDungeonById) => {
+    const dungeon = getDungeonById(currentDungeonId)
+    return dungeon?.nextDungeonId || null
 }
