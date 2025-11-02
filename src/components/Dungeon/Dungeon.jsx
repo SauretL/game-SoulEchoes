@@ -49,6 +49,10 @@ const Dungeon = ({
   const [stairsMessage, setStairsMessage] = useState('')
   const [isOnStairs, setIsOnStairs] = useState(false)
 
+  // ========== MOBILE MODALS ==========
+  const [showCharactersModal, setShowCharactersModal] = useState(false)
+  const [showInstructionsModal, setShowInstructionsModal] = useState(false)
+
   // ========== COIN PROCESSING EFFECT ==========
   useEffect(() => {
     if (pendingCoins > 0) {
@@ -151,6 +155,12 @@ const Dungeon = ({
   // ========== KEYBOARD CONTROLS ==========
   useEffect(() => {
     const handleKeyPress = (e) => {
+      // Prevenir comportamiento por defecto para las teclas de flecha y otras teclas de juego
+      const gameKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'r', 'R', 'Enter', ' '];
+      if (gameKeys.includes(e.key)) {
+        e.preventDefault(); // Esto evita que el scroll se mueva
+      }
+
       // Check for reset key
       if (isResetKey(e.key)) {
         manualCombatReset()
@@ -179,6 +189,23 @@ const Dungeon = ({
     return () => window.removeEventListener('keydown', handleKeyPress)
   }, [movePlayer, inCombat, manualCombatReset, isOnStairs, handleStairsInteraction])
 
+  // ========== PREVENT SCROLL EFFECT ==========
+  useEffect(() => {
+    // Add class to body when dungeon is mounted
+    document.body.classList.add('dungeon-active');
+
+    // Focus the container to capture keyboard events
+    const container = document.querySelector('.dungeon-container');
+    if (container) {
+      container.focus({ preventScroll: true });
+    }
+
+    return () => {
+      // Remove class when component unmounts
+      document.body.classList.remove('dungeon-active');
+    };
+  }, []);
+
   // ========== RENDER ACTIVE CHARACTERS ==========
   const renderActiveCharacters = () => {
     const activeCount = getActiveCharactersCount(activeCharacters)
@@ -188,7 +215,7 @@ const Dungeon = ({
     if (!hasActiveCharacters(activeCharacters)) {
       return (
         <div className="dungeon-active-characters">
-          <h4>Almas Elegidas (0/6)</h4>
+          <h4>Almas Elegidas (0/3)</h4>
           <div className="no-active-characters">
             <p>No hay almas elegidas activas</p>
             <small>Ve a tu biblioteca para elegir almas para la aventura</small>
@@ -199,7 +226,7 @@ const Dungeon = ({
 
     return (
       <div className="dungeon-active-characters">
-        <h4>Almas Elegidas ({activeCount}/3)</h4>
+        <h4>Almas Elegidas ({activeCount}/6)</h4>
         <div className="active-characters-grid">
           {allActiveChars.map((character, index) => (
             <div
@@ -251,6 +278,97 @@ const Dungeon = ({
               </div>
             </div>
           ))}
+        </div>
+      </div>
+    )
+  }
+
+  // ========== RENDER CHARACTERS MODAL ==========
+  const renderCharactersModal = () => {
+    if (!showCharactersModal) return null
+
+    return (
+      <div className="mobile-modal-overlay">
+        <div className="mobile-modal">
+          <div className="mobile-modal-header">
+            <h3>🎭 Almas Elegidas</h3>
+            <button
+              className="close-modal-btn"
+              onClick={() => setShowCharactersModal(false)}
+            >
+              ✕
+            </button>
+          </div>
+          <div className="mobile-modal-content">
+            {renderActiveCharacters()}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ========== RENDER INSTRUCTIONS MODAL ==========
+  const renderInstructionsModal = () => {
+    if (!showInstructionsModal) return null
+
+    return (
+      <div className="mobile-modal-overlay">
+        <div className="mobile-modal">
+          <div className="mobile-modal-header">
+            <h3>🎯 Instrucciones</h3>
+            <button
+              className="close-modal-btn"
+              onClick={() => setShowInstructionsModal(false)}
+            >
+              ✕
+            </button>
+          </div>
+          <div className="mobile-modal-content">
+            <div className="dungeon-instructions-sidebar">
+              <p><strong>Movimiento:</strong> Flechas del teclado o botones táctiles</p>
+              <p><strong>Encuentros:</strong> {(encounterRate * 100).toFixed(0)}% por paso</p>
+              <p><strong>Escaleras:</strong> Busca ⇧ y presiona ENTER</p>
+              <p><strong>Monedas:</strong> Ganas al derrotar enemigos</p>
+              <p><strong>Pérdidas:</strong> Pierdes si eres derrotado</p>
+
+              {inCombat && (
+                <p className="combat-warning">
+                  ⚠️ <strong>Combate en curso</strong> - Movimiento bloqueado
+                </p>
+              )}
+              {isOnStairs && !inCombat && (
+                <p className="stairs-warning">
+                  🏰 <strong>¡En escaleras!</strong> Presiona ENTER
+                </p>
+              )}
+            </div>
+
+            <div className="dungeon-stats-sidebar">
+              <h4>📊 Estadísticas</h4>
+              <div className="stat-item">
+                <span className="stat-label">Posición:</span>
+                <span className="stat-value">({playerPos.x}, {playerPos.y})</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Monedas ganadas:</span>
+                <span className="stat-value">+{coinsCollected}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Estado:</span>
+                <span className={`stat-value ${inCombat ? 'combat' : 'exploring'}`}>
+                  {inCombat ? '⚔️ En Combate' : '🌍 Explorando'}
+                </span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Mazmorra:</span>
+                <span className="stat-value">{currentDungeon.name}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Dificultad:</span>
+                <span className="stat-value">{currentDungeon.difficulty}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -339,10 +457,15 @@ const Dungeon = ({
 
   // ========== RENDER COMPONENT ==========
   return (
-    <div className="dungeon-container">
-
-      {/* ========== STAIRS MODAL ========== */}
+    <div
+      className="dungeon-container"
+      tabIndex="0"
+      onKeyDown={(e) => e.preventDefault()}
+    >
+      {/* ========== MODALS ========== */}
       {renderStairsModal()}
+      {renderCharactersModal()}
+      {renderInstructionsModal()}
 
       {/* ========== DUNGEON HEADER ========== */}
       <div className="dungeon-header">
@@ -358,122 +481,215 @@ const Dungeon = ({
         </div>
       </div>
 
-      {/* Dungeon difficulty badge */}
-      <div style={{
-        textAlign: 'center',
-        padding: '5px',
-        backgroundColor: '#333',
-        borderRadius: '5px',
-        margin: '10px 0'
-      }}>
-        <small>Dificultad: <strong>{currentDungeon.difficulty}</strong></small>
-      </div>
+      {/* ========== MAIN CONTENT GRID ========== */}
+      <div className="dungeon-main-grid">
 
-      {/* ========== COMBAT STATUS INDICATOR ========== */}
-      {inCombat && (
-        <div className="combat-status" style={{
-          backgroundColor: '#ff4444',
-          color: 'white',
-          padding: '10px',
-          borderRadius: '5px',
-          margin: '10px 0',
-          textAlign: 'center'
-        }}>
-          ⚔️ EN COMBATE - Movimiento deshabilitado
-          <br />
-          <small>Presiona 'R' para reset manual si hay errores</small>
+        {/* ========== LEFT SIDEBAR - ACTIVE CHARACTERS ========== */}
+        <div className="dungeon-sidebar left-sidebar">
+          {renderActiveCharacters()}
         </div>
-      )}
 
-      {/* ========== STAIRS INDICATOR ========== */}
-      {isOnStairs && !inCombat && (
-        <div className="stairs-status" style={{
-          backgroundColor: '#4CAF50',
-          color: 'white',
-          padding: '15px',
-          borderRadius: '5px',
-          margin: '10px 0',
-          textAlign: 'center',
-          fontSize: '1.1em',
-          fontWeight: 'bold',
-          animation: 'pulse 2s infinite'
-        }}>
-          🏰 ¡Escaleras encontradas!
-          <br />
-          <small style={{ fontSize: '0.9em' }}>Presiona ENTER o el botón 🏰 para subir de nivel</small>
-        </div>
-      )}
+        {/* ========== CENTER CONTENT - MAP AND CONTROLS ========== */}
+        <div className="dungeon-center-content">
 
-      {/* ========== NAVIGATION BUTTONS ========== */}
-      <div className="dungeon-navigation">
-        <button onClick={onBack} className="nav-button back-button">
-          ← Volver a Invocaciones
-        </button>
-        <button onClick={resetDungeon} className="nav-button refresh-button">
-          🔄 Reiniciar Mazmorra
-        </button>
-      </div>
+          {/* Dungeon difficulty badge */}
+          <div className="dungeon-difficulty-badge">
+            <small>Dificultad: <strong>{currentDungeon.difficulty}</strong></small>
+          </div>
 
-      {/* ========== ACTIVE CHARACTERS DISPLAY ========== */}
-      {renderActiveCharacters()}
+          {/* ========== COMBAT STATUS INDICATOR ========== */}
+          {inCombat && (
+            <div className="combat-status">
+              ⚔️ EN COMBATE - Movimiento deshabilitado
+              <br />
+              <small>Presiona 'R' para reset manual si hay errores</small>
+            </div>
+          )}
 
-      {/* ========== GAME INSTRUCTIONS ========== */}
-      <div className="dungeon-instructions">
-        <p>⚔️ {currentDungeon.description}</p>
-        <p>🎯 Usa las flechas del teclado o los botones táctiles</p>
-        <p>👹 Tasa de encuentros: {(encounterRate * 100).toFixed(0)}%</p>
-        <p>🏰 Busca las escaleras ⇧ y presiona ENTER o el botón para subir</p>
-        <p>💰 Gana monedas al derrotar enemigos</p>
-        <p>¡Cuidado! Pierdes monedas si eres derrotado</p>
-        {inCombat && (
-          <p style={{ color: '#ff4444', fontWeight: 'bold' }}>
-            ⚠️ Combate en curso - Movimiento bloqueado
-          </p>
-        )}
-        {isOnStairs && !inCombat && (
-          <p style={{ color: '#4CAF50', fontWeight: 'bold' }}>
-            🏰 ¡Estás en las escaleras! Presiona ENTER o el botón 🏰 para avanzar
-          </p>
-        )}
-      </div>
+          {/* ========== STAIRS INDICATOR ========== */}
+          {isOnStairs && !inCombat && (
+            <div className="stairs-status">
+              🏰 ¡Escaleras encontradas!
+              <br />
+              <small>Presiona ENTER o el botón 🏰 para subir de nivel</small>
+            </div>
+          )}
 
-      {/* ========== DUNGEON MAP DISPLAY ========== */}
-      <div className="dungeon-map-container">
-        <div className="dungeon-map">
-          {map.map((row, y) => (
-            <div key={y} className="map-row">
-              {row.map((cell, x) => (
-                <div
-                  key={x}
-                  className={`map-cell ${cell === 1 ? 'wall' : 'floor'} 
-                                        ${cell === 2 ? 'stairs' : ''}
-                                        ${x === playerPos.x && y === playerPos.y ? 'player' : ''}`}
-                >
-                  {getCellDisplay(cell, x, y, playerPos)}
+          {/* ========== NAVIGATION BUTTONS ========== */}
+          <div className="dungeon-navigation">
+            <button onClick={onBack} className="nav-button back-button">
+              ← Volver a Invocaciones
+            </button>
+            <button onClick={resetDungeon} className="nav-button refresh-button">
+              🔄 Reiniciar Mazmorra
+            </button>
+          </div>
+
+          {/* ========== DUNGEON MAP DISPLAY ========== */}
+          <div className="dungeon-map-container">
+            <div className="dungeon-map">
+              {map.map((row, y) => (
+                <div key={y} className="map-row">
+                  {row.map((cell, x) => (
+                    <div
+                      key={x}
+                      className={`map-cell ${cell === 1 ? 'wall' : 'floor'} 
+                                                ${cell === 2 ? 'stairs' : ''}
+                                                ${x === playerPos.x && y === playerPos.y ? 'player' : ''}`}
+                    >
+                      {getCellDisplay(cell, x, y, playerPos)}
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      {/* ========== MAP LEGEND ========== */}
-      <div className="dungeon-legend">
-        <div className="legend-item">
-          <span className="legend-symbol">☻</span>
-          <span className="legend-text">Jugador</span>
+          {/* ========== MAP LEGEND ========== */}
+          <div className="dungeon-legend">
+            <div className="legend-item">
+              <span className="legend-symbol">☻</span>
+              <span className="legend-text">Jugador</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-symbol">█</span>
+              <span className="legend-text">Pared</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-symbol">·</span>
+              <span className="legend-text">Suelo</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-symbol">⇧</span>
+              <span className="legend-text">Escaleras</span>
+            </div>
+          </div>
+
+          {/* ========== TOUCH CONTROLS ========== */}
+          <div className="touch-controls">
+            <div className="touch-row">
+              <button
+                className="touch-button up-button"
+                onClick={() => movePlayer('up')}
+                disabled={inCombat}
+              >
+                ↑
+              </button>
+            </div>
+            <div className="touch-row">
+              <button
+                className="touch-button left-button"
+                onClick={() => movePlayer('left')}
+                disabled={inCombat}
+              >
+                ←
+              </button>
+              <button
+                className="touch-button down-button"
+                onClick={() => movePlayer('down')}
+                disabled={inCombat}
+              >
+                ↓
+              </button>
+              <button
+                className="touch-button right-button"
+                onClick={() => movePlayer('right')}
+                disabled={inCombat}
+              >
+                →
+              </button>
+            </div>
+            {isOnStairs && !inCombat && (
+              <div className="touch-row stairs-row">
+                <button
+                  className="touch-button stairs-button"
+                  onClick={handleStairsInteraction}
+                >
+                  🏰 SUBIR ESCALERAS
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-        <div className="legend-item">
-          <span className="legend-symbol">█</span>
-          <span className="legend-text">Pared</span>
-        </div>
-        <div className="legend-item">
-          <span className="legend-symbol">·</span>
-          <span className="legend-text">Suelo</span>
-        </div>
-        <div className="legend-item">
-          <span className="legend-symbol">⇧</span>
-          <span className="legend-text">Escaleras</span>
+
+        {/* ========== RIGHT SIDEBAR - INFO AND STATS ========== */}
+        <div className="dungeon-sidebar right-sidebar">
+
+          {/* ========== DUNGEON INSTRUCTIONS ========== */}
+          <div className="dungeon-instructions-sidebar">
+            <h4>🎯 Instrucciones</h4>
+            <p><strong>Movimiento:</strong> Flechas del teclado o botones táctiles</p>
+            <p><strong>Encuentros:</strong> {(encounterRate * 100).toFixed(0)}% por paso</p>
+            <p><strong>Escaleras:</strong> Busca ⇧ y presiona ENTER</p>
+            <p><strong>Monedas:</strong> Ganas al derrotar enemigos</p>
+            <p><strong>Pérdidas:</strong> Pierdes si eres derrotado</p>
+
+            {inCombat && (
+              <p className="combat-warning">
+                ⚠️ <strong>Combate en curso</strong> - Movimiento bloqueado
+              </p>
+            )}
+            {isOnStairs && !inCombat && (
+              <p className="stairs-warning">
+                🏰 <strong>¡En escaleras!</strong> Presiona ENTER
+              </p>
+            )}
+          </div>
+
+          {/* ========== DUNGEON STATISTICS ========== */}
+          <div className="dungeon-stats-sidebar">
+            <h4>📊 Estadísticas</h4>
+            <div className="stat-item">
+              <span className="stat-label">Posición:</span>
+              <span className="stat-value">({playerPos.x}, {playerPos.y})</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Monedas ganadas:</span>
+              <span className="stat-value">+{coinsCollected}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Estado:</span>
+              <span className={`stat-value ${inCombat ? 'combat' : 'exploring'}`}>
+                {inCombat ? '⚔️ En Combate' : '🌍 Explorando'}
+              </span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Mazmorra:</span>
+              <span className="stat-value">{currentDungeon.name}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Dificultad:</span>
+              <span className="stat-value">{currentDungeon.difficulty}</span>
+            </div>
+          </div>
+
+          {/* ========== QUICK ACTIONS ========== */}
+          <div className="quick-actions">
+            <h4>⚡ Acciones Rápidas</h4>
+            <button
+              className="quick-action-btn"
+              onClick={resetDungeon}
+              title="Reiniciar mazmorra actual"
+            >
+              🔄 Reiniciar
+            </button>
+            <button
+              className="quick-action-btn"
+              onClick={onBack}
+              title="Volver a invocaciones"
+            >
+              🏠 Salir
+            </button>
+            {isOnStairs && !inCombat && (
+              <button
+                className="quick-action-btn stairs-btn"
+                onClick={handleStairsInteraction}
+                title="Subir al siguiente nivel"
+              >
+                🏰 Subir Nivel
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -512,16 +728,10 @@ const Dungeon = ({
           </button>
         </div>
         {isOnStairs && !inCombat && (
-          <div className="floating-controls-row" style={{ marginTop: '10px' }}>
+          <div className="floating-controls-row">
             <button
               className="floating-button stairs-button"
               onClick={handleStairsInteraction}
-              style={{
-                backgroundColor: '#4CAF50',
-                fontSize: '1.5em',
-                padding: '15px 25px',
-                animation: 'pulse 2s infinite'
-              }}
             >
               🏰 SUBIR
             </button>
@@ -529,79 +739,20 @@ const Dungeon = ({
         )}
       </div>
 
-      {/* ========== TOUCH CONTROLS ========== */}
-      <div className="touch-controls">
-        <div className="touch-row">
-          <button
-            className="touch-button up-button"
-            onClick={() => movePlayer('up')}
-            disabled={inCombat}
-          >
-            ↑
-          </button>
-        </div>
-        <div className="touch-row">
-          <button
-            className="touch-button left-button"
-            onClick={() => movePlayer('left')}
-            disabled={inCombat}
-          >
-            ←
-          </button>
-          <button
-            className="touch-button down-button"
-            onClick={() => movePlayer('down')}
-            disabled={inCombat}
-          >
-            ↓
-          </button>
-          <button
-            className="touch-button right-button"
-            onClick={() => movePlayer('right')}
-            disabled={inCombat}
-          >
-            →
-          </button>
-        </div>
-        {isOnStairs && !inCombat && (
-          <div className="touch-row" style={{ marginTop: '10px' }}>
-            <button
-              className="touch-button stairs-button"
-              onClick={handleStairsInteraction}
-              style={{
-                backgroundColor: '#4CAF50',
-                fontSize: '1.2em',
-                padding: '15px 30px',
-                gridColumn: '1 / -1',
-                animation: 'pulse 2s infinite'
-              }}
-            >
-              🏰 SUBIR ESCALERAS
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* ========== DUNGEON STATISTICS ========== */}
-      <div className="dungeon-stats">
-        <div className="stat-item">
-          <span className="stat-label">Posición:</span>
-          <span className="stat-value">({playerPos.x}, {playerPos.y})</span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-label">Monedas ganadas:</span>
-          <span className="stat-value">+{coinsCollected}</span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-label">Estado:</span>
-          <span className="stat-value" style={{ color: inCombat ? '#ff4444' : '#4CAF50' }}>
-            {inCombat ? '⚔️ En Combate' : '🌍 Explorando'}
-          </span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-label">Mazmorra:</span>
-          <span className="stat-value">{currentDungeon.name}</span>
-        </div>
+      {/* ===== MOBILE INFO BUTTONS ===== */}
+      <div className="mobile-info-buttons">
+        <button
+          className="mobile-info-btn characters-btn"
+          onClick={() => setShowCharactersModal(true)}
+        >
+          🎭 Almas
+        </button>
+        <button
+          className="mobile-info-btn instructions-btn"
+          onClick={() => setShowInstructionsModal(true)}
+        >
+          🎯 Instrucciones
+        </button>
       </div>
     </div>
   )
