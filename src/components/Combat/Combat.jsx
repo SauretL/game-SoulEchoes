@@ -15,8 +15,18 @@ import {
     areAllEnemiesDefeated,
     canSelectAttackType,
     isEnemyTargetable,
-    createTargetingMessage
+    createTargetingMessage,
+    getAllSpecialAttacks,
+    getAllBasicAttacks,
+    getAttackById,
+    processCharacterStartOfTurn,
+    processCharacterEndOfTurn,
+    handleConfusedTurn,
+    getStatusEffectDisplayInfo,
+    createStatusEffectMessage,
+    findNextAlivePlayer
 } from '../../utils/combatLogic'
+import { applyStatusEffect } from '../../utils/statusEffects'
 import CharacterDetail from '../CharacterDetail/CharacterDetail'
 
 const Combat = ({
@@ -44,7 +54,12 @@ const Combat = ({
 
     const [selectedCharacter, setSelectedCharacter] = useState(null)
     const [selectedAttackType, setSelectedAttackType] = useState(null)
+    const [selectedSpecialAttack, setSelectedSpecialAttack] = useState(null)
     const [targetingMode, setTargetingMode] = useState(false)
+
+    const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, content: null })
+    const [keywordTooltip, setKeywordTooltip] = useState({ visible: false, x: 0, y: 0, content: null })
+
 
     // ========== INITIALIZE COMBAT POSITIONS ==========
     useEffect(() => {
@@ -71,7 +86,23 @@ const Combat = ({
 
     // ========== GETTERS ==========
     const getCurrentPlayerTurn = () => {
-        return combatState.playerCharacters[combatState.currentPlayerTurnIndex]
+        const currentPlayer = combatState.playerCharacters[combatState.currentPlayerTurnIndex]
+
+        // If current player is dead, skip to next alive player
+        if (currentPlayer && currentPlayer.currentHp <= 0) {
+            const nextAliveIndex = findNextAlivePlayer(combatState.playerCharacters, combatState.currentPlayerTurnIndex)
+            if (nextAliveIndex !== -1 && nextAliveIndex !== combatState.currentPlayerTurnIndex) {
+                // Update to next alive player
+                setTimeout(() => {
+                    setCombatState(prev => ({
+                        ...prev,
+                        currentPlayerTurnIndex: nextAliveIndex
+                    }))
+                }, 100)
+            }
+        }
+
+        return currentPlayer
     }
 
     const getAlivePlayersCount = () => {
@@ -80,6 +111,32 @@ const Combat = ({
 
     const getAliveEnemiesCount = () => {
         return combatState.enemies.filter(enemy => enemy.currentHp > 0 && enemy.isAlive).length
+    }
+
+    // ========== STATUS EFFECT DISPLAY ==========
+    const getStatusEffectsForCharacter = (character) => {
+        if (!character || !character.statusEffects) return []
+        return getStatusEffectDisplayInfo(character.statusEffects)
+    }
+
+    const getStatusEffectIcon = (statusType) => {
+        const icons = {
+            'bleeding': '🩸',
+            'confusion': '🌀',
+            'trauma': '🧠',
+            'weakened': '💢'
+        }
+        return icons[statusType] || '⚡'
+    }
+
+    const getStatusEffectColor = (statusType) => {
+        const colors = {
+            'bleeding': '#ff4444',
+            'confusion': '#aa44ff',
+            'trauma': '#666666',
+            'weakened': '#ffaa44'
+        }
+        return colors[statusType] || '#ffffff'
     }
 
     // ========== CHARACTER CLICK HANDLER ==========
@@ -102,14 +159,33 @@ const Combat = ({
         }
 
         setSelectedAttackType(attackType)
+        setSelectedSpecialAttack(null)
         setTargetingMode(true)
 
         addLog(createTargetingMessage(attackType))
     }
 
+    // ========== SPECIAL ATTACK SELECTION ==========
+    const handleSelectSpecialAttack = (specialAttackId) => {
+        const currentPlayer = getCurrentPlayerTurn()
+
+        if (!canSelectAttackType(combatState.currentTurn, combatState.battleStatus, currentPlayer)) {
+            return
+        }
+
+        const attack = getAttackById(specialAttackId)
+        if (!attack) return
+
+        setSelectedSpecialAttack(specialAttackId)
+        setSelectedAttackType(attack.type)
+        setTargetingMode(true)
+
+        addLog(`🎯 ${attack.name} seleccionado - Haz clic en un enemigo para atacar`)
+    }
+
     // ========== ENEMY TARGET SELECTION ==========
     const handleEnemyClick = (enemy) => {
-        if (!targetingMode || !selectedAttackType) {
+        if (!targetingMode || (!selectedAttackType && !selectedSpecialAttack)) {
             return
         }
         if (combatState.currentTurn !== 'player' || combatState.battleStatus !== 'ongoing') {
@@ -120,16 +196,22 @@ const Combat = ({
             return
         }
 
-        executeAttack(selectedAttackType, enemy)
+        if (selectedSpecialAttack) {
+            executeAttack(selectedAttackType, enemy, true, selectedSpecialAttack)
+        } else {
+            executeAttack(selectedAttackType, enemy)
+        }
 
         setTargetingMode(false)
         setSelectedAttackType(null)
+        setSelectedSpecialAttack(null)
     }
 
     // ========== CANCEL TARGETING ==========
     const handleCancelTargeting = () => {
         setTargetingMode(false)
         setSelectedAttackType(null)
+        setSelectedSpecialAttack(null)
         addLog("❌ Selección de ataque cancelada")
     }
 
@@ -157,41 +239,107 @@ const Combat = ({
     }
 
     // ========== PLAYER ATTACK EXECUTION ==========
-    const executeAttack = (attackType, targetEnemy) => {
+    const executeAttack = (attackType, targetEnemy, isSpecial = false, specialAttackType = null) => {
         const currentPlayer = getCurrentPlayerTurn()
-        if (!currentPlayer || currentPlayer.currentHp <= 0) return
+        if (!currentPlayer || currentPlayer.currentHp <= 0) {
+            // Skip to next player if current is dead
+            endPlayerTurn()
+            return
+        }
 
-        const attackResult = executePlayerAttack(combatState, attackType, targetEnemy)
+        // Process start of turn status effects (bleeding, confusion)
+        const startOfTurnEffects = processCharacterStartOfTurn(currentPlayer)
+        if (startOfTurnEffects.damage > 0) {
+            startOfTurnEffects.messages.forEach(msg => addLog(msg.message))
+
+            // Apply bleeding damage
+            const updatedHp = Math.max(0, currentPlayer.currentHp - startOfTurnEffects.damage)
+            const updatedPlayers = combatState.playerCharacters.map(char =>
+                char.id === currentPlayer.id ? { ...char, currentHp: updatedHp } : char
+            )
+
+            setCombatState(prev => ({ ...prev, playerCharacters: updatedPlayers }))
+
+            if (typeof onCharacterHpChange === 'function') {
+                onCharacterHpChange(currentPlayer.id, updatedHp)
+            }
+
+            // Check if player dies from bleeding
+            if (updatedHp <= 0) {
+                addLog(`💀 ${currentPlayer.name} muere por Sangrado`)
+                endPlayerTurn()
+                return
+            }
+        }
+
+        // Handle confusion
+        if (startOfTurnEffects.isConfused) {
+            const confusionResult = handleConfusedTurn(currentPlayer, combatState.playerCharacters)
+            addLog(confusionResult.message)
+
+            if (confusionResult.success) {
+                // Apply confusion attack to ally
+                const updatedPlayers = combatState.playerCharacters.map(char =>
+                    char.id === confusionResult.target.id
+                        ? { ...char, currentHp: Math.max(0, char.currentHp - confusionResult.attackResult.damage) }
+                        : char
+                )
+
+                setCombatState(prev => ({ ...prev, playerCharacters: updatedPlayers }))
+
+                if (typeof onCharacterHpChange === 'function') {
+                    onCharacterHpChange(confusionResult.target.id, Math.max(0, confusionResult.target.currentHp - confusionResult.attackResult.damage))
+                }
+
+                addLog(`${confusionResult.target.name} recibe ${confusionResult.attackResult.damage} de daño`)
+            }
+
+            processCharacterEndOfTurn(currentPlayer)
+            endPlayerTurn()
+            return
+        }
+
+        // Normal attack execution
+        const attackResult = executePlayerAttack(combatState, attackType, targetEnemy, isSpecial, specialAttackType)
 
         if (attackResult.shouldSkipTurn) {
             endPlayerTurn()
             return
         }
 
+        // Add log message
         addLog(attackResult.logMessage)
 
+        // Update enemy HP and apply status effects
         const updatedEnemies = combatState.enemies.map(enemy => {
             if (enemy.id === targetEnemy.id) {
-                return {
+                const totalDamage = attackResult.totalDamage || attackResult.damage
+                const updatedEnemy = {
                     ...enemy,
-                    currentHp: attackResult.updatedEnemyHp,
-                    isAlive: attackResult.updatedEnemyHp > 0
+                    currentHp: Math.max(0, enemy.currentHp - totalDamage),
+                    isAlive: (enemy.currentHp - totalDamage) > 0
                 }
+
+                // Apply status effects to the enemy
+                if (attackResult.statusApplied && attackResult.appliedStatuses) {
+                    attackResult.appliedStatuses.forEach(status => {
+                        applyStatusEffect(updatedEnemy, status.type, status.stacks, currentPlayer.id)
+                    })
+                }
+
+                return updatedEnemy
             }
             return enemy
         })
 
+        // Process end of turn status effects
+        processCharacterEndOfTurn(currentPlayer)
+
         if (areAllEnemiesDefeated(updatedEnemies)) {
-            setCombatState(prev => ({
-                ...prev,
-                enemies: updatedEnemies
-            }))
+            setCombatState(prev => ({ ...prev, enemies: updatedEnemies }))
             endBattle('victory')
         } else {
-            setCombatState(prev => ({
-                ...prev,
-                enemies: updatedEnemies
-            }))
+            setCombatState(prev => ({ ...prev, enemies: updatedEnemies }))
             endPlayerTurn()
         }
     }
@@ -215,14 +363,52 @@ const Combat = ({
     const enemyTurn = () => {
         let allLogMessages = []
         let updatedPlayers = [...combatState.playerCharacters]
+        let updatedEnemies = [...combatState.enemies]
 
         combatState.enemies.forEach((enemy, enemyIndex) => {
             if (enemy.currentHp <= 0 || !enemy.isAlive) {
                 return
             }
 
+            // Process enemy start of turn status effects
+            const enemyStartEffects = processCharacterStartOfTurn(enemy)
+            if (enemyStartEffects.damage > 0) {
+                enemyStartEffects.messages.forEach(msg => allLogMessages.push(msg.message))
+
+                const updatedEnemyHp = Math.max(0, enemy.currentHp - enemyStartEffects.damage)
+                updatedEnemies = updatedEnemies.map(e =>
+                    e.id === enemy.id
+                        ? { ...e, currentHp: updatedEnemyHp, isAlive: updatedEnemyHp > 0 }
+                        : e
+                )
+
+                if (updatedEnemyHp <= 0) {
+                    allLogMessages.push(`💀 ${enemy.name} muere por Sangrado`)
+                    return // Skip attack if enemy dies from bleeding
+                }
+            }
+
+            // Handle confused enemy
+            if (enemyStartEffects.isConfused) {
+                const confusionResult = handleConfusedTurn(enemy, combatState.enemies)
+                allLogMessages.push(confusionResult.message)
+
+                if (confusionResult.success) {
+                    // Apply confusion attack to another enemy
+                    updatedEnemies = updatedEnemies.map(e =>
+                        e.id === confusionResult.target.id
+                            ? { ...e, currentHp: Math.max(0, e.currentHp - confusionResult.attackResult.damage) }
+                            : e
+                    )
+                    allLogMessages.push(`${confusionResult.target.name} recibe ${confusionResult.attackResult.damage} de daño`)
+                }
+
+                processCharacterEndOfTurn(enemy)
+                return
+            }
+
             const enemyResult = executeEnemyTurn(
-                { ...combatState, playerCharacters: updatedPlayers },
+                { ...combatState, playerCharacters: updatedPlayers, enemies: updatedEnemies },
                 enemy
             )
 
@@ -242,11 +428,11 @@ const Combat = ({
                 allLogMessages.push(enemyResult.logMessage)
             }
 
+            // Process enemy end of turn status effects
+            processCharacterEndOfTurn(enemy)
+
             if (enemyResult.shouldEndBattle) {
-                setCombatState(prev => ({
-                    ...prev,
-                    playerCharacters: updatedPlayers
-                }))
+                setCombatState(prev => ({ ...prev, playerCharacters: updatedPlayers, enemies: updatedEnemies }))
                 endBattle(enemyResult.result)
                 return
             }
@@ -257,8 +443,9 @@ const Combat = ({
         setCombatState(prev => ({
             ...prev,
             playerCharacters: updatedPlayers,
+            enemies: updatedEnemies,
             currentTurn: 'player',
-            currentPlayerTurnIndex: 0
+            currentPlayerTurnIndex: findNextAlivePlayer(updatedPlayers, -1)
         }))
     }
 
@@ -292,10 +479,102 @@ const Combat = ({
         }, 3000)
     }
 
+    // ===== TOOLTIP HANDLERS =====
+    // ===== TOOLTIP HANDLERS =====
+    const showTooltip = (event, attack) => {
+        const currentPlayer = getCurrentPlayerTurn();
+        const rect = event.currentTarget.getBoundingClientRect();
+
+        // Get the actual description text by calling the function
+        const descriptionText = attack.description && typeof attack.description === 'function'
+            ? attack.description(currentPlayer || { physicalAttack: 0, psychicAttack: 0 })
+            : attack.name;
+
+        setTooltip({
+            visible: true,
+            x: rect.left + rect.width / 2,
+            y: rect.top - 10,
+            content: (
+                <div>
+                    <div className="tooltip-title">{attack.name}</div>
+                    <div className="tooltip-description" style={{ whiteSpace: 'pre-line' }}>
+                        {descriptionText}
+                    </div>
+                    {attack.statusEffects && attack.statusEffects.length > 0 && (
+                        <div className="tooltip-keywords">
+                            {attack.statusEffects.map((status, i) => (
+                                <span
+                                    key={i}
+                                    className="tooltip-keyword"
+                                    onMouseEnter={(e) => showKeywordTooltip(e, status)}
+                                    onMouseLeave={hideKeywordTooltip}
+                                >
+                                    {status.name}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )
+        })
+    }
+
+    const hideTooltip = () => {
+        setTooltip({ visible: false, x: 0, y: 0, content: null })
+    }
+
+    const showKeywordTooltip = (event, status) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        setKeywordTooltip({
+            visible: true,
+            x: rect.left + rect.width / 2,
+            y: rect.top - 10,
+            content: (
+                <div>
+                    <div className="tooltip-title">{status.name}</div>
+                    <div className="tooltip-description" style={{ whiteSpace: 'pre-line' }}>
+                        {status.description}
+                    </div>
+                </div>
+            )
+        })
+    }
+
+    const hideKeywordTooltip = () => {
+        setKeywordTooltip({ visible: false, x: 0, y: 0, content: null })
+    }
+
+
+    // ========== RENDER STATUS EFFECTS ==========
+    const renderStatusEffects = (character) => {
+        const statusEffects = getStatusEffectsForCharacter(character)
+
+        if (statusEffects.length === 0) return null
+
+        return (
+            <div className="status-effects-container">
+                {statusEffects.map((status, index) => (
+                    <div
+                        key={`${status.type}-${index}`}
+                        className="status-effect-badge"
+                        style={{
+                            borderColor: getStatusEffectColor(status.type),
+                            backgroundColor: `${getStatusEffectColor(status.type)}20`
+                        }}
+                        title={`${status.name} - ${status.stacks} stack(s) - Duración: ${status.duration !== null ? status.duration : '∞'}`}
+                    >
+                        {getStatusEffectIcon(status.type)}
+                        {status.stacks > 1 && <span className="status-stack-count">{status.stacks}</span>}
+                    </div>
+                ))}
+            </div>
+        )
+    }
+
     // ========== RENDER COMPONENT ==========
     return (
         <div className="combat-overlay">
-            <div className="combat-container">
+            <div className="combat-container" style={{ position: 'relative' }}>
 
                 {/* ========== COMBAT HEADER ========== */}
                 <div className="combat-header">
@@ -313,7 +592,7 @@ const Combat = ({
                     {/* TARGETING MODE INDICATOR */}
                     {targetingMode && (
                         <div className="targeting-indicator">
-                            🎯 SELECCIONA UN ENEMIGO PARA ATACAR
+                            🎯 {selectedSpecialAttack ? getAttackById(selectedSpecialAttack)?.name : selectedAttackType === 'physical' ? 'Ataque Físico' : 'Ataque Psíquico'} SELECCIONADO - HAZ CLIC EN UN ENEMIGO
                         </div>
                     )}
                 </div>
@@ -345,6 +624,8 @@ const Combat = ({
                                                         PV: {combatState.playerCharacters.find(p => p.id === char.id)?.currentHp || 0}/{playerMaxHp}
                                                     </span>
                                                 </div>
+                                                {/* Status Effects Display */}
+                                                {renderStatusEffects(combatState.playerCharacters.find(p => p.id === char.id))}
                                                 <div className="position-badge back-badge">Trasero</div>
                                             </div>
                                             <div className="combatant-image">
@@ -379,6 +660,8 @@ const Combat = ({
                                                         PV: {combatState.playerCharacters.find(p => p.id === char.id)?.currentHp || 0}/{playerMaxHp}
                                                     </span>
                                                 </div>
+                                                {/* Status Effects Display */}
+                                                {renderStatusEffects(combatState.playerCharacters.find(p => p.id === char.id))}
                                                 <div className="position-badge front-badge">Delantero</div>
                                             </div>
                                             <div className="combatant-image">
@@ -423,6 +706,8 @@ const Combat = ({
                                                                 PV: {enemy.currentHp}/{enemy.maxHp}
                                                             </span>
                                                         </div>
+                                                        {/* Status Effects Display */}
+                                                        {renderStatusEffects(enemy)}
                                                         <div className="stats">
                                                             <span>ATAQ FÍS: {enemy.physicalAttack}</span>
                                                             <span>ATAQ PSÍ: {enemy.psychicAttack}</span>
@@ -469,6 +754,8 @@ const Combat = ({
                                                                 PV: {enemy.currentHp}/{enemy.maxHp}
                                                             </span>
                                                         </div>
+                                                        {/* Status Effects Display */}
+                                                        {renderStatusEffects(enemy)}
                                                         <div className="stats">
                                                             <span>ATAQ FÍS: {enemy.physicalAttack}</span>
                                                             <span>ATAQ PSÍ: {enemy.psychicAttack}</span>
@@ -496,22 +783,38 @@ const Combat = ({
                     <div className="action-buttons">
                         <div className="current-turn-indicator">
                             Turno: {getCurrentPlayerTurn()?.name}
+                            {getStatusEffectsForCharacter(getCurrentPlayerTurn()).length > 0 && (
+                                <span className="status-indicator"> (Tiene {getStatusEffectsForCharacter(getCurrentPlayerTurn()).length} estado(s))</span>
+                            )}
                         </div>
 
                         {!targetingMode ? (
                             <>
-                                <button
-                                    className="attack-btn physical-attack"
-                                    onClick={() => handleSelectAttackType('physical')}
-                                >
-                                    🗡️ Ataque Físico
-                                </button>
-                                <button
-                                    className="attack-btn psychic-attack"
-                                    onClick={() => handleSelectAttackType('psychic')}
-                                >
-                                    🔮 Ataque Psíquico
-                                </button>
+                                {/* Basic Attacks */}
+                                {getAllBasicAttacks().map(attack => (
+                                    <button
+                                        key={attack.id}
+                                        className={`attack-btn ${attack.type}-attack`}
+                                        onClick={() => handleSelectAttackType(attack.type)}
+                                        onMouseEnter={(e) => showTooltip(e, attack)}
+                                        onMouseLeave={hideTooltip}
+                                    >
+                                        {attack.type === 'physical' ? '🗡️' : '🔮'} {attack.name}
+                                    </button>
+                                ))}
+
+                                {/* Special Attacks */}
+                                {getAllSpecialAttacks().map(attack => (
+                                    <button
+                                        key={attack.id}
+                                        className={`attack-btn ${attack.type}-attack special-${attack.id.toLowerCase()}`}
+                                        onClick={() => handleSelectSpecialAttack(attack.id)}
+                                        onMouseEnter={(e) => showTooltip(e, attack)}
+                                        onMouseLeave={hideTooltip}
+                                    >
+                                        {getStatusEffectIcon(attack.statusEffects?.[0]?.type) || '⚡'} {attack.name}
+                                    </button>
+                                ))}
                                 <button
                                     className="position-btn"
                                     onClick={handlePositionSwap}
@@ -564,6 +867,39 @@ const Combat = ({
                     character={selectedCharacter}
                     onClose={closeCharacterDetail}
                 />
+            )}
+
+            {/* TOOLTIP OVERLAYS */}
+            {tooltip.visible && (
+                <div
+                    className="combat-tooltip visible"
+                    style={{
+                        top: `${tooltip.y}px`,
+                        left: `${tooltip.x}px`,
+                        transform: 'translate(-50%, -100%)',
+                        marginTop: '-10px'
+                    }}
+                    onMouseEnter={() => setTooltip(prev => ({ ...prev, visible: true }))}
+                    onMouseLeave={hideTooltip}
+                >
+                    {tooltip.content}
+                </div>
+            )}
+
+            {keywordTooltip.visible && (
+                <div
+                    className="tooltip-keyword-tooltip"
+                    style={{
+                        top: `${keywordTooltip.y}px`,
+                        left: `${keywordTooltip.x}px`,
+                        transform: 'translate(-50%, -100%)',
+                        marginTop: '-10px'
+                    }}
+                    onMouseEnter={() => setKeywordTooltip(prev => ({ ...prev, visible: true }))}
+                    onMouseLeave={hideKeywordTooltip}
+                >
+                    {keywordTooltip.content}
+                </div>
             )}
         </div>
     )

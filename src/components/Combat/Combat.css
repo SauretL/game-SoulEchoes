@@ -384,6 +384,54 @@
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
+/* ========== STATUS EFFECTS STYLES ========== */
+.status-effects-container {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin: 8px 0;
+    flex-wrap: wrap;
+}
+
+.status-effect-badge {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em;
+    border: 2px solid;
+    cursor: help;
+    transition: all 0.2s ease;
+}
+
+.status-effect-badge:hover {
+    transform: scale(1.2);
+}
+
+.status-stack-count {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background: #ff4444;
+    color: white;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    font-size: 0.6em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.status-indicator {
+    color: #ffa07a;
+    font-size: 0.8em;
+}
+
 /* ========== ACTION BUTTONS ========== */
 .action-buttons {
     display: grid;
@@ -574,6 +622,158 @@
     background: #555;
 }
 
+/* ========== COMBAT TOOLTIP ========== */
+.combat-tooltip {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.95);
+    border: 2px solid #ffd700;
+    border-radius: 8px;
+    padding: 12px;
+    color: white;
+    font-size: 0.8em;
+    white-space: pre-line;
+    z-index: 10001;
+    pointer-events: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+    max-width: 280px;
+    text-align: left;
+    backdrop-filter: blur(4px);
+    line-height: 1.4;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.combat-tooltip.visible {
+    opacity: 1;
+}
+
+.combat-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 10px 10px 0 10px;
+    border-style: solid;
+    border-color: #ffd700 transparent transparent transparent;
+}
+
+.combat-tooltip.top::after {
+    top: -10px;
+    bottom: auto;
+    border-width: 0 10px 10px 10px;
+    border-color: transparent transparent #ffd700 transparent;
+}
+
+/* Tooltip content styles */
+.tooltip-title {
+    color: #ffd700;
+    font-weight: bold;
+    margin-bottom: 6px;
+    font-size: 0.9em;
+}
+
+.tooltip-description {
+    margin-bottom: 8px;
+    white-space: pre-line;
+    line-height: 1.4;
+}
+
+.tooltip-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    margin: 6px 0;
+    font-size: 0.75em;
+}
+
+.tooltip-stat {
+    background: rgba(255, 215, 0, 0.1);
+    padding: 3px 6px;
+    border-radius: 3px;
+    text-align: center;
+}
+
+.tooltip-keywords {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #444;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.tooltip-keyword {
+    color: #ffa07a;
+    cursor: help;
+    text-decoration: underline dotted;
+    font-size: 0.75em;
+    padding: 2px 4px;
+    border-radius: 3px;
+    background: rgba(255, 160, 122, 0.1);
+    transition: background-color 0.2s ease;
+}
+
+.tooltip-keyword:hover {
+    background: rgba(255, 160, 122, 0.2);
+}
+
+/* Ensure tooltip stays visible when hovering over it */
+.combat-tooltip:hover {
+    opacity: 1 !important;
+}
+
+/* Nested tooltip for keywords */
+.tooltip-keyword-tooltip {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.95);
+    border: 2px solid #ffa07a;
+    border-radius: 6px;
+    padding: 8px;
+    color: white;
+    font-size: 0.75em;
+    z-index: 10002;
+    max-width: 250px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+    white-space: pre-line;
+    line-height: 1.4;
+    pointer-events: auto;
+}
+
+.tooltip-keyword-tooltip:hover {
+    opacity: 1 !important;
+}
+
+.tooltip-keyword-tooltip .tooltip-title {
+    color: #ffa07a;
+    font-size: 0.85em;
+}
+
+.tooltip-keyword-tooltip .tooltip-description {
+    font-size: 0.75em;
+}
+
+/* Status effect tooltips */
+.status-effect-badge {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+}
+
+/* Ensure tooltips overlay everything */
+.combat-overlay {
+    position: fixed;
+    z-index: 1000;
+}
+
+.combat-tooltip {
+    z-index: 10001;
+}
+
+.tooltip-keyword-tooltip {
+    z-index: 10002;
+}
+
 /* ========== RESPONSIVE DESIGN ========== */
 @media (max-width: 768px) {
     .combat-overlay {
@@ -681,6 +881,18 @@
 
     .position-column {
         gap: 8px;
+    }
+
+    /* Tooltip adjustments for mobile */
+    .combat-tooltip {
+        max-width: 250px;
+        font-size: 0.75em;
+        padding: 10px;
+    }
+
+    .tooltip-keyword-tooltip {
+        max-width: 220px;
+        font-size: 0.7em;
     }
 }
 
@@ -791,6 +1003,18 @@
     .position-column {
         gap: 6px;
     }
+
+    /* Tooltip adjustments for small mobile */
+    .combat-tooltip {
+        max-width: 220px;
+        font-size: 0.7em;
+        padding: 8px;
+    }
+
+    .tooltip-keyword-tooltip {
+        max-width: 200px;
+        font-size: 0.65em;
+    }
 }
 
 @media (max-width: 360px) {
@@ -829,4 +1053,61 @@
     .action-buttons {
         gap: 4px;
     }
+
+    /* Tooltip adjustments for very small screens */
+    .combat-tooltip {
+        max-width: 200px;
+        font-size: 0.65em;
+    }
+
+    .tooltip-keyword-tooltip {
+        max-width: 180px;
+        font-size: 0.6em;
+    }
+}
+
+/* ========== CHARACTER DETAIL MODAL ========== */
+.character-detail-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #1a1a2a;
+    border: 2px solid #ffd700;
+    border-radius: 12px;
+    padding: 20px;
+    z-index: 10003;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    color: #e0e0e0;
+}
+
+.character-detail-modal h2 {
+    color: #ffd700;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.character-detail-modal .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.character-detail-modal .close-btn:hover {
+    background: #ef4444;
+    transform: scale(1.1);
 }

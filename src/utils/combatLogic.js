@@ -1,3 +1,26 @@
+// ========== IMPORTS ==========
+import {
+    STATUS_EFFECTS,
+    applyStatusEffect,
+    processStartOfTurnStatusEffects,
+    processDamageTriggeredStatusEffects,
+    processEndOfTurnStatusEffects,
+    applyStatusEffectStats,
+    canCharacterActNormally,
+    getConfusionAttackTarget,
+    getStatusEffectDisplayInfo,
+    getStatusEffectText,
+    createStatusEffectMessage,
+    hasStatusEffects
+} from './statusEffects'
+
+import {
+    ATTACKS,
+    getAttack,
+    getSpecialAttacks,
+    getBasicAttacks
+} from './attacks'
+
 // ========== UNIQUE ID GENERATION ==========
 
 // Generate unique ID for enemy instances
@@ -5,9 +28,9 @@ export const generateUniqueEnemyId = (baseId, index) => {
     return `enemy_${baseId}_${index}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 }
 
-// ========== DAMAGE CALCULATION ==========
+// ========== DAMAGE CALCULATION SYSTEM ==========
 
-export const calculateDamage = (attack, defense) => {
+export const calculateDamage = (attack, defense, isStatusEffect = false) => {
     // STEP 1: Calculate base damage
     const baseDamage = attack - defense
 
@@ -37,60 +60,221 @@ export const calculateDamage = (attack, defense) => {
     finalDamage = Math.ceil(finalDamage)
     finalDamage = Math.max(finalDamage, 1)
 
+    // STEP 5: Status effects cannot crit and have reduced damage
+    if (isStatusEffect) {
+        finalDamage = Math.max(1, Math.floor(finalDamage * 0.8))
+    }
+
     return finalDamage
 }
 
-// ========== COMBAT ACTIONS ==========
+// ========== COMBAT ACTIONS SYSTEM ==========
 
-// Perform an attack between attacker and defender
-export const performAttack = (attacker, defender, attackType) => {
-    let damage = 0
-
-    if (attackType === 'physical') {
-        damage = calculateDamage(attacker.physicalAttack, defender.physicalDefense)
-    } else if (attackType === 'psychic') {
-        damage = calculateDamage(attacker.psychicAttack, defender.psychicDefense)
+// Perform basic attack
+export const performAttack = (attacker, defender, attackType, isSpecial = false, specialAttackType = null) => {
+    // Apply status effect stat modifications to defender
+    const defenderStats = applyStatusEffectStats(defender)
+    const modifiedDefender = {
+        ...defender,
+        physicalDefense: defenderStats.physicalDefense,
+        psychicDefense: defenderStats.psychicDefense
     }
 
-    // Apply critical hit chance (10%)
+    let damage = 0
+    let attackResult = {}
+
+    if (isSpecial && specialAttackType) {
+        attackResult = performSpecialAttack(attacker, modifiedDefender, specialAttackType)
+    } else {
+        // Basic attack
+        if (attackType === 'physical') {
+            damage = calculateDamage(attacker.physicalAttack, modifiedDefender.physicalDefense)
+        } else if (attackType === 'psychic') {
+            damage = calculateDamage(attacker.psychicAttack, modifiedDefender.psychicDefense)
+        }
+
+        // Apply critical hit chance (10%)
+        const isCritical = Math.random() < 0.1
+        if (isCritical) {
+            damage = Math.floor(damage * 1.5)
+        }
+
+        attackResult = {
+            damage,
+            attackType,
+            isCritical,
+            isSpecial: false
+        }
+    }
+
+    // Process trauma if defender receives damage
+    if (attackResult.damage > 0) {
+        const traumaEffects = processDamageTriggeredStatusEffects(defender, attackResult.attackType)
+        traumaEffects.forEach(effect => {
+            if (effect.type === STATUS_EFFECTS.TRAUMA) {
+                // Add trauma damage to the attack
+                attackResult.traumaDamage = effect.damage
+                attackResult.totalDamage = attackResult.damage + effect.damage
+            }
+        })
+    }
+
+    return attackResult
+}
+
+// Perform special attack with status effect chance
+export const performSpecialAttack = (attacker, defender, attackId) => {
+    const attack = getAttack(attackId)
+
+    if (!attack) {
+        console.warn(`Unknown attack: ${attackId}`)
+        return performAttack(attacker, defender, 'physical')
+    }
+
+    // Apply status effect stat modifications to defender
+    const defenderStats = applyStatusEffectStats(defender)
+    const modifiedDefender = {
+        ...defender,
+        physicalDefense: defenderStats.physicalDefense,
+        psychicDefense: defenderStats.psychicDefense
+    }
+
+    // Calculate damage
+    let damage = 0
+    if (attack.type === 'physical') {
+        damage = calculateDamage(attacker.physicalAttack + attack.damage, modifiedDefender.physicalDefense)
+    } else if (attack.type === 'psychic') {
+        damage = calculateDamage(attacker.psychicAttack + attack.damage, modifiedDefender.psychicDefense)
+    }
+
+    // Apply critical hit chance
     const isCritical = Math.random() < 0.1
     if (isCritical) {
         damage = Math.floor(damage * 1.5)
     }
 
+    // Check for status effect application
+    const appliedStatuses = []
+
+    if (attack.statusEffects) {
+        attack.statusEffects.forEach(statusEffect => {
+            if (Math.random() < statusEffect.chance) {
+                const applied = applyStatusEffect(defender, statusEffect.type, statusEffect.stacks, attacker.id)
+                if (applied) {
+                    appliedStatuses.push({
+                        type: statusEffect.type,
+                        stacks: statusEffect.stacks
+                    })
+                }
+            }
+        })
+    }
+
     return {
         damage,
-        attackType,
-        isCritical
+        attackType: attack.type,
+        isCritical,
+        isSpecial: true,
+        specialAttackName: attack.name,
+        statusApplied: appliedStatuses.length > 0,
+        appliedStatuses: appliedStatuses,
+        attackId: attack.id
     }
 }
 
-// ========== ENEMY AI ==========
+// ========== STATUS EFFECTS TURN PROCESSING ==========
 
-// Enemy AI to choose and perform attacks
-export const enemyAI = (enemy, player) => {
-    // Randomly choose between physical and psychic attack
-    const attackTypes = ['physical', 'psychic']
-    const randomAttack = attackTypes[Math.floor(Math.random() * attackTypes.length)]
+// Process start of turn status effects for a character
+export const processCharacterStartOfTurn = (character) => {
+    const statusEffects = processStartOfTurnStatusEffects(character)
+    let totalDamage = 0
+    let statusMessages = []
 
-    return performAttack(enemy, player, randomAttack)
+    statusEffects.forEach(effect => {
+        if (effect.type === STATUS_EFFECTS.BLEEDING && effect.damage > 0) {
+            totalDamage += effect.damage
+            statusMessages.push({
+                message: `${character.name} sufre ${effect.damage} de daño por Sangrado (${effect.stacks} stacks)`,
+                type: 'bleeding'
+            })
+        }
+    })
+
+    return {
+        damage: totalDamage,
+        messages: statusMessages,
+        isConfused: statusEffects.some(effect => effect.type === STATUS_EFFECTS.CONFUSION)
+    }
 }
 
-// ========== BATTLE STATUS CHECK ==========
+// Process end of turn status effects
+export const processCharacterEndOfTurn = (character) => {
+    processEndOfTurnStatusEffects(character)
+}
+
+// Handle confused character turn
+export const handleConfusedTurn = (confusedCharacter, allies) => {
+    const target = getConfusionAttackTarget(confusedCharacter, allies)
+
+    if (!target) {
+        return {
+            success: false,
+            message: `${confusedCharacter.name} está confuso pero no hay aliados para atacar`
+        }
+    }
+
+    // Random attack type
+    const attackTypes = ['physical', 'psychic']
+    const randomAttackType = attackTypes[Math.floor(Math.random() * attackTypes.length)]
+
+    const attackResult = performAttack(confusedCharacter, target, randomAttackType)
+
+    return {
+        success: true,
+        target: target,
+        attackResult: attackResult,
+        message: `${confusedCharacter.name} está confuso y ataca a ${target.name}`
+    }
+}
+
+// ========== ENEMY AI SYSTEM ==========
+
+// Enhanced enemy AI to use special attacks occasionally
+export const enemyAI = (enemy, player) => {
+    // 20% chance to use special attack if enemy has one
+    const useSpecialAttack = Math.random() < 0.2
+
+    if (useSpecialAttack && enemy.specialAttacks && enemy.specialAttacks.length > 0) {
+        const randomSpecial = enemy.specialAttacks[Math.floor(Math.random() * enemy.specialAttacks.length)]
+        return performSpecialAttack(enemy, player, randomSpecial)
+    } else {
+        // Fallback to basic attack
+        const attackTypes = ['physical', 'psychic']
+        const randomAttack = attackTypes[Math.floor(Math.random() * attackTypes.length)]
+        return performAttack(enemy, player, randomAttack)
+    }
+}
+
+// ========== BATTLE STATUS CHECK SYSTEM ==========
 
 // Check if battle has ended and who won
-export const checkBattleEnd = (playerCharacters, enemy) => {
+export const checkBattleEnd = (playerCharacters, enemies) => {
     // Check if all players are defeated
     const alivePlayers = playerCharacters.filter(player => player.currentHp > 0)
     if (alivePlayers.length === 0) {
         return 'player_lost'
-    } else if (enemy.currentHp <= 0) {
+    }
+
+    // Check if all enemies are defeated
+    const aliveEnemies = enemies.filter(enemy => enemy.currentHp > 0 && enemy.isAlive)
+    if (aliveEnemies.length === 0) {
         return 'player_won'
     }
+
     return 'ongoing'
 }
 
-// ========== REWARDS AND PENALTIES ==========
+// ========== REWARDS AND PENALTIES SYSTEM ==========
 
 // Calculate coins rewarded for winning battle
 export const getBattleReward = () => {
@@ -104,7 +288,7 @@ export const getBattlePenalty = () => {
     return 50 // Lose 50 coins when losing
 }
 
-// ========== CHARACTER HP MANAGEMENT ==========
+// ========== CHARACTER HP MANAGEMENT SYSTEM ==========
 
 // Update character HP (for multiple characters)
 export const updateCharacterHp = (characterId, newHp, currentHpState) => {
@@ -132,7 +316,7 @@ export const getFirstAlivePlayer = (playerCharacters) => {
     return playerCharacters.find(player => player.currentHp > 0) || null
 }
 
-// ========== ENEMY TARGETING LOGIC ==========
+// ========== ENEMY TARGETING LOGIC SYSTEM ==========
 
 // Get random alive player target
 export const getRandomAlivePlayer = (playerCharacters) => {
@@ -143,13 +327,20 @@ export const getRandomAlivePlayer = (playerCharacters) => {
     return alivePlayers[randomIndex]
 }
 
-// ========== PLAYER TURN MANAGEMENT ==========
+// ========== PLAYER TURN MANAGEMENT SYSTEM ==========
 
 // Find next alive player for turn rotation
 export const findNextAlivePlayer = (playerCharacters, currentIndex) => {
     const totalPlayers = playerCharacters.length
-    for (let i = 1; i <= totalPlayers; i++) {
-        const nextIndex = (currentIndex + i) % totalPlayers
+    let startIndex = currentIndex + 1
+
+    // If starting from -1, start from beginning
+    if (currentIndex === -1) {
+        startIndex = 0
+    }
+
+    for (let i = 0; i < totalPlayers; i++) {
+        const nextIndex = (startIndex + i) % totalPlayers
         if (playerCharacters[nextIndex].currentHp > 0) {
             return nextIndex
         }
@@ -164,7 +355,7 @@ export const getHpPercentage = (current, max) => {
     return Math.max((current / max) * 100, 0)
 }
 
-// ========== POSITION MANAGEMENT ==========
+// ========== POSITION MANAGEMENT SYSTEM ==========
 
 // Calculate position swap data for character movement
 export const calculatePositionSwap = (combatPositions, currentPlayer) => {
@@ -217,7 +408,7 @@ export const executePositionSwap = (combatPositions, swapData, currentPlayer) =>
     return newPositions
 }
 
-// ========== COMBAT STATE INITIALIZATION ==========
+// ========== COMBAT STATE INITIALIZATION SYSTEM ==========
 
 // Initialize combat state with player characters and enemies
 export const initializeCombatState = (activeCharacters, enemies, playerCharactersHp, playerMaxHp) => {
@@ -230,7 +421,8 @@ export const initializeCombatState = (activeCharacters, enemies, playerCharacter
             physicalAttack: 12,
             psychicAttack: 10,
             physicalDefense: 6,
-            psychicDefense: 2
+            psychicDefense: 2,
+            statusEffects: {} // Initialize status effects
         }))
 
     // enemies is an array
@@ -245,21 +437,25 @@ export const initializeCombatState = (activeCharacters, enemies, playerCharacter
             id: uniqueId, // Override with unique instance ID
             originalClassId: enemy.id, // Store original class ID for reference
             currentHp: enemy.currentHp || enemy.maxHp,
-            isAlive: true
+            isAlive: true,
+            statusEffects: {} // Initialize status effects
         }
     })
+
+    // Find first alive player
+    const firstAliveIndex = findNextAlivePlayer(playerCharacters, -1)
 
     return {
         playerCharacters,
         enemies: initializedEnemies,
         currentTurn: 'player',
-        currentPlayerTurnIndex: 0,
+        currentPlayerTurnIndex: firstAliveIndex,
         battleLog: [],
         battleStatus: 'ongoing'
     }
 }
 
-// ========== BATTLE LOG MANAGEMENT ==========
+// ========== BATTLE LOG MANAGEMENT SYSTEM ==========
 
 // Add message to battle log
 export const addToBattleLog = (battleLog, message) => {
@@ -271,7 +467,7 @@ export const getLastBattleLogs = (battleLog, count = 6) => {
     return battleLog.slice(-count)
 }
 
-// ========== COMBAT TEXT UTILITIES ==========
+// ========== COMBAT TEXT UTILITIES SYSTEM ==========
 
 // Get position text for battle log
 export const getPositionText = (position) => {
@@ -292,9 +488,9 @@ export const getBattleResultText = (result, enemyName) => {
     }
 }
 
-// ========== TURN MANAGEMENT ==========
+// ========== TURN EXECUTION SYSTEM ==========
 
-// Handle end of player turn and determine next action (next player or enemy turn)
+// Handle end of player turn and determine next action
 export const handleEndPlayerTurn = (combatState) => {
     const alivePlayers = combatState.playerCharacters.filter(player => player.currentHp > 0)
 
@@ -303,32 +499,16 @@ export const handleEndPlayerTurn = (combatState) => {
         return { shouldEndBattle: true, result: 'defeat' }
     }
 
-    // Try to find the next alive player
-    let nextIndex = (combatState.currentPlayerTurnIndex + 1) % combatState.playerCharacters.length
-    let attempts = 0
-    let foundNextPlayer = false
+    // Find next alive player starting from current position
+    const nextIndex = findNextAlivePlayer(combatState.playerCharacters, combatState.currentPlayerTurnIndex)
 
-    // Search for next alive player
-    while (attempts < combatState.playerCharacters.length) {
-        if (combatState.playerCharacters[nextIndex].currentHp > 0) {
-            foundNextPlayer = true
-            break
-        }
-        nextIndex = (nextIndex + 1) % combatState.playerCharacters.length
-        attempts++
+    // If no next player found, battle should end
+    if (nextIndex === -1) {
+        return { shouldEndBattle: true, result: 'defeat' }
     }
 
-    // Check if we've cycled through all players
-    if (foundNextPlayer && nextIndex > combatState.currentPlayerTurnIndex) {
-        // There's another player in this round, continue with them
-        return {
-            shouldEndBattle: false,
-            newState: {
-                currentPlayerTurnIndex: nextIndex,
-                currentTurn: 'player'
-            }
-        }
-    } else if (foundNextPlayer && nextIndex <= combatState.currentPlayerTurnIndex) {
+    // Check if we've cycled through all players (wrapped around)
+    if (nextIndex <= combatState.currentPlayerTurnIndex) {
         // We've wrapped around - all players have had their turn, switch to enemy
         return {
             shouldEndBattle: false,
@@ -338,18 +518,18 @@ export const handleEndPlayerTurn = (combatState) => {
             }
         }
     } else {
-        // Fallback: switch to enemy
+        // There's another player in this round, continue with them
         return {
             shouldEndBattle: false,
             newState: {
-                currentTurn: 'enemy',
-                currentPlayerTurnIndex: 0
+                currentPlayerTurnIndex: nextIndex,
+                currentTurn: 'player'
             }
         }
     }
 }
 
-// Execute enemy turn logic
+// Execute enemy turn logic with status effects
 export const executeEnemyTurn = (combatState, enemy) => {
     // Validate if enemy can attack
     if (combatState.battleStatus !== 'ongoing') {
@@ -375,20 +555,37 @@ export const executeEnemyTurn = (combatState, enemy) => {
     // Calculate player HP after attack
     const updatedPlayerHp = Math.max(0, targetPlayer.currentHp - actualDamage)
 
-    // Update players with new HP
-    const updatedPlayers = combatState.playerCharacters.map(char =>
-        char.id === targetPlayer.id
-            ? { ...char, currentHp: updatedPlayerHp }
-            : char
-    )
+    // Update players with new HP and status effects if any
+    const updatedPlayers = combatState.playerCharacters.map(char => {
+        if (char.id === targetPlayer.id) {
+            const updatedChar = { ...char, currentHp: updatedPlayerHp }
+
+            // Apply status effects if any
+            if (result.statusApplied && result.appliedStatuses) {
+                result.appliedStatuses.forEach(status => {
+                    applyStatusEffect(updatedChar, status.type, status.stacks, enemy.id)
+                })
+            }
+
+            return updatedChar
+        }
+        return char
+    })
 
     // Create battle log message
-    const attackName = result.attackType === 'physical' ? 'Ataque Físico' : 'Ataque Psíquico'
+    const attackName = result.isSpecial ? result.specialAttackName :
+        (result.attackType === 'physical' ? 'Ataque Físico' : 'Ataque Psíquico')
     const criticalText = result.isCritical ? ' ¡GOLPE CRÍTICO!' : ''
-    const logMessage = `${enemy.name} usa ${attackName} en ${targetPlayer.name} - ${actualDamage} de daño${criticalText}`
+    let logMessage = `${enemy.name} usa ${attackName} en ${targetPlayer.name} - ${actualDamage} de daño${criticalText}`
+
+    // Add status effect message if applied
+    if (result.statusApplied && result.appliedStatuses) {
+        const statusMessage = createStatusEffectMessage(targetPlayer.name, result.appliedStatuses)
+        logMessage += ` - ${statusMessage}`
+    }
 
     // Check if battle ends with this attack
-    const battleResult = checkBattleEnd(updatedPlayers, enemy)
+    const battleResult = checkBattleEnd(updatedPlayers, combatState.enemies)
 
     if (battleResult === 'player_lost') {
         return {
@@ -416,8 +613,8 @@ export const executeEnemyTurn = (combatState, enemy) => {
     }
 }
 
-// Execute player attack logic
-export const executePlayerAttack = (combatState, attackType, targetEnemy) => {
+// Execute player attack logic with status effects
+export const executePlayerAttack = (combatState, attackType, targetEnemy, isSpecial = false, specialAttackType = null) => {
     const currentPlayer = combatState.playerCharacters[combatState.currentPlayerTurnIndex]
 
     // Skip defeated players
@@ -426,18 +623,31 @@ export const executePlayerAttack = (combatState, attackType, targetEnemy) => {
     }
 
     // Perform attack against specific enemy
-    const result = performAttack(currentPlayer, targetEnemy, attackType)
+    const result = performAttack(currentPlayer, targetEnemy, attackType, isSpecial, specialAttackType)
 
     // Ensure minimum 1 damage
     const actualDamage = Math.max(1, result.damage)
 
     // Create battle log message
-    const attackName = attackType === 'physical' ? 'Ataque Físico' : 'Ataque Psíquico'
+    const attackName = result.isSpecial ? result.specialAttackName :
+        (attackType === 'physical' ? 'Ataque Físico' : 'Ataque Psíquico')
     const criticalText = result.isCritical ? ' ¡GOLPE CRÍTICO!' : ''
-    const logMessage = `${currentPlayer.name} usa ${attackName} en ${targetEnemy.name} - ${actualDamage} de daño${criticalText}`
+    let logMessage = `${currentPlayer.name} usa ${attackName} en ${targetEnemy.name} - ${actualDamage} de daño${criticalText}`
+
+    // Add status effect message if applied
+    if (result.statusApplied && result.appliedStatuses) {
+        const statusMessage = createStatusEffectMessage(targetEnemy.name, result.appliedStatuses)
+        logMessage += ` - ${statusMessage}`
+    }
+
+    // Add trauma damage if triggered
+    if (result.traumaDamage) {
+        logMessage += ` + ${result.traumaDamage} de daño por Trauma`
+    }
 
     // Calculate enemy HP after attack
-    const updatedEnemyHp = Math.max(0, targetEnemy.currentHp - actualDamage)
+    const totalDamage = result.totalDamage || actualDamage
+    const updatedEnemyHp = Math.max(0, targetEnemy.currentHp - totalDamage)
 
     // Check if this specific enemy is defeated
     const enemyDefeated = updatedEnemyHp <= 0
@@ -445,9 +655,13 @@ export const executePlayerAttack = (combatState, attackType, targetEnemy) => {
     return {
         shouldEndBattle: enemyDefeated,
         shouldSkipTurn: false,
-        updatedEnemyHp,
+        updatedEnemyHp: updatedEnemyHp,
         logMessage,
-        enemyDefeated
+        enemyDefeated,
+        statusApplied: result.statusApplied,
+        appliedStatuses: result.appliedStatuses || [],
+        traumaDamage: result.traumaDamage,
+        totalDamage: totalDamage
     }
 }
 
@@ -525,4 +739,37 @@ export const getAttackTypeName = (attackType) => {
 export const createTargetingMessage = (attackType) => {
     const attackName = getAttackTypeName(attackType)
     return `🎯 ${attackName} seleccionado - Haz clic en un enemigo para atacar`
+}
+
+// ========== ATTACKS MANAGEMENT ==========
+
+// Get special attack configuration
+export const getSpecialAttackConfig = (attackId) => {
+    return getAttack(attackId)
+}
+
+// Get all special attacks
+export const getAllSpecialAttacks = () => {
+    return getSpecialAttacks()
+}
+
+// Get all basic attacks
+export const getAllBasicAttacks = () => {
+    return getBasicAttacks()
+}
+
+// Get attack by ID
+export const getAttackById = (attackId) => {
+    return getAttack(attackId)
+}
+
+// ========== RE-EXPORTS FROM STATUS EFFECTS ==========
+// Export functions from statusEffects for external use
+export {
+    STATUS_EFFECTS,
+    createStatusEffectMessage,
+    getStatusEffectDisplayInfo,
+    getStatusEffectText,
+    hasStatusEffects,
+    canCharacterActNormally
 }
