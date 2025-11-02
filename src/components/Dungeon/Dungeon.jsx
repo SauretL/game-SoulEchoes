@@ -12,14 +12,168 @@ import {
   getDirectionFromKey,
   isResetKey,
   resetAllCharactersHP,
-  generateRandomEnemyParty
+  generateRandomEnemyParty,
+  isBossDungeon,
+  getBossEncounter,
+  handleBossDefeat as handleBossDefeatLogic,
+  isBossDefeated
 } from '../../utils/dungeonLogic'
 import {
   getDefaultDungeon,
   getRandomFormationForDungeon,
   getDungeonById,
-  getNextDungeonId
+  getNextDungeonId,
+  getAvailableDungeons
 } from '../../utils/dungeonMaps'
+
+// ========== DUNGEON STATE MANAGEMENT ==========
+const initializeDungeonState = () => {
+  const currentDungeon = getDefaultDungeon();
+  return {
+    currentDungeon,
+    ...getInitialDungeonState(currentDungeon.startPos),
+    isOnStairs: false,
+    isOnBossCell: false,
+    bossDefeated: false,
+    defeatedBosses: []
+  };
+};
+
+const resetDungeonComplete = () => {
+  const firstDungeon = getDefaultDungeon();
+  return {
+    currentDungeon: firstDungeon,
+    ...getInitialDungeonState(firstDungeon.startPos),
+    isOnStairs: false,
+    isOnBossCell: false,
+    bossDefeated: false,
+    defeatedBosses: []
+  };
+};
+
+const advanceToNextDungeon = (currentDungeonId, defeatedBosses = []) => {
+  const nextDungeonId = getNextDungeonId(currentDungeonId);
+  if (!nextDungeonId) return null;
+
+  const nextDungeon = getDungeonById(nextDungeonId);
+  return {
+    currentDungeon: nextDungeon,
+    playerPos: nextDungeon.startPos,
+    isOnStairs: false,
+    isOnBossCell: false,
+    bossDefeated: false,
+    defeatedBosses
+  };
+};
+
+const getStairsModalContent = (currentDungeonId, bossDefeated) => {
+  const nextDungeonId = getNextDungeonId(currentDungeonId);
+  const canAdvance = !!nextDungeonId && bossDefeated;
+
+  if (!canAdvance && !bossDefeated) {
+    return {
+      message: '¡Debes derrotar al jefe de esta mazmorra antes de usar las escaleras!',
+      canAdvance: false
+    };
+  }
+
+  if (!canAdvance) {
+    return {
+      message: '¡Has llegado a la cima de la torre! Esta es la mazmorra final.',
+      canAdvance: false
+    };
+  }
+
+  const nextDungeon = getDungeonById(nextDungeonId);
+  return {
+    message: `¡Has encontrado las escaleras al ${nextDungeon.name}!`,
+    canAdvance: true,
+    nextDungeon
+  };
+};
+
+// ========== INTERACTION HANDLERS ==========
+const handleBossInteractionLogic = (currentDungeonId, enemies, getRandomFormationForDungeon, onStartCombat) => {
+  console.log(`👑 INICIANDO ENCUENTRO JEFE - Comenzando combate contra jefe`);
+
+  const bossParty = generateRandomEnemyParty(
+    currentDungeonId,
+    enemies,
+    getRandomFormationForDungeon
+  );
+
+  onStartCombat(bossParty);
+  return true;
+};
+
+const handleStairsInteractionLogic = (currentDungeonId, bossDefeated, setCurrentDungeon, setPlayerPos, setDungeonState) => {
+  const dungeon = getDungeonById(currentDungeonId);
+
+  if (dungeon.isBossLevel && !bossDefeated) {
+    return {
+      showModal: true,
+      message: '¡Debes derrotar al jefe de esta mazmorra antes de usar las escaleras!'
+    };
+  }
+
+  const nextDungeonId = getNextDungeonId(currentDungeonId);
+  if (!nextDungeonId) {
+    return {
+      showModal: true,
+      message: '¡Has llegado a la cima de la torre! Esta es la mazmorra final.'
+    };
+  }
+
+  const nextDungeon = getDungeonById(nextDungeonId);
+  setCurrentDungeon(nextDungeon);
+  setPlayerPos(nextDungeon.startPos);
+
+  const newState = getInitialDungeonState(nextDungeon.startPos);
+  setDungeonState(newState);
+
+  console.log(`🏰 Cambiado a mazmorra: ${nextDungeon.name}`);
+  return { showModal: false };
+};
+
+const handleDungeonKeyPress = (e, {
+  inCombat,
+  manualCombatReset,
+  isOnStairs,
+  handleStairsInteraction,
+  isOnBossCell,
+  handleBossInteraction,
+  bossDefeated,
+  movePlayer
+}) => {
+  const gameKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'r', 'R', 'Enter', ' '];
+  if (gameKeys.includes(e.key)) {
+    e.preventDefault();
+  }
+
+  if (isResetKey(e.key)) {
+    manualCombatReset();
+    return;
+  }
+
+  if ((e.key === 'Enter' || e.key === ' ') && isOnStairs && !inCombat) {
+    handleStairsInteraction();
+    return;
+  }
+
+  if ((e.key === 'Enter' || e.key === ' ') && isOnBossCell && !inCombat && !bossDefeated) {
+    handleBossInteraction();
+    return;
+  }
+
+  if (!isMovementAllowed(inCombat)) {
+    return;
+  }
+
+  const direction = getDirectionFromKey(e.key);
+  if (direction) {
+    movePlayer(direction);
+  }
+};
 
 const Dungeon = ({
   onBack,
@@ -32,7 +186,8 @@ const Dungeon = ({
   inCombat,
   onResetDungeon,
   playerCharactersHp,
-  playerMaxHp
+  playerMaxHp,
+  onBossDefeat
 }) => {
   // ========== DUNGEON CONFIGURATION ==========
   const [currentDungeon, setCurrentDungeon] = useState(getDefaultDungeon())
@@ -48,10 +203,20 @@ const Dungeon = ({
   const [showStairsModal, setShowStairsModal] = useState(false)
   const [stairsMessage, setStairsMessage] = useState('')
   const [isOnStairs, setIsOnStairs] = useState(false)
+  const [isOnBossCell, setIsOnBossCell] = useState(false)
+  const [bossDefeated, setBossDefeated] = useState(false)
+  const [defeatedBosses, setDefeatedBosses] = useState([])
+  const [showDungeonSelect, setShowDungeonSelect] = useState(false)
 
   // ========== MOBILE MODALS ==========
   const [showCharactersModal, setShowCharactersModal] = useState(false)
   const [showInstructionsModal, setShowInstructionsModal] = useState(false)
+
+  // ========== BOSS DUNGEON CHECK ==========
+  const isBossLevel = isBossDungeon(currentDungeon)
+
+  // ========== AVAILABLE DUNGEONS ==========
+  const availableDungeons = getAvailableDungeons(defeatedBosses);
 
   // ========== COIN PROCESSING EFFECT ==========
   useEffect(() => {
@@ -61,7 +226,6 @@ const Dungeon = ({
         setCoinsCollected(prev => prev + pendingCoins)
         setPendingCoins(0)
       }, 0)
-
       return () => clearTimeout(timer)
     }
   }, [pendingCoins, onCoinEarned])
@@ -73,14 +237,33 @@ const Dungeon = ({
     }
   }, [combatTriggered, enemies])
 
+  // ========== RESET BOSS STATE ON DUNGEON CHANGE ==========
+  useEffect(() => {
+    setBossDefeated(false)
+    setIsOnBossCell(false)
+  }, [currentDungeon.id])
+
+  // ========== BOSS DEFEAT EFFECT ==========
+  useEffect(() => {
+    if (bossDefeated && currentDungeon.isBossLevel) {
+      console.log(`🎉 JEFE DERROTADO - Registrando victoria sobre jefe del piso ${currentDungeon.id}`);
+      setDefeatedBosses(prev => {
+        const updated = [...new Set([...prev, currentDungeon.id])];
+        console.log(`📊 JEFES DERROTADOS ACTUALIZADOS:`, updated);
+        return updated;
+      });
+      if (onBossDefeat) {
+        onBossDefeat(currentDungeon.id);
+      }
+    }
+  }, [bossDefeated, currentDungeon.id, currentDungeon.isBossLevel, onBossDefeat])
+
   // ========== PLAYER MOVEMENT LOGIC ==========
   const movePlayer = useCallback((direction) => {
-    // Check if movement is allowed
     if (!isMovementAllowed(inCombat)) {
       return
     }
 
-    // Execute movement with dungeon ID parameter
     const movementResult = executePlayerMovement(
       playerPos,
       direction,
@@ -89,61 +272,90 @@ const Dungeon = ({
       encounterRate
     )
 
-    // If movement was successful, update position
     if (movementResult.moved) {
       setPlayerPos(movementResult.newPosition)
 
-      // Check if player stepped on stairs
       if (movementResult.levelUp) {
         setIsOnStairs(true)
+        setIsOnBossCell(false)
         return
       } else {
         setIsOnStairs(false)
       }
 
-      // Si combat fue triggered, generar enemigos y empezar combate
-      if (movementResult.combatTriggered) {
-        // Generate random enemy party based on current dungeon
+      if (movementResult.bossTriggered && !bossDefeated && isBossLevel) {
+        setIsOnBossCell(true)
+        return
+      } else {
+        setIsOnBossCell(false)
+      }
+
+      if (movementResult.combatTriggered && !movementResult.bossTriggered) {
         const enemyParty = generateRandomEnemyParty(
           currentDungeon.id,
           enemies,
           getRandomFormationForDungeon
         )
-        // Start combat with the generated party
         onStartCombat(enemyParty)
       }
     }
-  }, [inCombat, enemies, playerPos, map, onStartCombat, encounterRate, currentDungeon.id])
+  }, [inCombat, enemies, playerPos, map, onStartCombat, encounterRate, currentDungeon.id, isBossLevel, bossDefeated])
 
-  // ========== STAIRS INTERACTION LOGIC ==========
-  const handleStairsInteraction = useCallback(() => {
-    const nextDungeonId = getNextDungeonId(currentDungeon.id)
-
-    if (!nextDungeonId) {
-      setStairsMessage('¡Has llegado a la cima de la torre! Esta es la mazmorra final.')
-      setShowStairsModal(true)
+  // ========== BOSS ENCOUNTER HANDLER ==========
+  const handleBossInteraction = useCallback(() => {
+    if (bossDefeated) {
+      console.log(`⚠️ JEFE YA DERROTADO - El jefe ya fue vencido`)
       return
     }
 
-    // Player can always use stairs - no level restrictions
-    const nextDungeon = getDungeonById(nextDungeonId)
-    setCurrentDungeon(nextDungeon)
-    setPlayerPos(nextDungeon.startPos)
-    setIsOnStairs(false)
+    const success = handleBossInteractionLogic(
+      currentDungeon.id,
+      enemies,
+      getRandomFormationForDungeon,
+      onStartCombat
+    )
 
-    // Reset dungeon state for new level
-    const newState = getInitialDungeonState(nextDungeon.startPos)
-    setCoinsCollected(newState.coinsCollected)
-    setPendingCoins(newState.pendingCoins)
-    setCombatTriggered(newState.combatTriggered)
+    if (success) setIsOnBossCell(false)
+  }, [bossDefeated, currentDungeon.id, enemies, onStartCombat])
 
-    console.log(`🏰 Cambiado a mazmorra: ${nextDungeon.name}`)
-  }, [currentDungeon.id])
+  // ========== STAIRS INTERACTION LOGIC ==========
+  const handleStairsInteraction = useCallback(() => {
+    if (currentDungeon.isBossLevel && !bossDefeated) {
+      setStairsMessage('¡Debes derrotar al jefe de esta mazmorra antes de usar las escaleras!');
+      setShowStairsModal(true);
+      return;
+    }
 
-  // ========== STAIRS CONFIRMATION ==========
-  const handleStairsConfirm = () => {
-    setShowStairsModal(false)
-  }
+    const nextDungeonId = getNextDungeonId(currentDungeon.id);
+    if (!nextDungeonId) {
+      setStairsMessage('¡Has llegado a la cima de la torre! Esta es la mazmorra final.');
+      setShowStairsModal(true);
+      return;
+    }
+
+    const nextDungeon = getDungeonById(nextDungeonId);
+    setCurrentDungeon(nextDungeon);
+    setPlayerPos(nextDungeon.startPos);
+    setBossDefeated(false);
+    setIsOnStairs(false);
+    setIsOnBossCell(false);
+
+    console.log(`🏰 Avanzando a mazmorra: ${nextDungeon.name}`);
+  }, [currentDungeon.id, currentDungeon.isBossLevel, bossDefeated])
+
+  // ========== DUNGEON SELECTION HANDLER ==========
+  const handleDungeonSelect = (dungeonId) => {
+    const selectedDungeon = getDungeonById(dungeonId);
+    if (selectedDungeon && availableDungeons.some(d => d.id === dungeonId)) {
+      setCurrentDungeon(selectedDungeon);
+      setPlayerPos(selectedDungeon.startPos);
+      setBossDefeated(false);
+      setIsOnStairs(false);
+      setIsOnBossCell(false);
+      setShowDungeonSelect(false);
+      console.log(`🏰 CAMBIO DIRECTO A MAZMORRA: ${selectedDungeon.name}`);
+    }
+  };
 
   // ========== MANUAL COMBAT RESET ==========
   const manualCombatReset = useCallback(() => {
@@ -155,53 +367,31 @@ const Dungeon = ({
   // ========== KEYBOARD CONTROLS ==========
   useEffect(() => {
     const handleKeyPress = (e) => {
-      // Prevenir comportamiento por defecto para las teclas de flecha y otras teclas de juego
-      const gameKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'r', 'R', 'Enter', ' '];
-      if (gameKeys.includes(e.key)) {
-        e.preventDefault(); // Esto evita que el scroll se mueva
-      }
-
-      // Check for reset key
-      if (isResetKey(e.key)) {
-        manualCombatReset()
-        return
-      }
-
-      // Check for Enter key when on stairs
-      if ((e.key === 'Enter' || e.key === ' ') && isOnStairs && !inCombat) {
-        handleStairsInteraction()
-        return
-      }
-
-      // Check if movement is allowed
-      if (!isMovementAllowed(inCombat)) {
-        return
-      }
-
-      // Get direction from key
-      const direction = getDirectionFromKey(e.key)
-      if (direction) {
-        movePlayer(direction)
-      }
+      handleDungeonKeyPress(e, {
+        inCombat,
+        manualCombatReset,
+        isOnStairs,
+        handleStairsInteraction,
+        isOnBossCell,
+        handleBossInteraction,
+        bossDefeated,
+        movePlayer
+      })
     }
 
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [movePlayer, inCombat, manualCombatReset, isOnStairs, handleStairsInteraction])
+  }, [movePlayer, inCombat, manualCombatReset, isOnStairs, handleStairsInteraction, isOnBossCell, handleBossInteraction, bossDefeated])
 
   // ========== PREVENT SCROLL EFFECT ==========
   useEffect(() => {
-    // Add class to body when dungeon is mounted
     document.body.classList.add('dungeon-active');
-
-    // Focus the container to capture keyboard events
     const container = document.querySelector('.dungeon-container');
     if (container) {
       container.focus({ preventScroll: true });
     }
 
     return () => {
-      // Remove class when component unmounts
       document.body.classList.remove('dungeon-active');
     };
   }, []);
@@ -211,7 +401,6 @@ const Dungeon = ({
     const activeCount = getActiveCharactersCount(activeCharacters)
     const allActiveChars = getAllActiveCharacters(activeCharacters)
 
-    // If no active characters, show empty state
     if (!hasActiveCharacters(activeCharacters)) {
       return (
         <div className="dungeon-active-characters">
@@ -226,8 +415,8 @@ const Dungeon = ({
 
     return (
       <div className="dungeon-active-characters">
-        <h4>Almas Elegidas ({activeCount}/6)</h4>
-        <div className="active-characters-grid">
+        <h4>Almas Elegidas ({activeCount}/3)</h4>
+        <div className="active-charaters-grid">
           {allActiveChars.map((character, index) => (
             <div
               key={`${character.id}-${index}`}
@@ -328,6 +517,7 @@ const Dungeon = ({
               <p><strong>Movimiento:</strong> Flechas del teclado o botones táctiles</p>
               <p><strong>Encuentros:</strong> {(encounterRate * 100).toFixed(0)}% por paso</p>
               <p><strong>Escaleras:</strong> Busca ⇧ y presiona ENTER</p>
+              <p><strong>Jefes:</strong> En el último piso de cada dificultad</p>
               <p><strong>Monedas:</strong> Ganas al derrotar enemigos</p>
               <p><strong>Pérdidas:</strong> Pierdes si eres derrotado</p>
 
@@ -339,6 +529,16 @@ const Dungeon = ({
               {isOnStairs && !inCombat && (
                 <p className="stairs-warning">
                   🏰 <strong>¡En escaleras!</strong> Presiona ENTER
+                </p>
+              )}
+              {isOnBossCell && !inCombat && !bossDefeated && (
+                <p className="boss-warning">
+                  👑 <strong>¡En casillero de Jefe!</strong> Presiona ENTER
+                </p>
+              )}
+              {isBossLevel && !bossDefeated && (
+                <p className="boss-warning">
+                  👑 <strong>¡Piso de Jefe!</strong> Encuentra y derrota al jefe
                 </p>
               )}
             </div>
@@ -367,6 +567,18 @@ const Dungeon = ({
                 <span className="stat-label">Dificultad:</span>
                 <span className="stat-value">{currentDungeon.difficulty}</span>
               </div>
+              {isBossLevel && (
+                <div className="stat-item">
+                  <span className="stat-label">Jefe:</span>
+                  <span className={`stat-value ${bossDefeated ? 'defeated' : 'active'}`}>
+                    {bossDefeated ? '✅ Derrotado' : '👑 Activo'}
+                  </span>
+                </div>
+              )}
+              <div className="stat-item">
+                <span className="stat-label">Jefes Derrotados:</span>
+                <span className="stat-value">{defeatedBosses.length}/3</span>
+              </div>
             </div>
           </div>
         </div>
@@ -374,12 +586,49 @@ const Dungeon = ({
     )
   }
 
+  // ========== RENDER DUNGEON SELECTION MODAL ==========
+  const renderDungeonSelectModal = () => {
+    if (!showDungeonSelect) return null;
+
+    return (
+      <div className="stairs-modal-overlay">
+        <div className="stairs-modal large-modal">
+          <h3>🏰 Seleccionar Mazmorra</h3>
+          <p>Elige a qué mazmorra viajar (solo mazmorras disponibles):</p>
+
+          <div className="dungeon-select-grid">
+            {availableDungeons.map(dungeon => (
+              <button
+                key={dungeon.id}
+                className={`dungeon-select-btn ${currentDungeon.id === dungeon.id ? 'active' : ''}`}
+                onClick={() => handleDungeonSelect(dungeon.id)}
+              >
+                <div className="dungeon-select-name">{dungeon.name}</div>
+                <div className="dungeon-select-difficulty">{dungeon.difficulty}</div>
+                {dungeon.isBossLevel && <div className="boss-indicator">👑 JEFE</div>}
+                {defeatedBosses.includes(dungeon.id) && <div className="defeated-indicator">✅ VENCIDO</div>}
+              </button>
+            ))}
+          </div>
+
+          <div className="modal-actions">
+            <button
+              className="cancel-button"
+              onClick={() => setShowDungeonSelect(false)}
+            >
+              ↩️ Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // ========== RENDER STAIRS MODAL ==========
   const renderStairsModal = () => {
     if (!showStairsModal) return null
 
-    const nextDungeonId = getNextDungeonId(currentDungeon.id)
-    const canAdvance = !!nextDungeonId
+    const canAdvance = !currentDungeon.isBossLevel || (currentDungeon.isBossLevel && bossDefeated);
 
     return (
       <div className="stairs-modal-overlay">
@@ -387,36 +636,19 @@ const Dungeon = ({
           <h3>¡Escaleras Encontradas! 🏰</h3>
           <p>{stairsMessage}</p>
 
-          {nextDungeonId && (
-            <div className="next-dungeon-info">
-              <h4>Próxima Mazmorra:</h4>
-              <p><strong>Nombre:</strong> {getDungeonById(nextDungeonId).name}</p>
-              <p><strong>Dificultad:</strong> {getDungeonById(nextDungeonId).difficulty}</p>
-            </div>
-          )}
-
           <div className="modal-actions">
-            {canAdvance ? (
-              <>
-                <button
-                  className="confirm-button"
-                  onClick={handleStairsConfirm}
-                >
-                  🏰 Avanzar al Siguiente Nivel
-                </button>
-                <button
-                  className="cancel-button"
-                  onClick={() => setShowStairsModal(false)}
-                >
-                  ↩️ Seguir Explorando
-                </button>
-              </>
-            ) : (
+            <button
+              className="confirm-button"
+              onClick={() => setShowStairsModal(false)}
+            >
+              {canAdvance ? '🏰 Avanzar' : 'Entendido'}
+            </button>
+            {canAdvance && (
               <button
-                className="confirm-button"
+                className="cancel-button"
                 onClick={() => setShowStairsModal(false)}
               >
-                Entendido
+                ↩️ Seguir Explorando
               </button>
             )}
           </div>
@@ -429,29 +661,22 @@ const Dungeon = ({
   const resetDungeon = () => {
     console.log(`🔄 DUNGEON RESET - Reiniciando mazmorra completa`)
 
-    // Reset to first dungeon
-    const firstDungeon = getDefaultDungeon()
-    setCurrentDungeon(firstDungeon)
-
-    const newState = resetDungeonState(firstDungeon.startPos)
+    const newState = resetDungeonComplete()
+    setCurrentDungeon(newState.currentDungeon)
     setPlayerPos(newState.playerPos)
     setCoinsCollected(newState.coinsCollected)
     setPendingCoins(newState.pendingCoins)
     setCombatTriggered(newState.combatTriggered)
-    setIsOnStairs(false)
+    setIsOnStairs(newState.isOnStairs)
+    setIsOnBossCell(newState.isOnBossCell)
+    setBossDefeated(newState.bossDefeated)
+    // Note: defeatedBosses are preserved on reset
 
     console.log(`🔄 PLAYER POSITION RESET - Nueva posición: (${newState.playerPos.x}, ${newState.playerPos.y})`)
 
-    // Reset all character HP using logic function
     if (activeCharacters) {
       console.log(`🔄 CHARACTER HP RESET - Reiniciando HP de ${getActiveCharactersCount(activeCharacters)} personajes`)
       const hpResets = resetAllCharactersHP(activeCharacters, playerMaxHp)
-
-      hpResets.forEach(({ characterId, newHp }) => {
-        if (typeof onCharacterHpChange === 'function') {
-          onCharacterHpChange(characterId, newHp)
-        }
-      })
     }
   }
 
@@ -464,6 +689,7 @@ const Dungeon = ({
     >
       {/* ========== MODALS ========== */}
       {renderStairsModal()}
+      {renderDungeonSelectModal()}
       {renderCharactersModal()}
       {renderInstructionsModal()}
 
@@ -478,8 +704,25 @@ const Dungeon = ({
           <div className="dungeon-coins-collected">
             <span>Recolectadas: +{coinsCollected}</span>
           </div>
+          <div className="defeated-bosses-display">
+            <span>Jefes: {defeatedBosses.length}/3</span>
+          </div>
         </div>
       </div>
+
+      {/* ========== BOSS INDICATOR ========== */}
+      {isBossLevel && (
+        <div className="boss-level-indicator">
+          👑 <strong>PISO DE JEFE</strong> 👑
+          <br />
+          <small>Encuentra y derrota al jefe para avanzar</small>
+          {bossDefeated && (
+            <div className="boss-defeated-message">
+              ✅ <strong>¡Jefe Derrotado!</strong> Puedes usar las escaleras
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ========== MAIN CONTENT GRID ========== */}
       <div className="dungeon-main-grid">
@@ -495,6 +738,7 @@ const Dungeon = ({
           {/* Dungeon difficulty badge */}
           <div className="dungeon-difficulty-badge">
             <small>Dificultad: <strong>{currentDungeon.difficulty}</strong></small>
+            {isBossLevel && <span className="boss-badge">👑 JEFE</span>}
           </div>
 
           {/* ========== COMBAT STATUS INDICATOR ========== */}
@@ -511,7 +755,21 @@ const Dungeon = ({
             <div className="stairs-status">
               🏰 ¡Escaleras encontradas!
               <br />
-              <small>Presiona ENTER o el botón 🏰 para subir de nivel</small>
+              <small>
+                {currentDungeon.isBossLevel && !bossDefeated
+                  ? 'Derrota al jefe primero para usar las escaleras'
+                  : 'Presiona ENTER o el botón 🏰 para subir de nivel'
+                }
+              </small>
+            </div>
+          )}
+
+          {/* ========== BOSS CELL INDICATOR ========== */}
+          {isOnBossCell && !inCombat && !bossDefeated && (
+            <div className="boss-status">
+              👑 ¡Encuentro con el Jefe!
+              <br />
+              <small>Presiona ENTER o el botón 👑 para comenzar el combate</small>
             </div>
           )}
 
@@ -522,6 +780,13 @@ const Dungeon = ({
             </button>
             <button onClick={resetDungeon} className="nav-button refresh-button">
               🔄 Reiniciar Mazmorra
+            </button>
+            <button
+              onClick={() => setShowDungeonSelect(true)}
+              className="nav-button travel-button"
+              title="Viajar a mazmorras disponibles"
+            >
+              🏰 Viajar a Otra Mazmorra
             </button>
           </div>
 
@@ -534,8 +799,9 @@ const Dungeon = ({
                     <div
                       key={x}
                       className={`map-cell ${cell === 1 ? 'wall' : 'floor'} 
-                                                ${cell === 2 ? 'stairs' : ''}
-                                                ${x === playerPos.x && y === playerPos.y ? 'player' : ''}`}
+                                            ${cell === 2 ? 'stairs' : ''}
+                                            ${cell === 3 ? 'boss' : ''}
+                                            ${x === playerPos.x && y === playerPos.y ? 'player' : ''}`}
                     >
                       {getCellDisplay(cell, x, y, playerPos)}
                     </div>
@@ -563,6 +829,12 @@ const Dungeon = ({
               <span className="legend-symbol">⇧</span>
               <span className="legend-text">Escaleras</span>
             </div>
+            {isBossLevel && !bossDefeated && (
+              <div className="legend-item">
+                <span className="legend-symbol">👑</span>
+                <span className="legend-text">Jefe</span>
+              </div>
+            )}
           </div>
 
           {/* ========== TOUCH CONTROLS ========== */}
@@ -599,13 +871,23 @@ const Dungeon = ({
                 →
               </button>
             </div>
-            {isOnStairs && !inCombat && (
+            {isOnStairs && !inCombat && (!currentDungeon.isBossLevel || bossDefeated) && (
               <div className="touch-row stairs-row">
                 <button
                   className="touch-button stairs-button"
                   onClick={handleStairsInteraction}
                 >
                   🏰 SUBIR ESCALERAS
+                </button>
+              </div>
+            )}
+            {isOnBossCell && !inCombat && !bossDefeated && (
+              <div className="touch-row boss-row">
+                <button
+                  className="touch-button boss-button"
+                  onClick={handleBossInteraction}
+                >
+                  👑 ENFRENTAR JEFE
                 </button>
               </div>
             )}
@@ -621,6 +903,7 @@ const Dungeon = ({
             <p><strong>Movimiento:</strong> Flechas del teclado o botones táctiles</p>
             <p><strong>Encuentros:</strong> {(encounterRate * 100).toFixed(0)}% por paso</p>
             <p><strong>Escaleras:</strong> Busca ⇧ y presiona ENTER</p>
+            <p><strong>Jefes:</strong> En el último piso de cada dificultad</p>
             <p><strong>Monedas:</strong> Ganas al derrotar enemigos</p>
             <p><strong>Pérdidas:</strong> Pierdes si eres derrotado</p>
 
@@ -632,6 +915,16 @@ const Dungeon = ({
             {isOnStairs && !inCombat && (
               <p className="stairs-warning">
                 🏰 <strong>¡En escaleras!</strong> Presiona ENTER
+              </p>
+            )}
+            {isOnBossCell && !inCombat && !bossDefeated && (
+              <p className="boss-warning">
+                👑 <strong>¡En casillero de Jefe!</strong> Presiona ENTER
+              </p>
+            )}
+            {isBossLevel && !bossDefeated && (
+              <p className="boss-warning">
+                👑 <strong>¡Piso de Jefe!</strong> Encuentra y derrota al jefe
               </p>
             )}
           </div>
@@ -661,6 +954,22 @@ const Dungeon = ({
               <span className="stat-label">Dificultad:</span>
               <span className="stat-value">{currentDungeon.difficulty}</span>
             </div>
+            {isBossLevel && (
+              <div className="stat-item">
+                <span className="stat-label">Jefe:</span>
+                <span className={`stat-value ${bossDefeated ? 'defeated' : 'active'}`}>
+                  {bossDefeated ? '✅ Derrotado' : '👑 Activo'}
+                </span>
+              </div>
+            )}
+            <div className="stat-item">
+              <span className="stat-label">Jefes Derrotados:</span>
+              <span className="stat-value">{defeatedBosses.length}/3</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Mazmorras Disponibles:</span>
+              <span className="stat-value">{availableDungeons.length}/6</span>
+            </div>
           </div>
 
           {/* ========== QUICK ACTIONS ========== */}
@@ -680,13 +989,29 @@ const Dungeon = ({
             >
               🏠 Salir
             </button>
-            {isOnStairs && !inCombat && (
+            <button
+              className="quick-action-btn"
+              onClick={() => setShowDungeonSelect(true)}
+              title="Viajar a mazmorras disponibles"
+            >
+              🏰 Viajar
+            </button>
+            {isOnStairs && !inCombat && (!currentDungeon.isBossLevel || bossDefeated) && (
               <button
                 className="quick-action-btn stairs-btn"
                 onClick={handleStairsInteraction}
                 title="Subir al siguiente nivel"
               >
                 🏰 Subir Nivel
+              </button>
+            )}
+            {isOnBossCell && !inCombat && !bossDefeated && (
+              <button
+                className="quick-action-btn boss-btn"
+                onClick={handleBossInteraction}
+                title="Enfrentar al jefe"
+              >
+                👑 Enfrentar Jefe
               </button>
             )}
           </div>
@@ -727,13 +1052,23 @@ const Dungeon = ({
             →
           </button>
         </div>
-        {isOnStairs && !inCombat && (
+        {isOnStairs && !inCombat && (!currentDungeon.isBossLevel || bossDefeated) && (
           <div className="floating-controls-row">
             <button
               className="floating-button stairs-button"
               onClick={handleStairsInteraction}
             >
               🏰 SUBIR
+            </button>
+          </div>
+        )}
+        {isOnBossCell && !inCombat && !bossDefeated && (
+          <div className="floating-controls-row">
+            <button
+              className="floating-button boss-button"
+              onClick={handleBossInteraction}
+            >
+              👑 JEFE
             </button>
           </div>
         )}
@@ -752,6 +1087,12 @@ const Dungeon = ({
           onClick={() => setShowInstructionsModal(true)}
         >
           🎯 Instrucciones
+        </button>
+        <button
+          className="mobile-info-btn travel-btn"
+          onClick={() => setShowDungeonSelect(true)}
+        >
+          🏰 Viajar
         </button>
       </div>
     </div>

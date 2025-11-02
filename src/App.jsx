@@ -40,6 +40,7 @@ function App() {
   const [playerCoins, setPlayerCoins] = useState(GACHA_PULL_COST)
   const [isInCombat, setIsInCombat] = useState(false)
   const [playerCharactersHp, setPlayerCharactersHp] = useState({})
+  const [defeatedBosses, setDefeatedBosses] = useState([]) // New state for tracking defeated bosses
 
   // ========== CHARACTER DATA MANAGEMENT ==========
   const [playerCharacters, setPlayerCharacters] = useState(() => {
@@ -71,6 +72,29 @@ function App() {
     const initialHp = initializeCharacterHp(playerCharacters, PLAYER_MAX_HP)
     setPlayerCharactersHp(prev => ({ ...prev, ...initialHp }))
   }, [playerCharacters])
+
+  // ========== PERSIST DEFEATED BOSSES ==========
+  useEffect(() => {
+    // Load defeated bosses from localStorage on component mount
+    const savedDefeatedBosses = localStorage.getItem('defeatedBosses');
+    if (savedDefeatedBosses) {
+      try {
+        const parsedBosses = JSON.parse(savedDefeatedBosses);
+        setDefeatedBosses(parsedBosses);
+        console.log(`📂 JEFES CARGADOS DESDE LOCALSTORAGE:`, parsedBosses);
+      } catch (error) {
+        console.error('Error loading defeated bosses from localStorage:', error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    // Save defeated bosses to localStorage whenever it changes
+    if (defeatedBosses.length > 0) {
+      localStorage.setItem('defeatedBosses', JSON.stringify(defeatedBosses));
+      console.log(`💾 JEFES GUARDADOS EN LOCALSTORAGE:`, defeatedBosses);
+    }
+  }, [defeatedBosses]);
 
   // ========== ACTIVE CHARACTER SLOT MANAGEMENT ==========
 
@@ -141,6 +165,18 @@ function App() {
       ...prev,
       [characterId]: PLAYER_MAX_HP
     }))
+  }, [])
+
+  // ========== BOSS DEFEAT MANAGEMENT ==========
+
+  /* Handles boss defeat */
+  const handleBossDefeat = useCallback((dungeonId) => {
+    console.log(`🏆 JEFE DERROTADO EN APP - Mazmorra ${dungeonId}`);
+    setDefeatedBosses(prev => {
+      const updated = [...new Set([...prev, dungeonId])];
+      console.log(`📊 LISTA GLOBAL DE JEFES DERROTADOS ACTUALIZADA:`, updated);
+      return updated;
+    });
   }, [])
 
   // ========== GACHA SYSTEM ==========
@@ -237,6 +273,11 @@ function App() {
             Monedas: {playerCoins}
           </div>
 
+          {/* DEFEATED BOSSES DISPLAY */}
+          <div className="bosses-display" style={{ marginBottom: '15px', fontSize: '16px', color: '#8B4513' }}>
+            Jefes Derrotados: {defeatedBosses.length}/3
+          </div>
+
           <p>Descubre nuevas Almas</p>
           <button onClick={gachaButton}>¡Prueba tu suerte! ({GACHA_PULL_COST} coins)</button>
           <button
@@ -272,6 +313,7 @@ function App() {
           setActiveCharacter={setActiveCharacter}
           setActiveCharacters={setActiveCharacters}
           activeCharacters={activeCharacters}
+          defeatedBosses={defeatedBosses} // Pass defeated bosses to library
         />
       )}
 
@@ -282,6 +324,7 @@ function App() {
           allCharacters={allCharacters}
           playerCoins={playerCoins}
           onBack={() => changeView("library")}
+          defeatedBosses={defeatedBosses} // Pass defeated bosses to stats
         />
       )}
 
@@ -299,6 +342,8 @@ function App() {
           onResetDungeon={resetDungeon}
           playerCharactersHp={playerCharactersHp}
           playerMaxHp={PLAYER_MAX_HP}
+          onBossDefeat={handleBossDefeat} // Pass boss defeat handler
+          defeatedBosses={defeatedBosses} // Pass current defeated bosses
         />
       )}
 

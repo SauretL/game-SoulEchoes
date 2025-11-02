@@ -1,3 +1,6 @@
+// ========== IMPORTS ========== //
+import { getDungeonById, getNextDungeonId } from './dungeonMaps'
+
 // ========== POSITION MANAGEMENT ========== //
 
 // Calculate new position based on direction
@@ -24,11 +27,10 @@ export const calculateNewPosition = (currentPos, direction, map) => {
     }
 
     // Check if new position is valid (within bounds and not a wall)
-    // Allow stairs (value 2) as valid movement
-    if (map[newY]?.[newX] === 0 || map[newY]?.[newX] === 2) {
+    // Allow stairs (value 2) and boss cells (value 3) as valid movement
+    if (map[newY]?.[newX] === 0 || map[newY]?.[newX] === 2 || map[newY]?.[newX] === 3) {
         return { x: newX, y: newY }
     }
-
     return null // Position is blocked by wall
 }
 
@@ -41,30 +43,27 @@ export const getCharacterPositionText = (activeCharacters, character) => {
     if (frontIndex !== -1) {
         return `Delantera ${positions[frontIndex]}`
     }
-
     // Check back row
     const backIndex = activeCharacters.back.findIndex(char => char?.id === character.id)
     if (backIndex !== -1) {
         return `Trasera ${positions[backIndex]}`
     }
-
     return null
 }
 
-// ========== COMBAT ENCOUNTER LOGIC ==========
+// ========== COMBAT ENCOUNTER LOGIC ========== //
 
 // Check if combat should be triggered (probability-based)
 export const shouldTriggerCombat = (encounterRate = 0.2) => {
     return Math.random() < encounterRate
 }
 
-// ========== ACTIVE CHARACTERS PROCESSING ==========
+// ========== ACTIVE CHARACTERS PROCESSING ========== //
 
 // Get all active characters with their position data
 export const getAllActiveCharacters = (activeCharacters) => {
     const positions = ['Izquierda', 'Centro', 'Derecha']
     const allActiveChars = []
-
     // Add front row characters
     activeCharacters.front.forEach((char, index) => {
         if (char) {
@@ -76,7 +75,6 @@ export const getAllActiveCharacters = (activeCharacters) => {
             })
         }
     })
-
     // Add back row characters
     activeCharacters.back.forEach((char, index) => {
         if (char) {
@@ -88,7 +86,6 @@ export const getAllActiveCharacters = (activeCharacters) => {
             })
         }
     })
-
     return allActiveChars
 }
 
@@ -99,7 +96,7 @@ export const getActiveCharactersCount = (activeCharacters) => {
     return frontCount + backCount
 }
 
-// ========== MAP RENDERING UTILITIES ==========
+// ========== MAP RENDERING UTILITIES ========== //
 
 // Get cell display character for map rendering
 export const getCellDisplay = (cell, x, y, playerPos) => {
@@ -107,22 +104,23 @@ export const getCellDisplay = (cell, x, y, playerPos) => {
     if (x === playerPos.x && y === playerPos.y) {
         return '☻' // Player character
     }
-
     // Wall
     if (cell === 1) {
         return '█' // Wall
     }
-
     // Stairs
     if (cell === 2) {
         return '⇧' // Stairs to next level
     }
-
+    // Boss cell
+    if (cell === 3) {
+        return '👑' // Boss encounter
+    }
     // Floor
     return '·' // Floor
 }
 
-// ========== DUNGEON STATE UTILITIES ==========
+// ========== DUNGEON STATE UTILITIES ========== //
 
 // Get initial dungeon state
 export const getInitialDungeonState = (startPosition = { x: 1, y: 1 }) => {
@@ -139,7 +137,7 @@ export const resetDungeonState = (startPosition = { x: 1, y: 1 }) => {
     return getInitialDungeonState(startPosition)
 }
 
-// ========== KEYBOARD INPUT HANDLING ==========
+// ========== KEYBOARD INPUT HANDLING ========== //
 
 // Map keyboard keys to movement directions
 export const getDirectionFromKey = (key) => {
@@ -157,7 +155,6 @@ export const getDirectionFromKey = (key) => {
         'd': 'right',
         'D': 'right'
     }
-
     return keyMap[key] || null
 }
 
@@ -166,38 +163,44 @@ export const isResetKey = (key) => {
     return key === 'r' || key === 'R'
 }
 
-// ========== PLAYER MOVEMENT LOGIC ==========
+// ========== PLAYER MOVEMENT LOGIC ========== //
 
 // Execute player movement with combat check
 export const executePlayerMovement = (currentPos, direction, map, dungeonId, encounterRate = 0.2) => {
     // Calculate new position
     const newPosition = calculateNewPosition(currentPos, direction, map)
-
     // If position is invalid, return no change
     if (!newPosition) {
         return {
             moved: false,
             newPosition: currentPos,
             combatTriggered: false,
-            levelUp: false
+            levelUp: false,
+            bossTriggered: false
         }
     }
-
+    // Get dungeon data to check if it's a boss level
+    const dungeon = getDungeonById(dungeonId)
+    const isBossLevel = isBossDungeon(dungeon)
+    // Check if player stepped on boss cell (cell type 3) in boss level
+    const isOnBossCell = map[newPosition.y]?.[newPosition.x] === 3
+    const bossTriggered = isBossLevel && isOnBossCell
     // Check if player stepped on stairs
     const isOnStairs = map[newPosition.y]?.[newPosition.x] === 2
-
-    // Check for combat encounter (only if not on stairs)
-    const combatTriggered = !isOnStairs && shouldTriggerCombat(encounterRate)
+    // Check for combat encounter (only if not on stairs and not on boss cell)
+    const combatTriggered = !isOnStairs && !bossTriggered && shouldTriggerCombat(encounterRate)
 
     return {
         moved: true,
         newPosition,
         combatTriggered,
+        bossTriggered,
         levelUp: isOnStairs, // Signal level up if on stairs
         dungeonId // Pass dungeon ID so we can generate appropriate formation
     }
 }
-// ========== COIN MANAGEMENT ==========
+
+// ========== COIN MANAGEMENT ========== //
 
 // Process pending coins to collected coins
 export const processPendingCoins = (pendingCoins) => {
@@ -207,7 +210,7 @@ export const processPendingCoins = (pendingCoins) => {
     }
 }
 
-// ========== HP MANAGEMENT FOR CHARACTERS ==========
+// ========== HP MANAGEMENT FOR CHARACTERS ========== //
 
 // Reset all character HP to max
 export const resetAllCharactersHP = (activeCharacters, maxHp) => {
@@ -220,34 +223,31 @@ export const resetAllCharactersHP = (activeCharacters, maxHp) => {
     }))
 }
 
-// ========== ENEMY PARTY GENERATION ==========
+// ========== ENEMY PARTY GENERATION ========== //
 
 // Generate enemy party from formation configuration
 export const generateEnemyPartyFromFormation = (formation, enemiesData) => {
-    console.log(`🔍 DUNGEON ENEMY GENERATION - Iniciando generación de grupo enemigo desde formación`)
-    console.log(`🔍 FORMATION DATA - Formación recibida:`, formation)
-    console.log(`🔍 ENEMIES DATA SOURCE - Total enemigos disponibles: ${enemiesData?.length || 0}`)
+    console.log(`🔍 GENERACIÓN DE ENEMIGOS - Iniciando generación de grupo enemigo desde formación`)
+    console.log(`🔍 DATOS DE FORMACIÓN - Formación recibida:`, formation)
+    console.log(`🔍 FUENTE DE DATOS ENEMIGOS - Total enemigos disponibles: ${enemiesData?.length || 0}`)
 
     if (!formation || !formation.enemies || !enemiesData) {
-        console.warn(`🔍 ENEMY GENERATION FAILED - Datos de formación o enemigos faltantes`)
+        console.warn(`⚠️ GENERACIÓN FALLIDA - Datos de formación o enemigos faltantes`)
         return []
     }
-
-    console.log(`🔍 FORMATION ENEMIES - Configuración de enemigos en formación:`, formation.enemies)
+    console.log(`🔍 ENEMIGOS EN FORMACIÓN - Configuración de enemigos en formación:`, formation.enemies)
 
     // Map formation config to actual enemy instances
     const enemyParty = formation.enemies.map((config, index) => {
-        console.log(`🔍 PROCESSING ENEMY CONFIG [${index}] - Buscando enemigo ID: ${config.enemyId}, Posición: ${config.position}, Slot: ${config.slot}`)
+        console.log(`🔍 PROCESANDO CONFIG ENEMIGO [${index}] - Buscando enemigo ID: ${config.enemyId}, Posición: ${config.position}, Slot: ${config.slot}`)
 
         // Find enemy data by ID
         const enemyData = enemiesData.find(e => e.id === config.enemyId)
-
         if (!enemyData) {
-            console.warn(`🔍 ENEMY NOT FOUND - Enemigo con ID ${config.enemyId} no encontrado en enemies.json`)
+            console.warn(`⚠️ ENEMIGO NO ENCONTRADO - Enemigo con ID ${config.enemyId} no encontrado en enemies.json`)
             return null
         }
-
-        console.log(`🔍 ENEMY DATA FOUND - ${enemyData.name} encontrado:`, {
+        console.log(`✅ DATOS ENCONTRADOS - ${enemyData.name} encontrado:`, {
             id: enemyData.id,
             maxHp: enemyData.maxHp,
             physicalAttack: enemyData.physicalAttack,
@@ -258,8 +258,7 @@ export const generateEnemyPartyFromFormation = (formation, enemiesData) => {
 
         // Create truly unique ID combining enemyId, position, slot, and timestamp
         const uniqueId = `enemy_${config.enemyId}_${config.position}_${config.slot}_${index}_${Date.now()}`
-
-        console.log(`🔍 ENEMY INSTANCE CREATED - ID único: ${uniqueId}`)
+        console.log(`🆔 INSTANCIA ENEMIGO CREADA - ID único: ${uniqueId}`)
 
         // Create enemy instance with combat properties
         return {
@@ -273,33 +272,32 @@ export const generateEnemyPartyFromFormation = (formation, enemiesData) => {
         }
     }).filter(enemy => enemy !== null) // Remove any nulls from missing enemies
 
-    console.log(`🔍 ENEMY PARTY COMPLETE - Grupo generado con ${enemyParty.length} enemigos:`,
+    console.log(`✅ GRUPO ENEMIGO COMPLETO - Grupo generado con ${enemyParty.length} enemigos:`,
         enemyParty.map(e => `${e.name} (ID: ${e.id}, HP: ${e.currentHp}/${e.maxHp})`))
-
     return enemyParty
 }
 
 // Generate random enemy party for a specific dungeon
 export const generateRandomEnemyParty = (dungeonId, enemiesData, getRandomFormationForDungeon) => {
-    console.log(`🔍 RANDOM ENEMY PARTY GENERATION - Iniciando para dungeon: ${dungeonId}`)
-    console.log(`🔍 AVAILABLE ENEMIES DATA - Total tipos de enemigos: ${enemiesData?.length || 0}`)
+    console.log(`🎲 GENERACIÓN ALEATORIA ENEMIGOS - Iniciando para mazmorra: ${dungeonId}`)
+    console.log(`📊 DATOS ENEMIGOS DISPONIBLES - Total tipos de enemigos: ${enemiesData?.length || 0}`)
 
     if (enemiesData && enemiesData.length > 0) {
-        console.log(`🔍 ENEMY TYPES AVAILABLE - Lista de enemigos disponibles:`,
+        console.log(`📋 TIPOS ENEMIGOS DISPONIBLES - Lista de enemigos disponibles:`,
             enemiesData.map(e => `${e.name} (ID: ${e.id}, HP: ${e.maxHp})`))
     }
 
     // Get random formation for this dungeon
     const formation = getRandomFormationForDungeon(dungeonId)
-    console.log(`🔍 SELECTED FORMATION - Formación aleatoria para dungeon ${dungeonId}:`, formation)
+    console.log(`🎯 FORMACIÓN SELECCIONADA - Formación aleatoria para mazmorra ${dungeonId}:`, formation)
 
     if (!formation) {
-        console.warn(`🔍 NO FORMATION FOUND - Sin formaciones disponibles para dungeon ${dungeonId}`)
+        console.warn(`⚠️ FORMACIÓN NO ENCONTRADA - Sin formaciones disponibles para mazmorra ${dungeonId}`)
 
         // Fallback to single enemy with unique ID
         const fallbackEnemy = enemiesData?.[0]
         if (fallbackEnemy) {
-            console.log(`🔍 FALLBACK ENEMY CREATED - Usando enemigo por defecto: ${fallbackEnemy.name}`)
+            console.log(`🔄 ENEMIGO DE RESERVA CREADO - Usando enemigo por defecto: ${fallbackEnemy.name}`)
             const fallbackParty = [{
                 ...fallbackEnemy,
                 id: `enemy_fallback_${Date.now()}`, // Unique fallback ID
@@ -309,19 +307,19 @@ export const generateRandomEnemyParty = (dungeonId, enemiesData, getRandomFormat
                 slot: 1,
                 isAlive: true
             }]
-            console.log(`🔍 FALLBACK PARTY - Grupo de respaldo creado:`, fallbackParty)
+            console.log(`✅ GRUPO DE RESERVA - Grupo de respaldo creado:`, fallbackParty)
             return fallbackParty
         } else {
-            console.error(`🔍 CRITICAL ERROR - No hay enemigos disponibles para crear grupo de respaldo`)
+            console.error(`❌ ERROR CRÍTICO - No hay enemigos disponibles para crear grupo de respaldo`)
             return []
         }
     }
 
     // Generate party from formation
-    console.log(`🔍 GENERATING PARTY FROM FORMATION - Usando formación con ${formation.enemies?.length || 0} enemigos`)
+    console.log(`🏗️ GENERANDO GRUPO DESDE FORMACIÓN - Usando formación con ${formation.enemies?.length || 0} enemigos`)
     const enemyParty = generateEnemyPartyFromFormation(formation, enemiesData)
 
-    console.log(`🔍 RANDOM ENEMY PARTY FINAL - Grupo enemigo completo para dungeon ${dungeonId}:`,
+    console.log(`✅ GRUPO ENEMIGO FINAL - Grupo enemigo completo para mazmorra ${dungeonId}:`,
         enemyParty.map(e => ({
             name: e.name,
             id: e.id,
@@ -336,11 +334,41 @@ export const generateRandomEnemyParty = (dungeonId, enemiesData, getRandomFormat
                 psyDef: e.psychicDefense
             }
         })))
-
     return enemyParty
 }
 
-// ========== VALIDATION UTILITIES ==========
+// ========== BOSS DUNGEON FUNCTIONS ========== //
+
+// Check if current dungeon is a boss level
+export const isBossDungeon = (dungeon) => {
+    return dungeon && dungeon.isBossLevel === true
+}
+
+// Get boss encounter for specific dungeon (placeholder with normal enemies)
+export const getBossEncounter = (dungeonId, enemiesData, getRandomFormationForDungeon) => {
+    console.log(`👑 ENCUENTRO DE JEFE - Generando encuentro de jefe para mazmorra: ${dungeonId}`)
+
+    // Use normal formation system but with special boss flag
+    const bossFormation = getRandomFormationForDungeon(dungeonId)
+    if (!bossFormation) {
+        console.warn(`⚠️ FORMACIÓN JEFE NO ENCONTRADA - Usando formación normal como respaldo`)
+        return generateRandomEnemyParty(dungeonId, enemiesData, getRandomFormationForDungeon)
+    }
+    console.log(`👑 FORMACIÓN JEFE SELECCIONADA - Formación de jefe:`, bossFormation)
+
+    const bossParty = generateEnemyPartyFromFormation(bossFormation, enemiesData)
+
+    // Mark all enemies as part of boss encounter
+    const bossPartyWithFlag = bossParty.map(enemy => ({
+        ...enemy,
+        isBossEncounter: true,
+        bossDungeonId: dungeonId
+    }))
+    console.log(`👑 GRUPO JEFE CREADO - Grupo de jefe con ${bossPartyWithFlag.length} enemigos`)
+    return bossPartyWithFlag
+}
+
+// ========== VALIDATION UTILITIES ========== //
 
 // Check if movement is allowed (not in combat)
 export const isMovementAllowed = (inCombat) => {
@@ -353,18 +381,189 @@ export const hasActiveCharacters = (activeCharacters) => {
     return count > 0
 }
 
-// ========== STAIRS MANAGEMENT ==========
+// ========== STAIRS MANAGEMENT ========== //
 
 // Check if position has stairs
-export const isStairsPosition = (dungeonId, position, getDungeonById) => {
+export const isStairsPosition = (dungeonId, position) => {
     const dungeon = getDungeonById(dungeonId)
-    if (!dungeon || !dungeon.stairsPos) return false
-
-    return position.x === dungeon.stairsPos.x && position.y === dungeon.stairsPos.y
+    if (!dungeon) return false
+    // Search for stairs (value 2) in the map
+    const map = dungeon.map
+    return map[position.y]?.[position.x] === 2
 }
 
-// Get next dungeon ID
-export const getNextDungeonId = (currentDungeonId, getDungeonById) => {
+// ========== DUNGEON STATE MANAGEMENT ========== //
+
+// Initialize complete dungeon state
+export const initializeDungeonState = () => {
+    const currentDungeon = getDefaultDungeon();
+    return {
+        currentDungeon,
+        ...getInitialDungeonState(currentDungeon.startPos),
+        isOnStairs: false,
+        isOnBossCell: false,
+        bossDefeated: false
+    };
+};
+
+// Reset complete dungeon state
+export const resetDungeonComplete = () => {
+    const firstDungeon = getDefaultDungeon();
+    return {
+        currentDungeon: firstDungeon,
+        ...getInitialDungeonState(firstDungeon.startPos),
+        isOnStairs: false,
+        isOnBossCell: false,
+        bossDefeated: false
+    };
+};
+
+// Advance to next dungeon
+export const advanceToNextDungeon = (currentDungeonId) => {
+    const nextDungeonId = getNextDungeonId(currentDungeonId);
+    if (!nextDungeonId) return null;
+
+    const nextDungeon = getDungeonById(nextDungeonId);
+    return {
+        currentDungeon: nextDungeon,
+        playerPos: nextDungeon.startPos,
+        isOnStairs: false,
+        isOnBossCell: false,
+        bossDefeated: false
+    };
+};
+
+// Get stairs modal content
+export const getStairsModalContent = (currentDungeonId) => {
+    const nextDungeonId = getNextDungeonId(currentDungeonId);
+    const canAdvance = !!nextDungeonId;
+
+    if (!canAdvance) {
+        return {
+            message: '¡Has llegado a la cima de la torre! Esta es la mazmorra final.',
+            canAdvance: false
+        };
+    }
+
+    const nextDungeon = getDungeonById(nextDungeonId);
+    return {
+        message: `¡Has encontrado las escaleras al ${nextDungeon.name}!`,
+        canAdvance: true,
+        nextDungeon
+    };
+};
+
+// ========== INTERACTION HANDLERS ========== //
+
+// Handle boss encounter interaction
+export const handleBossInteractionLogic = (currentDungeonId, enemies, getRandomFormationForDungeon, onStartCombat) => {
+    console.log(`👑 INICIANDO ENCUENTRO JEFE - Comenzando combate contra jefe`);
+
+    const bossParty = generateRandomEnemyParty(
+        currentDungeonId,
+        enemies,
+        getRandomFormationForDungeon
+    );
+
+    onStartCombat(bossParty);
+    return true;
+};
+
+// Handle stairs interaction
+export const handleStairsInteractionLogic = (currentDungeonId, bossDefeated, setCurrentDungeon, setPlayerPos, setDungeonState) => {
     const dungeon = getDungeonById(currentDungeonId)
-    return dungeon?.nextDungeonId || null
+
+    // Check if this is a boss level and boss is not defeated
+    if (dungeon.isBossLevel && !bossDefeated) {
+        return {
+            showModal: true,
+            message: '¡Debes derrotar al jefe de esta mazmorra antes de usar las escaleras!'
+        };
+    }
+
+    const nextDungeonId = getNextDungeonId(currentDungeonId);
+    if (!nextDungeonId) {
+        return {
+            showModal: true,
+            message: '¡Has llegado a la cima de la torre! Esta es la mazmorra final.'
+        };
+    }
+
+    const nextDungeon = getDungeonById(nextDungeonId);
+    setCurrentDungeon(nextDungeon);
+    setPlayerPos(nextDungeon.startPos);
+
+    const newState = getInitialDungeonState(nextDungeon.startPos);
+    setDungeonState(newState);
+
+    console.log(`🏰 Cambiado a mazmorra: ${nextDungeon.name}`);
+    return { showModal: false };
+};
+
+// Handle dungeon keyboard input
+export const handleDungeonKeyPress = (e, {
+    inCombat,
+    manualCombatReset,
+    isOnStairs,
+    handleStairsInteraction,
+    isOnBossCell,
+    handleBossInteraction,
+    bossDefeated,
+    movePlayer
+}) => {
+    const gameKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'r', 'R', 'Enter', ' '];
+    if (gameKeys.includes(e.key)) {
+        e.preventDefault();
+    }
+
+    if (isResetKey(e.key)) {
+        manualCombatReset();
+        return;
+    }
+
+    if ((e.key === 'Enter' || e.key === ' ') && isOnStairs && !inCombat) {
+        handleStairsInteraction();
+        return;
+    }
+
+    if ((e.key === 'Enter' || e.key === ' ') && isOnBossCell && !inCombat && !bossDefeated) {
+        handleBossInteraction();
+        return;
+    }
+
+    if (!isMovementAllowed(inCombat)) {
+        return;
+    }
+
+    const direction = getDirectionFromKey(e.key);
+    if (direction) {
+        movePlayer(direction);
+    }
 }
+
+// ========== BOSS DEFEAT MANAGEMENT ==========
+
+// Handle boss defeat
+export const handleBossDefeat = (dungeonId, setDefeatedBosses, setBossDefeated) => {
+    console.log(`🎉 REGISTRANDO VICTORIA SOBRE JEFE - Mazmorra ${dungeonId}`);
+    setDefeatedBosses(prev => {
+        const updated = [...new Set([...prev, dungeonId])];
+        console.log(`📊 LISTA ACTUALIZADA DE JEFES DERROTADOS:`, updated);
+        return updated;
+    });
+    setBossDefeated(true);
+};
+
+// Check if boss is defeated for current dungeon
+export const isBossDefeated = (dungeonId, defeatedBosses) => {
+    return defeatedBosses.includes(dungeonId);
+}
+
+// ========== HELPER FUNCTIONS ========== //
+
+// Get default dungeon
+export const getDefaultDungeon = () => {
+    // This function should be imported from dungeonMaps
+    // For now, return a placeholder that will be overridden by import
+    return null;
+};
