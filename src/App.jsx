@@ -269,13 +269,13 @@ function App() {
           <h1>Soul Echoes</h1>
 
           {/* COINS DISPLAY */}
-          <div className="coins-display" style={{ marginBottom: '15px', fontSize: '18px', fontWeight: 'bold' }}>
-            Monedas: {playerCoins}
+          <div className="coins-display">
+            <span className="coins-count">Monedas: {playerCoins}</span>
           </div>
 
           {/* DEFEATED BOSSES DISPLAY */}
-          <div className="bosses-display" style={{ marginBottom: '15px', fontSize: '16px', color: '#8B4513' }}>
-            Jefes Derrotados: {defeatedBosses.length}/3
+          <div className="bosses-display">
+            <span className="bosses-count">Jefes Derrotados: {defeatedBosses.length}/3</span>
           </div>
 
           <p>Descubre nuevas Almas</p>

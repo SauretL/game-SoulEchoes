@@ -69,12 +69,68 @@
 /* Footer */
 
 footer {
-  padding: 10px;
-  border-style: double;
-  border-color: #333;
-  color: white;
+  padding: 15px;
+  border-top: 2px solid #444;
+  background: rgba(10, 10, 26, 0.9);
+  color: #c0c0ff;
   text-align: center;
-  margin-top: 10px;
+  margin-top: 20px;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  backdrop-filter: blur(5px);
+  position: relative;
+}
+
+footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #296ab4, transparent);
+}
+
+/* Boss Counter */
+.bosses-display {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: linear-gradient(135deg, #8B4513, #A0522D);
+  padding: 10px 20px;
+  border-radius: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 2px solid #D2691E;
+  z-index: 1000;
+}
+
+.bosses-count {
+  font-weight: bold;
+  color: #FFD700;
+  font-size: 16px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Coin Counter */
+
+.coins-display {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  padding: 10px 20px;
+  border-radius: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 2px solid #ffb700;
+  z-index: 1000;
+}
+
+.coins-count {
+  font-weight: bold;
+  color: #8b4513;
+  font-size: 16px;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 /* Buttons */
@@ -120,6 +176,16 @@ button:active {
   transform: translateY(-1px);
 }
 
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+button:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .app-container {
@@ -143,33 +209,20 @@ button:active {
     padding: 12px 30px;
     font-size: 1rem;
   }
-}
 
-.coins-display {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: linear-gradient(135deg, #ffd700, #ffed4e);
-  padding: 10px 20px;
-  border-radius: 25px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  border: 2px solid #ffb700;
-  z-index: 1000;
-}
+  .bosses-display {
+    position: relative;
+    top: auto;
+    left: auto;
+    display: inline-block;
+    margin: 10px;
+  }
 
-.coins-count {
-  font-weight: bold;
-  color: #8b4513;
-  font-size: 16px;
-  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-button:disabled:hover {
-  transform: none;
-  box-shadow: none;
+  .coins-display {
+    position: relative;
+    top: auto;
+    right: auto;
+    display: inline-block;
+    margin: 10px;
+  }
 }
